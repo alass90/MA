@@ -11,6 +11,7 @@ class ModelProvider(Enum):
     GOOGLE = "google"
     XAI = "xai"
     MOONSHOTAI = "moonshotai"
+    DASHSCOPE = "dashscope"
 
 class ModelCapability(Enum):
     CHAT = "chat"

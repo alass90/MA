@@ -37,10 +37,10 @@ class ComposioProfileService:
         self.db = db_connection or DBConnection()
         
     def _get_encryption_key(self) -> bytes:
-        key = os.getenv("ENCRYPTION_KEY")
+        key = os.getenv("ENCRYPTION_KEY") or os.getenv("MCP_CREDENTIAL_ENCRYPTION_KEY")
         if not key:
-            raise ValueError("ENCRYPTION_KEY environment variable is required")
-        return key.encode()
+            raise ValueError("ENCRYPTION_KEY or MCP_CREDENTIAL_ENCRYPTION_KEY environment variable is required")
+        return key.strip().encode()
 
     def _encrypt_config(self, config_json: str) -> str:
         fernet = Fernet(self._get_encryption_key())

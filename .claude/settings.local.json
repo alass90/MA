@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker ps --filter \"name=ma-backend-1\" --format \"{{.Status}}\")",
+      "Bash(docker exec ma-backend-1 python3 -c \"import requests; print(''requests module is available'')\")",
+      "Bash(docker compose up -d --build backend worker)",
+      "Bash(docker exec ma-backend-1 sh -c \"curl -s http://localhost:8000/health || echo ''Health check endpoint may not exist''\")",
+      "Bash(docker logs ma-backend-1 --tail 100)",
+      "Bash(docker logs ma-backend-1)",
+      "Bash(supabase --version)",
+      "Bash(npm --version)",
+      "Bash(powershell -Command \"Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force; irm get.scoop.sh | iex\")",
+      "Bash(powershell -Command \"scoop bucket add supabase https://github.com/supabase/scoop-bucket.git; scoop install supabase\")",
+      "Bash(npx supabase --version)",
+      "Bash(npx supabase link --project-ref tjxreftrndyfvsvaqelr --password Allass974435)",
+      "Bash(npx supabase db push)",
+      "Bash(psql \"postgresql://postgres.tjxreftrndyfvsvaqelr:Allass974435@aws-1-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require\" -c \"CREATE EXTENSION IF NOT EXISTS \"\"uuid-ossp\"\";\")",
+      "Bash(npx supabase db execute --db-url \"postgresql://postgres.tjxreftrndyfvsvaqelr:Allass974435@aws-1-eu-west-1.pooler.supabase.com:5432/postgres?sslmode=require\" --query \"CREATE EXTENSION IF NOT EXISTS \"\"uuid-ossp\"\";\")",
+      "Bash(docker logs ma-backend-1 --tail 200)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

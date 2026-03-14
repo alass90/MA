@@ -54,6 +54,7 @@ def setup_api_keys() -> None:
         "MORPH",
         "GEMINI",
         "OPENAI_COMPATIBLE",
+        "DASHSCOPE",
     ]
     
     for provider in providers:

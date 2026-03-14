@@ -15,7 +15,7 @@ def get_encryption_key() -> bytes:
     if key_env:
         try:
             if isinstance(key_env, str):
-                return key_env.encode('utf-8')
+                return key_env.strip().encode('utf-8')
             else:
                 return key_env
         except Exception as e:

@@ -8,8 +8,9 @@ from core.utils.logger import logger
 SHOULD_USE_ANTHROPIC = config.ENV_MODE == EnvMode.LOCAL and bool(config.ANTHROPIC_API_KEY)
 
 # Actual model IDs for LiteLLM
-_BASIC_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "bedrock/converse/arn:aws:bedrock:us-west-2:935064898258:application-inference-profile/few7z4l830xh"
-_POWER_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "bedrock/converse/arn:aws:bedrock:us-west-2:935064898258:application-inference-profile/few7z4l830xh"
+# MODIFICATION: Use Qwen as default instead of Bedrock when no Anthropic key
+_BASIC_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "dashscope/qwen-plus"
+_POWER_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "dashscope/qwen-plus"
 
 # Default model IDs (these are aliases that resolve to actual IDs)
 FREE_MODEL_ID = "kortix/basic"
@@ -329,25 +330,46 @@ class ModelRegistry:
         #     enabled=False  # Currently disabled
         # ))
         
-        # # Qwen Models
-        # self.register(Model(
-        #     id="openrouter/qwen/qwen3-235b-a22b",
-        #     name="Qwen3 235B",
-        #     provider=ModelProvider.OPENROUTER,
-        #     aliases=["qwen3", "qwen-3"],
-        #     context_window=128_000,
-        #     capabilities=[
-        #         ModelCapability.CHAT, 
-        #         ModelCapability.FUNCTION_CALLING
-        #     ],
-        #     pricing=ModelPricing(
-        #         input_cost_per_million_tokens=0.13,
-        #         output_cost_per_million_tokens=0.60
-        #     ),
-        #     tier_availability=["free", "paid"],
-        #     priority=90,
-        #     enabled=False  # Currently disabled
-        # ))
+        # Qwen Models via DashScope
+        self.register(Model(
+            id="dashscope/qwen-max",
+            name="Qwen Max",
+            provider=ModelProvider.DASHSCOPE,
+            aliases=["qwen-max"],
+            context_window=30_000,
+            capabilities=[
+                ModelCapability.CHAT, 
+                ModelCapability.FUNCTION_CALLING,
+                ModelCapability.VISION
+            ],
+            pricing=ModelPricing(
+                input_cost_per_million_tokens=0.04,
+                output_cost_per_million_tokens=0.12
+            ),
+            tier_availability=["paid"],
+            priority=95,
+            enabled=True
+        ))
+        
+        self.register(Model(
+            id="dashscope/qwen-plus",
+            name="Qwen Plus",
+            provider=ModelProvider.DASHSCOPE,
+            aliases=["qwen-plus"],
+            context_window=128_000,
+            capabilities=[
+                ModelCapability.CHAT, 
+                ModelCapability.FUNCTION_CALLING,
+                ModelCapability.VISION
+            ],
+            pricing=ModelPricing(
+                input_cost_per_million_tokens=0.01,
+                output_cost_per_million_tokens=0.03
+            ),
+            tier_availability=["free", "paid"],
+            priority=94,
+            enabled=True
+        ))
         
     
     def register(self, model: Model) -> None:

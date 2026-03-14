@@ -4,6 +4,9 @@ from fastapi import HTTPException, Request, Header
 from typing import Optional
 import jwt
 from jwt.exceptions import PyJWTError
+from jwt.algorithms import ECAlgorithm
+import requests
+import json
 from core.utils.logger import structlog
 from core.utils.config import config
 from core.services.supabase import DBConnection
@@ -41,53 +44,72 @@ async def verify_admin_api_key(x_admin_api_key: Optional[str] = Header(None)):
 
 def _decode_jwt_with_verification(token: str) -> dict:
     """
-    Decode and verify JWT token using Supabase JWT secret.
-    
-    This function properly validates the JWT signature to prevent token forgery.
+    Decode and verify JWT token using Supabase JWT secret or JWKS endpoint.
+
+    This function supports both HS256 (legacy) and ES256 (via JWKS) algorithms.
+    It tries HS256 first for backward compatibility, then falls back to ES256 via JWKS.
     """
+    # Essai 1 : HS256 avec legacy secret
     jwt_secret = config.SUPABASE_JWT_SECRET
-    
-    if not jwt_secret:
-        logger.error("SUPABASE_JWT_SECRET is not configured - JWT verification disabled!")
-        raise HTTPException(
-            status_code=500,
-            detail="Server authentication configuration error"
-        )
-    
+    if jwt_secret:
+        try:
+            return jwt.decode(
+                token,
+                jwt_secret,
+                algorithms=["HS256"],
+                options={
+                    "verify_signature": True,
+                    "verify_exp": True,
+                    "verify_aud": False,
+                    "verify_iss": False,
+                }
+            )
+        except jwt.InvalidAlgorithmError:
+            pass
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=401, detail="Token has expired", headers={"WWW-Authenticate": "Bearer"})
+        except jwt.InvalidSignatureError:
+            pass
+
+    # Essai 2 : ES256 via JWKS
     try:
-        # Verify signature with the Supabase JWT secret
-        # Supabase uses HS256 algorithm by default
-        return jwt.decode(
-            token,
-            jwt_secret,
-            algorithms=["HS256"],
-            options={
-                "verify_signature": True,
-                "verify_exp": True,
-                "verify_aud": False,  # Supabase doesn't always set audience
-                "verify_iss": False,  # Issuer varies by project
-            }
-        )
+        supabase_url = config.SUPABASE_URL
+        jwks_url = f"{supabase_url}/auth/v1/.well-known/jwks.json"
+        jwks_response = requests.get(jwks_url, timeout=10)
+        jwks = jwks_response.json()
+
+        header = jwt.get_unverified_header(token)
+        kid = header.get("kid")
+
+        public_key = None
+        for key_data in jwks.get("keys", []):
+            if key_data.get("kid") == kid:
+                public_key = ECAlgorithm.from_jwk(json.dumps(key_data))
+                break
+
+        if not public_key:
+            # Essayer la première clé disponible
+            if jwks.get("keys"):
+                public_key = ECAlgorithm.from_jwk(json.dumps(jwks["keys"][0]))
+
+        if public_key:
+            return jwt.decode(
+                token,
+                public_key,
+                algorithms=["ES256"],
+                options={
+                    "verify_signature": True,
+                    "verify_exp": True,
+                    "verify_aud": False,
+                    "verify_iss": False,
+                }
+            )
     except jwt.ExpiredSignatureError:
-        raise HTTPException(
-            status_code=401,
-            detail="Token has expired",
-            headers={"WWW-Authenticate": "Bearer"}
-        )
-    except jwt.InvalidSignatureError:
-        logger.warning("JWT signature verification failed - possible token forgery attempt")
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid token signature",
-            headers={"WWW-Authenticate": "Bearer"}
-        )
-    except PyJWTError as e:
-        logger.warning(f"JWT decode error: {str(e)}")
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid token",
-            headers={"WWW-Authenticate": "Bearer"}
-        )
+        raise HTTPException(status_code=401, detail="Token has expired", headers={"WWW-Authenticate": "Bearer"})
+    except Exception as e:
+        logger.warning(f"JWKS verification failed: {str(e)}")
+
+    raise HTTPException(status_code=401, detail="Invalid token", headers={"WWW-Authenticate": "Bearer"})
 
 async def get_account_id_from_thread(thread_id: str, db: "DBConnection") -> str:
     """

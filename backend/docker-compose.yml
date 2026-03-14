@@ -78,7 +78,7 @@ services:
       - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
-      - ./services/docker/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - ./core/services/docker/redis.conf:/usr/local/etc/redis/redis.conf:ro
     restart: unless-stopped
     networks:
       - app-network

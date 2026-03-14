@@ -1,29 +1,6 @@
 # ============================================================================
 # SUNA DOCKER COMPOSE - LOCAL DEVELOPMENT
 # ============================================================================
-# This Docker Compose file runs Suna services (Backend, Worker, Frontend, Redis)
-#
-# ⚠️  IMPORTANT LIMITATION - LOCAL SUPABASE:
-# Currently, local Supabase (via `npx supabase start`) is NOT supported with
-# Docker Compose due to network configuration complexity.
-#
-# TODO: Integrate Supabase services directly into this compose file to enable
-#       full Docker-based local development with proper network configuration.
-#
-# CURRENT WORKAROUND:
-# - Use cloud Supabase for Docker Compose setup
-# - OR run everything manually (no Docker) to use local Supabase
-#
-# Quick Start:
-#   docker compose up -d          # Start all services
-#   docker compose down           # Stop all services
-#   docker compose logs -f        # View all logs
-#
-# Access:
-#   - Suna Frontend:     http://localhost:3000
-#   - Suna Backend API:  http://localhost:8000
-# ============================================================================
-
 services:
   redis:
     image: redis:7-alpine
@@ -34,7 +11,7 @@ services:
       - ./backend/services/docker/redis.conf:/usr/local/etc/redis/redis.conf:ro
     command: redis-server /usr/local/etc/redis/redis.conf --save 60 1 --loglevel warning
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -54,6 +31,22 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=
       - REDIS_SSL=False
+      - ENV_MODE=local
+      - SUPABASE_URL=https://tjxreftrndyfvsvaqelr.supabase.co
+      - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqeHJlZnRybmR5ZnZzdmFxZWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyOTA3MDAsImV4cCI6MjA4ODg2NjcwMH0.46x13bjrRzDXchFgQAfxOCPWZehbqTrx6gI_omKUUmA
+      - SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqeHJlZnRybmR5ZnZzdmFxZWxyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzI5MDcwMCwiZXhwIjoyMDg4ODY2NzAwfQ.tZVZ9W1SRW4gk3nRbxuVwp4A4hB-1fq1UnXyi85138Q
+      - SUPABASE_JWT_SECRET=QJVx3Oo9wKA+VkoBKJMLt3vNtBnFZ70buShJTs61Unk41y6eIf4Bu5d36dSZ/W/yjRBU4ssJsjZsy9SDxsHlLQ==
+      - OPENAI_API_KEY=sk-bb7ac782c319478e923f63b9924d8958
+      - OPENAI_API_BASE=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+      - OPENAI_COMPATIBLE_API_KEY=sk-bb7ac782c319478e923f63b9924d8958
+      - OPENAI_COMPATIBLE_API_BASE=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+      - MCP_CREDENTIAL_ENCRYPTION_KEY=97Lj_kTs1qtGlHL36rH14LWy1RH3aS2HIxC6yP-z3Fc=
+      - DAYTONA_API_KEY=dtn_ccaa21949a2ddb53dd0dc299dece62909e4cd44ad667af72da6214bfaccfe5c5
+      - DAYTONA_SERVER_URL=https://app.daytona.io/api
+      - DAYTONA_TARGET=eu
+      - TAVILY_API_KEY=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
+      - FIRECRAWL_API_KEY=fc-a77da76d9d044f7481a68539f9ee3f8b
+      - COMPOSIO_API_KEY=ak_XcEwBB_GQt35cpJXOnxJ
     depends_on:
       redis:
         condition: service_healthy
@@ -74,6 +67,22 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=
       - REDIS_SSL=False
+      - ENV_MODE=local
+      - SUPABASE_URL=https://tjxreftrndyfvsvaqelr.supabase.co
+      - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqeHJlZnRybmR5ZnZzdmFxZWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyOTA3MDAsImV4cCI6MjA4ODg2NjcwMH0.46x13bjrRzDXchFgQAfxOCPWZehbqTrx6gI_omKUUmA
+      - SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqeHJlZnRybmR5ZnZzdmFxZWxyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzI5MDcwMCwiZXhwIjoyMDg4ODY2NzAwfQ.tZVZ9W1SRW4gk3nRbxuVwp4A4hB-1fq1UnXyi85138Q
+      - SUPABASE_JWT_SECRET=QJVx3Oo9wKA+VkoBKJMLt3vNtBnFZ70buShJTs61Unk41y6eIf4Bu5d36dSZ/W/yjRBU4ssJsjZsy9SDxsHlLQ==
+      - OPENAI_API_KEY=sk-bb7ac782c319478e923f63b9924d8958
+      - OPENAI_API_BASE=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+      - OPENAI_COMPATIBLE_API_KEY=sk-bb7ac782c319478e923f63b9924d8958
+      - OPENAI_COMPATIBLE_API_BASE=https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+      - MCP_CREDENTIAL_ENCRYPTION_KEY=97Lj_kTs1qtGlHL36rH14LWy1RH3aS2HIxC6yP-z3Fc=
+      - DAYTONA_API_KEY=dtn_ccaa21949a2ddb53dd0dc299dece62909e4cd44ad667af72da6214bfaccfe5c5
+      - DAYTONA_SERVER_URL=https://app.daytona.io/api
+      - DAYTONA_TARGET=eu
+      - TAVILY_API_KEY=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
+      - FIRECRAWL_API_KEY=fc-a77da76d9d044f7481a68539f9ee3f8b
+      - COMPOSIO_API_KEY=ak_XcEwBB_GQt35cpJXOnxJ
     depends_on:
       redis:
         condition: service_healthy

@@ -1,7 +1,7 @@
 {
-  "name": "Kortix the Super Mega Giga Worker",
-  "short_name": "Kortix",
-  "description": "Kortix the Super Mega Giga Worker – A generalist AI Worker that is able to autonomously tackle complex tasks, browse the web, write and execute code, manage files, conduct research, automate workflows, and accomplish real-world objectives through natural conversation.",
+  "name": "Talos - Open Source Generalist AI Worker",
+  "short_name": "Talos",
+  "description": "Open Source Generalist AI Worker. Talos is a fully open source AI assistant that helps you accomplish real-world tasks with ease through natural conversation.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
@@ -10,25 +10,21 @@
   "icons": [
     {
       "src": "/favicon.png",
-      "sizes": "32x32",
+      "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
-      "src": "/favicon-light.png",
-      "sizes": "32x32",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/logo_black.png",
+      "src": "/favicon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["productivity", "utilities", "business"],
+  "categories": ["productivity", "utilities"],
   "scope": "/",
   "lang": "en-US",
   "dir": "ltr"
 }
+
+

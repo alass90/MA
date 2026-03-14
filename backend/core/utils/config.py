@@ -321,6 +321,8 @@ class Configuration:
     OPENAI_COMPATIBLE_API_BASE: Optional[str] = None
     OR_SITE_URL: Optional[str] = "https://kortix.ai"
     OR_APP_NAME: Optional[str] = "Kortix AI"
+    DASHSCOPE_API_KEY: Optional[str] = None
+    DASHSCOPE_API_BASE: Optional[str] = None
     
     # Frontend URL configuration
     FRONTEND_URL_ENV: Optional[str] = None
