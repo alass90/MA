@@ -1,7 +1,10 @@
 import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
 
-const nextConfig = (): NextConfig => ({
-  output: (process.env.NEXT_OUTPUT as 'standalone') || undefined,
+const withNextIntl = createNextIntlPlugin('./i18n.ts');
+
+const nextConfig: NextConfig = {
+  output: 'standalone',
   
   // Performance optimizations
   experimental: {
@@ -69,6 +72,6 @@ const nextConfig = (): NextConfig => ({
   },
   
   skipTrailingSlashRedirect: true,
-});
+};
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

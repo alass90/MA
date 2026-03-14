@@ -15,6 +15,8 @@ import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { PlanSelectionModal } from '@/components/billing/pricing/plan-selection-modal';
 import { Suspense } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 
 
 export const viewport: Viewport = {
@@ -117,9 +119,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const messages = await getMessages();
+
   return (
     <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <head>
@@ -196,26 +200,28 @@ export default function RootLayout({
         </noscript>
         {/* End Google Tag Manager (noscript) */}
 
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <ReactQueryProvider>
-              {children}
-              <Toaster />
-              <Suspense fallback={null}>
-                <PlanSelectionModal />
-              </Suspense>
-            </ReactQueryProvider>
-          </AuthProvider>
-          <Analytics />
-          <GoogleAnalytics gaId="G-6ETJFB3PT3" />
-          <SpeedInsights />
-          <PostHogIdentify />
-        </ThemeProvider>
+        <NextIntlClientProvider messages={messages}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AuthProvider>
+              <ReactQueryProvider>
+                {children}
+                <Toaster />
+                <Suspense fallback={null}>
+                  <PlanSelectionModal />
+                </Suspense>
+              </ReactQueryProvider>
+            </AuthProvider>
+            <Analytics />
+            <GoogleAnalytics gaId="G-6ETJFB3PT3" />
+            <SpeedInsights />
+            <PostHogIdentify />
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

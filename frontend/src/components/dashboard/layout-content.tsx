@@ -1,5 +1,5 @@
 'use client';
-
+ 
 import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Suspense, lazy } from 'react';
@@ -10,11 +10,12 @@ import { useRouter } from 'next/navigation';
 import { useApiHealth } from '@/hooks/usage/use-health';
 import { useAdminRole } from '@/hooks/admin';
 import { usePresence } from '@/hooks/use-presence';
-
+import { PresenceProvider } from '@/providers/presence-provider';
+ 
 import { useProjects } from '@/hooks/sidebar/use-sidebar';
 import { useIsMobile } from '@/hooks/utils';
 import { AppProviders } from '@/components/layout/app-providers';
-
+ 
 // Lazy load heavy components that aren't needed for initial render
 const FloatingMobileMenuButton = lazy(() => 
   import('@/components/sidebar/sidebar-left').then(mod => ({ default: mod.FloatingMobileMenuButton }))
@@ -28,18 +29,24 @@ const StatusOverlay = lazy(() =>
 const PresentationViewerWrapper = lazy(() => 
   import('@/stores/presentation-viewer-store').then(mod => ({ default: mod.PresentationViewerWrapper }))
 );
-
+ 
 const OnboardingProvider = lazy(() => 
   import('@/components/onboarding/onboarding-provider').then(mod => ({ default: mod.OnboardingProvider }))
 );
 const WelcomeBonusBanner = lazy(() => 
   import('@/components/billing/welcome-bonus-banner').then(mod => ({ default: mod.WelcomeBonusBanner }))
 );
-
+ 
 const PresenceDebug = lazy(() => 
   import('@/components/debug/presence-debug').then(mod => ({ default: mod.PresenceDebug }))
 );
-
+ 
+// Handles presence tracking inside PresenceProvider context
+function PresenceHandler({ threadId }: { threadId?: string }) {
+  usePresence(threadId);
+  return null;
+}
+ 
 // Skeleton shell that renders immediately for FCP
 function DashboardSkeleton() {
   return (
@@ -67,19 +74,17 @@ function DashboardSkeleton() {
     </div>
   );
 }
-
+ 
 interface DashboardLayoutContentProps {
   children: React.ReactNode;
 }
-
+ 
 export default function DashboardLayoutContent({
   children,
 }: DashboardLayoutContentProps) {
   const { user, isLoading } = useAuth();
   const params = useParams();
   const threadId = params?.threadId as string | undefined;
-  
-  usePresence(threadId);
   
   const { data: accounts } = useAccounts({ enabled: !!user });
   const personalAccount = accounts?.find((account) => account.personal_account);
@@ -91,11 +96,11 @@ export default function DashboardLayoutContent({
     isLoading: isCheckingHealth,
     error: healthError,
   } = useApiHealth();
-
+ 
   const { data: projects } = useProjects();
   const { data: adminRoleData, isLoading: isCheckingAdminRole } = useAdminRole();
   const isAdmin = adminRoleData?.isAdmin ?? false;
-
+ 
   // Log data prefetching for debugging
   useEffect(() => {
     if (isMobile) {
@@ -106,32 +111,30 @@ export default function DashboardLayoutContent({
       });
     }
   }, [isMobile, projects, accounts, user]);
-
+ 
   // API health is now managed by useApiHealth hook
   const isApiHealthy = healthData?.status === 'ok' && !healthError;
-
+ 
   // Check authentication status
   useEffect(() => {
     if (!isLoading && !user) {
       router.push('/auth');
     }
   }, [user, isLoading, router]);
-
+ 
   const mantenanceBanner: React.ReactNode | null = null;
-
+ 
   // Show skeleton immediately for FCP while checking auth
-  // This allows content to paint quickly instead of blocking
   if (isLoading) {
     return <DashboardSkeleton />;
   }
-
+ 
   // Redirect to auth if not authenticated (don't block render)
   if (!user) {
     return <DashboardSkeleton />;
   }
-
+ 
   // Show maintenance page if maintenance mode is enabled
-  // Lazy loaded to not impact initial FCP
   if (maintenanceNotice?.enabled && !maintenanceLoading && !isCheckingAdminRole && !isAdmin) {
     return (
       <Suspense fallback={<DashboardSkeleton />}>
@@ -139,7 +142,7 @@ export default function DashboardLayoutContent({
       </Suspense>
     );
   }
-
+ 
   // Show maintenance page if API is not healthy
   if (!isCheckingHealth && !isCheckingAdminRole && (!isApiHealthy || healthError) && !isAdmin) {
     return (
@@ -148,35 +151,38 @@ export default function DashboardLayoutContent({
       </Suspense>
     );
   }
-
+ 
   return (
-    <AppProviders 
-      showSidebar={true}
-      sidebarSiblings={
-        <Suspense fallback={null}>
-          {/* Status overlay for deletion operations */}
-          <StatusOverlay />
-          {/* Floating mobile menu button */}
-          <FloatingMobileMenuButton />
-        </Suspense>
-      }
-    >
-      <div className="relative h-full">
-        {/* Site-wide welcome bonus banner for free tier users */}
-        <Suspense fallback={null}>
-          <WelcomeBonusBanner />
-        </Suspense>
-        
-        <Suspense fallback={null}>
-          <OnboardingProvider>
-            {mantenanceBanner}
-            <div className="bg-background">{children}</div>
-          </OnboardingProvider>
-        </Suspense>
-        <Suspense fallback={null}>
-          <PresentationViewerWrapper />
-        </Suspense>
-      </div>
-    </AppProviders>
+    <PresenceProvider>
+      <PresenceHandler threadId={threadId} />
+      <AppProviders 
+        showSidebar={true}
+        sidebarSiblings={
+          <Suspense fallback={null}>
+            {/* Status overlay for deletion operations */}
+            <StatusOverlay />
+            {/* Floating mobile menu button */}
+            <FloatingMobileMenuButton />
+          </Suspense>
+        }
+      >
+        <div className="relative h-full">
+          {/* Site-wide welcome bonus banner for free tier users */}
+          <Suspense fallback={null}>
+            <WelcomeBonusBanner />
+          </Suspense>
+          
+          <Suspense fallback={null}>
+            <OnboardingProvider>
+              {mantenanceBanner}
+              <div className="bg-background">{children}</div>
+            </OnboardingProvider>
+          </Suspense>
+          <Suspense fallback={null}>
+            <PresentationViewerWrapper />
+          </Suspense>
+        </div>
+      </AppProviders>
+    </PresenceProvider>
   );
 }
