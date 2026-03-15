@@ -32,6 +32,7 @@ SANDBOX_TOOLS = [
     ('sb_presentation_tool', 'core.tools.sb_presentation_tool', 'SandboxPresentationTool'),
     ('sb_upload_file_tool', 'core.tools.sb_upload_file_tool', 'SandboxUploadFileTool'),
     # ('sb_docs_tool', 'core.tools.sb_docs_tool', 'SandboxDocsTool'),
+    ('talos_deploy_tool', 'core.tools.talos_deploy_tool', 'TalosDeployTool'),
 ]
 
 # Search and research tools

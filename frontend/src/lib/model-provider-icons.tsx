@@ -160,7 +160,7 @@ export function getModelProviderName(modelId: string): string {
   const provider = getModelProvider(modelId);
 
   const nameMap: Record<ModelProvider, string> = {
-    kortix: 'Kortix',
+    kortix: 'Talos',
     anthropic: 'Anthropic',
     openai: 'OpenAI',
     google: 'Google',

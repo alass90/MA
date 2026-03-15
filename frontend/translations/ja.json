@@ -261,8 +261,8 @@
   "dashboard": {
     "title": "ダッシュボード",
     "welcome": "ようこそ",
-    "whatWouldYouLike": "何をやりたい？",
-    "describeWhatYouNeed": "何のヘルプが必要か説明して...",
+    "whatWouldYouLike": "どうお手伝いできますか？",
+    "describeWhatYouNeed": "Talosに何をしてほしいですか",
     "usageLimits": "使用制限",
     "threads": "スレッド",
     "customWorkers": "カスタム Workers",
@@ -755,8 +755,8 @@
     "chooseTemplate": "テンプレートを選択",
     "chooseOutputFormat": "出力形式を選択",
     "preferredCharts": "推奨チャート",
-    "whatWouldYouLike": "何をやりたい？",
-    "describeTask": "Workerに完了させたいタスクを説明...",
+    "whatWouldYouLike": "どうお手伝いできますか？",
+    "describeTask": "Talosに何をしてほしいですか",
     "modes": {
       "image": "画像",
       "slides": "スライド",

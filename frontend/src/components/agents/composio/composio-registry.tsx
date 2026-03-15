@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
-import { Search, Zap, X, Settings, ChevronDown, ChevronUp, Loader2, Server, Lock } from 'lucide-react';
+import { Search, X, Settings, Loader2, Server, Lock } from 'lucide-react';
 import { useComposioCategories, useComposioToolkitsInfinite } from '@/hooks/composio/use-composio';
 import { useComposioProfiles } from '@/hooks/composio/use-composio-profiles';
 import { useAgent } from '@/hooks/agents/use-agents';
@@ -16,7 +16,6 @@ import type { ComposioToolkit, ComposioProfile } from '@/hooks/composio/utils';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { CustomMCPDialog } from '../mcp/custom-mcp-dialog';
 
 const CATEGORY_EMOJIS: Record<string, string> = {
@@ -482,108 +481,128 @@ export const ComposioRegistry: React.FC<ComposioRegistryProps> = ({
 
   return (
     <div className="h-full w-full overflow-hidden flex">
-      {/*<div className="w-64 h-full overflow-hidden border-r bg-muted/20">
-        <div className="h-full flex flex-col">
-          <div className="flex-shrink-0 p-4 border-b">
-            <h3 className="text-sm font-medium text-muted-foreground">Categories</h3>
+      {/* LEFT SIDEBAR */}
+      <div className="w-80 h-full overflow-hidden border-r flex flex-col">
+        {/* Header */}
+        <div className="flex-shrink-0 p-6 border-b">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-foreground flex items-center justify-center">
+              <Server className="h-5 w-5 text-background" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg">Connectors</h3>
+              <p className="text-xs text-muted-foreground">200+ integrations</p>
+            </div>
           </div>
-          
+        </div>
+
+        <div className="flex-1 overflow-hidden flex flex-col">
+          {/* Categories Section */}
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full">
-              <div className="p-4 space-y-1">
-                <button
-                  onClick={() => setSelectedCategory('')}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm transition-colors text-left",
-                    selectedCategory === '' 
-                      ? "bg-muted-foreground/20 text-muted-foreground" 
-                      : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <span className="text-base">📁</span>
-                  <span>All Apps</span>
-                </button>
+              <div className="p-4">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-3">Categories</h4>
+                <div className="space-y-0.5">
+                  <button
+                    onClick={() => setSelectedCategory('')}
+                    className={cn(
+                      "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors text-left",
+                      selectedCategory === ''
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "hover:bg-muted text-foreground"
+                    )}
+                  >
+                    <span>All</span>
+                    <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-md">200+</span>
+                  </button>
 
-                {isLoadingCategories ? (
-                  <div className="space-y-2">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <div key={i} className="flex items-center gap-3 px-3 py-2">
-                        <Skeleton className="w-4 h-4 bg-muted rounded" />
-                        <Skeleton className="flex-1 h-4 bg-muted rounded" />
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => setSelectedCategory(category.id)}
-                      className={cn(
-                        "w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm transition-colors text-left",
-                        selectedCategory === category.id 
-                          ? "bg-muted-foreground/20 text-muted-foreground" 
-                          : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
-                      )}
-                    >
-                      <span className="text-base">{CATEGORY_EMOJIS[category.id] || '📁'}</span>
-                      <span className="truncate">{category.name}</span>
-                    </button>
-                  ))
-                )}
+                  {isLoadingCategories ? (
+                    <div className="space-y-1">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <Skeleton key={i} className="w-full h-9 rounded-lg" />
+                      ))}
+                    </div>
+                  ) : (
+                    categories.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => setSelectedCategory(category.id)}
+                        className={cn(
+                          "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors text-left",
+                          selectedCategory === category.id
+                            ? "bg-primary/10 text-primary font-medium"
+                            : "hover:bg-muted text-foreground"
+                        )}
+                      >
+                        <span className="truncate">{category.name}</span>
+                      </button>
+                    ))
+                  )}
+                </div>
               </div>
             </ScrollArea>
           </div>
+
+          {/* Connected Apps Section */}
+          <div className="flex-shrink-0 border-t">
+            <div className="p-4">
+              <h4 className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wider mb-3 px-3">Connected</h4>
+              <div className="space-y-2">
+                {connectedApps.length > 0 ? (
+                  connectedApps.slice(0, 3).map((connectedApp) => (
+                    <button
+                      key={connectedApp.profile.profile_id}
+                      onClick={() => {
+                        setSelectedConnectedApp(connectedApp);
+                        setShowToolsManager(true);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors text-left"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-card border flex-shrink-0 flex items-center justify-center overflow-hidden">
+                        {connectedApp.toolkit.logo ? (
+                          <img src={connectedApp.toolkit.logo} alt={connectedApp.toolkit.name} className="w-5 h-5 object-contain" />
+                        ) : (
+                          <span className="text-xs font-medium">{connectedApp.toolkit.name.charAt(0)}</span>
+                        )}
+                      </div>
+                      <span className="flex-1 text-sm truncate">{connectedApp.toolkit.name}</span>
+                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                    </button>
+                  ))
+                ) : (
+                  <p className="text-xs text-muted-foreground px-3 py-2">No connected apps</p>
+                )}
+              </div>
+
+              {mode !== 'profile-only' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowCustomMCPDialog(true)}
+                  className="w-full mt-3 text-xs"
+                >
+                  <Server className="h-3 w-3 mr-2" />
+                  Custom MCP
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
-      </div>*/}
+      </div>
+
+      {/* RIGHT CONTENT */}
       <div className="flex-1 h-full overflow-hidden">
         <div className="h-full flex flex-col">
           <div className="flex-shrink-0 border-b p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1 min-w-0 pr-4">
-                <h2 className="text-xl font-semibold">
-                  {mode === 'profile-only' ? 'Connect New App' : 'App Integrations'}
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  {mode === 'profile-only'
-                    ? 'Create a connection profile for your favorite apps'
-                    : `Connect your favorite apps with ${currentAgentId ? 'this agent' : 'your agent'}`
-                  }
-                </p>
-              </div>
-              <div className="flex-shrink-0">
-                <div className="flex items-center gap-3">
-                  {/* {showAgentSelector && (
-                    <AgentSelector
-                      selectedAgentId={currentAgentId}
-                      onAgentSelect={handleAgentSelect}
-                      isSunaAgent={agent?.metadata?.is_suna_default}
-                    />
-                  )} */}
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search apps..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="pl-10 h-10"
-                  />
-                </div>
-                {mode !== 'profile-only' && currentAgentId && (
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowCustomMCPDialog(true)}
-                    className="flex items-center gap-2 whitespace-nowrap h-10"
-                  >
-                    <Server className="h-4 w-4" />
-                    Add Custom MCP
-                  </Button>
-                )}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search apps..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10 h-10"
+                />
               </div>
 
               {selectedCategory && (
@@ -606,60 +625,7 @@ export const ComposioRegistry: React.FC<ComposioRegistryProps> = ({
 
           <div className="flex-1 overflow-hidden">
             <ScrollArea className="h-full">
-              <div className="p-6 space-y-6">
-                {currentAgentId && (
-                  <Collapsible open={showConnectedApps} onOpenChange={setShowConnectedApps}>
-                    <CollapsibleTrigger asChild>
-                      <div className="w-full hover:underline flex items-center justify-between p-0 h-auto">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-medium">Connected to this agent</h3>
-                          {isLoadingConnectedApps ? (
-                            <Skeleton className="w-6 h-5 rounded ml-2" />
-                          ) : connectedApps.length > 0 && (
-                            <Badge variant="outline" className="ml-2">
-                              {connectedApps.length}
-                            </Badge>
-                          )}
-                        </div>
-                        {showConnectedApps ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </div>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-4">
-                      {isLoadingConnectedApps ? (
-                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                          {Array.from({ length: 3 }).map((_, i) => (
-                            <ConnectedAppSkeleton key={i} />
-                          ))}
-                        </div>
-                      ) : connectedApps.length === 0 ? (
-                        <div className="text-center py-8 text-muted-foreground">
-                          <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-4 mx-auto">
-                            <Zap className="h-8 w-8 text-muted-foreground" />
-                          </div>
-                          <h4 className="text-sm font-medium mb-2">No connected apps</h4>
-                          <p className="text-xs">Connect apps below to manage tools for this agent.</p>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-4 gap-4">
-                          {connectedApps.map((connectedApp) => (
-                            <ConnectedAppCard
-                              key={connectedApp.profile.profile_id}
-                              connectedApp={connectedApp}
-                              onToggleTools={handleToggleTools}
-                              onConfigure={handleConfigure}
-                              onManageTools={handleManageTools}
-                              isUpdating={isUpdatingAgent}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    </CollapsibleContent>
-                  </Collapsible>
-                )}
+              <div className="p-6">
                 <div>
                   <h3 className="text-lg font-medium mb-4">
                     {currentAgentId ? 'Available Apps' : 'Browse Apps'}

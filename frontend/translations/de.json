@@ -297,8 +297,8 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Willkommen",
-    "whatWouldYouLike": "Was möchtest du erledigen?",
-    "describeWhatYouNeed": "Beschreibe, wobei du Hilfe benötigst...",
+    "whatWouldYouLike": "Wie kann ich dir helfen?",
+    "describeWhatYouNeed": "Was möchtest du, dass Talos tut",
     "usageLimits": "Nutzungslimits",
     "threads": "Threads",
     "customWorkers": "Benutzerdefinierte Worker",
@@ -782,8 +782,8 @@
     "chooseTemplate": "Wähle eine Vorlage",
     "chooseOutputFormat": "Wähle Ausgabeformat",
     "preferredCharts": "Bevorzugte Diagramme",
-    "whatWouldYouLike": "Was möchtest du erledigen?",
-    "describeTask": "Beschreibe die Aufgabe, die dein Worker erledigen soll...",
+    "whatWouldYouLike": "Wie kann ich dir helfen?",
+    "describeTask": "Was möchtest du, dass Talos tut",
     "modes": {
       "image": "Bild",
       "slides": "Folien",

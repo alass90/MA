@@ -464,6 +464,21 @@ export function DashboardContent() {
                 <div className="w-full animate-in fade-in-0 duration-300">
                   <div className="px-4 py-6 sm:py-8">
                     <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-5 sm:space-y-6 md:space-y-8">
+                      {alertType === 'thread_limit' && (
+                        <div className='inline-flex items-center justify-center gap-2.5 px-4 py-2 rounded-lg bg-muted/40 text-sm mb-4'>
+                          <span className='font-normal text-muted-foreground'>
+                            {planName || 'Free plan'}
+                          </span>
+                          <span className='text-muted-foreground/50'>·</span>
+                          <button
+                            className='font-normal text-blue-600 hover:underline underline-offset-2 transition-all'
+                            onClick={() => pricingModalStore.openPricingModal()}
+                          >
+                            {tCommon('upgrade')}
+                          </button>
+                        </div>
+                      )}
+
                       <div className="flex flex-col items-center text-center w-full">
                         <p
                           className="tracking-tight text-2xl sm:text-2xl md:text-3xl font-normal text-foreground/90"
@@ -514,32 +529,6 @@ export function DashboardContent() {
                                 onClick={() => pricingModalStore.openPricingModal()}
                               >
                               {tCommon('upgrade')}
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-
-                        {alertType === 'thread_limit' && (
-                          <div 
-                            className='w-full h-16 p-2 px-4 dark:bg-amber-500/5 bg-amber-500/10 dark:border-amber-500/10 border-amber-700/10 border text-white rounded-b-3xl flex items-center justify-between overflow-hidden'
-                            style={{
-                              marginTop: '-40px',
-                              transition: 'margin-top 300ms ease-in-out, opacity 300ms ease-in-out',
-                            }}
-                          >
-                            <span className='-mb-3.5 dark:text-amber-500 text-amber-700 text-sm'>
-                              {t('limitsExceeded', { 
-                                current: accountState?.limits?.threads?.current ?? 0, 
-                                limit: accountState?.limits?.threads?.max ?? 0 
-                              })}
-                            </span>
-                            <div className='flex items-center -mb-3.5'>
-                              <Button 
-                                size='sm' 
-                                className='h-6 text-xs'
-                                onClick={() => pricingModalStore.openPricingModal()}
-                              >
-                                {tCommon('upgrade')}
                               </Button>
                             </div>
                           </div>

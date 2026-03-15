@@ -4,16 +4,12 @@ import Link from 'next/link';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { AnimatedBg } from '@/components/ui/animated-bg';
 import { KortixLogo } from '@/components/sidebar/kortix-logo';
 
 export default function NotFound() {
   return (
     <div className="w-full relative overflow-hidden min-h-screen">
       <div className="relative flex flex-col items-center w-full px-4 sm:px-6 min-h-screen justify-center">
-        {/* Animated background - exactly like maintenance page */}
-        <AnimatedBg variant="hero" />
-
         <div className="relative z-10 w-full max-w-[456px] flex flex-col items-center gap-8">
           {/* Logo - 32px height */}
           <KortixLogo size={32} />

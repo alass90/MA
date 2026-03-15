@@ -5,13 +5,13 @@ import { pricingTiers, type PricingTier } from '@/lib/pricing-config';
 export type { PricingTier } from '@/lib/pricing-config';
 
 export const siteConfig = {
-  name: 'Kortix: Your Autonomous AI Worker',
+  name: 'Talos: Your Autonomous AI Worker',
   description: 'Built for complex tasks, designed for everything. The ultimate AI assistant that handles it all—from simple requests to mega-complex projects.',
   cta: 'Start Free',
   url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-  keywords: ['Kortix', 'Autonomous AI Worker', 'AI Worker', 'Generalist AI', 'Open Source AI', 'Autonomous Agent', 'Complex Tasks', 'AI Assistant'],
+  keywords: ['Talos', 'Autonomous AI Worker', 'AI Worker', 'Generalist AI', 'Open Source AI', 'Autonomous Agent', 'Complex Tasks', 'AI Assistant'],
   links: {
-    email: 'support@kortix.com',
+    email: 'support@talos.ai',
     twitter: 'https://x.com/kortix',
     // discord: 'https://discord.gg/kortixai',
     github: 'https://github.com/Kortix-ai/Suna',
@@ -56,19 +56,19 @@ export const siteConfig = {
     ),
     badge: '100% OPEN SOURCE',
     githubUrl: 'https://github.com/kortix-ai/suna',
-    title: 'Kortix – Build, manage and train your AI Workforce.',
+    title: 'Talos – Build, manage and train your AI Workforce.',
     description:
-      'Kortix – open-source platform to build, manage and train your AI Workforce.',
-    inputPlaceholder: 'Ask Kortix to...',
+      'Talos – open-source platform to build, manage and train your AI Workforce.',
+    inputPlaceholder: 'Ask Talos to...',
   },
   cloudPricingItems: pricingTiers,
   footerLinks: [
     {
-      title: 'Kortix',
+      title: 'Talos',
       links: [
-        { id: 1, title: 'About', url: 'https://kortix.com' },
-        { id: 3, title: 'Contact', url: 'mailto:hey@kortix.com' },
-        { id: 4, title: 'Careers', url: 'https://kortix.com/careers' },
+        { id: 1, title: 'About', url: 'https://talos.ai' },
+        { id: 3, title: 'Contact', url: 'mailto:hey@talos.ai' },
+        { id: 4, title: 'Careers', url: 'https://talos.ai/careers' },
       ],
     },
     {
@@ -89,12 +89,12 @@ export const siteConfig = {
         {
           id: 9,
           title: 'Privacy Policy',
-          url: 'https://kortix.com/legal?tab=privacy',
+          url: 'https://talos.ai/legal?tab=privacy',
         },
         {
           id: 10,
           title: 'Terms of Service',
-          url: 'https://kortix.com/legal?tab=terms',
+          url: 'https://talos.ai/legal?tab=terms',
         },
         {
           id: 11,

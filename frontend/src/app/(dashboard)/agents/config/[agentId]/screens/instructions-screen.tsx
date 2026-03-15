@@ -30,7 +30,7 @@ export function InstructionsScreen({ agentId }: InstructionsScreenProps) {
         if (!isEditable) {
             if (isSunaAgent) {
                 toast.error("System prompt cannot be edited", {
-                    description: "Suna's system prompt is managed centrally.",
+                    description: "Talos's system prompt is managed centrally.",
                 });
             }
             return;

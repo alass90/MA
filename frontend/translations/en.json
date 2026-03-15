@@ -296,8 +296,8 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome",
-    "whatWouldYouLike": "What do you want to get done?",
-    "describeWhatYouNeed": "Describe what you need help with...",
+    "whatWouldYouLike": "What can I help you get done?",
+    "describeWhatYouNeed": "What would you like Talos to do",
     "usageLimits": "Usage Limits",
     "threads": "Threads",
     "customWorkers": "Custom Workers",
@@ -812,8 +812,8 @@
     "chooseTemplate": "Choose a template",
     "chooseOutputFormat": "Choose output format",
     "preferredCharts": "Preferred charts",
-    "whatWouldYouLike": "What do you want to get done?",
-    "describeTask": "Describe the task you want your Worker to complete...",
+    "whatWouldYouLike": "What can I help you get done?",
+    "describeTask": "What would you like Talos to do",
     "modes": {
       "image": "Image",
       "slides": "Slides",

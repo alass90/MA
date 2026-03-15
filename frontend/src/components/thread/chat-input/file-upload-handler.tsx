@@ -1,8 +1,9 @@
 'use client';
 
-import React, { forwardRef, useEffect } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Paperclip, Loader2 } from 'lucide-react';
+import { Paperclip, Loader2, Plus, Cloud } from 'lucide-react';
+import { SiGoogledrive } from '@icons-pack/react-simple-icons';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -13,6 +14,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { UploadedFile } from './chat-input';
 import { normalizeFilenameToNFC } from '@/lib/utils/unicode';
 
@@ -350,35 +356,69 @@ export const FileUploadHandler = forwardRef<
       event.target.value = '';
     };
 
+    const [popoverOpen, setPopoverOpen] = useState(false);
+
     return (
       <>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="inline-block">
-                <Button
-                  type="button"
-                  onClick={handleFileUpload}
-                  variant="outline"
-                  size="sm"
-                  className="h-8 w-8 p-0 bg-transparent border border-border rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center justify-center cursor-pointer"
-                  disabled={
-                    !isLoggedIn || loading || (disabled && !isAgentRunning) || isUploading
-                  }
-                >
-                  {isUploading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Paperclip className="h-4 w-4" />
-                  )}
-                </Button>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <p>{isLoggedIn ? 'Attach files' : 'Please login to attach files'}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0 bg-transparent border border-border rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center justify-center cursor-pointer"
+              disabled={
+                !isLoggedIn || loading || (disabled && !isAgentRunning) || isUploading
+              }
+            >
+              {isUploading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="h-4 w-4" />
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-56 p-2" align="start">
+            <div className="flex flex-col gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="justify-start gap-3 h-10"
+                onClick={() => {
+                  handleFileUpload();
+                  setPopoverOpen(false);
+                }}
+              >
+                <Paperclip className="h-4 w-4" />
+                <span>Upload from local files</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="justify-start gap-3 h-10"
+                onClick={() => {
+                  toast.info('Google Drive integration coming soon');
+                  setPopoverOpen(false);
+                }}
+              >
+                <SiGoogledrive className="h-4 w-4" />
+                <span>Google Drive</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="justify-start gap-3 h-10"
+                onClick={() => {
+                  toast.info('OneDrive integration coming soon');
+                  setPopoverOpen(false);
+                }}
+              >
+                <Cloud className="h-4 w-4" />
+                <span>OneDrive</span>
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
 
         <input
           type="file"

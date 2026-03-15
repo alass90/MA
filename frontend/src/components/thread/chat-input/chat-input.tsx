@@ -121,7 +121,7 @@ const SubmitButton = memo(function SubmitButton({
               ) : isAgentRunning ? (
                 <div className="min-h-[14px] min-w-[14px] w-[14px] h-[14px] rounded-sm bg-current" />
               ) : (
-                <CornerDownLeft className="h-5 w-5" />
+                <ArrowUp className="h-5 w-5" />
               )}
             </Button>
           </TooltipTrigger>
@@ -203,7 +203,7 @@ export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
   (
     {
       onSubmit,
-      placeholder = 'Describe what you need help with...',
+      placeholder = 'What would you like Talos to do',
       loading = false,
       disabled = false,
       isAgentRunning = false,
@@ -802,101 +802,104 @@ export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
                         )}
                       </div>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-[320px] px-0 py-3 border-[1.5px] border-border rounded-2xl" sideOffset={6}>
-                      <div className="px-3 mb-3">
-                        <span className="text-xs font-medium text-muted-foreground pl-1">Integrations</span>
-                      </div>
-                      <div className="space-y-0.5 px-2 relative">
-                        {quickIntegrations.map((integration) => (
-                          <SpotlightCard 
-                            key={integration.id} 
-                            className={cn(
-                              "transition-colors bg-transparent",
-                              isFreeTier && !isLocalMode() ? "cursor-not-allowed" : "cursor-pointer"
-                            )}
-                          >
+                    <DropdownMenuContent align="start" className="w-[320px] px-0 py-0 border-[1.5px] border-border rounded-2xl" sideOffset={6}>
+                      <div className="grid grid-cols-2 divide-x">
+                        {/* Left Column: CONNECTÉS */}
+                        <div className="p-3">
+                          <div className="px-1 mb-3">
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Connectés</span>
+                          </div>
+                          <div className="space-y-1">
+                            {/* Empty state for now - will show connected integrations */}
+                            <div className="text-center py-8 text-muted-foreground">
+                              <p className="text-xs">No connected apps</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Right Column: AJOUTER */}
+                        <div className="p-3 relative">
+                          <div className="px-1 mb-3">
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ajouter</span>
+                          </div>
+                          <div className="space-y-0.5 relative">
+                            {quickIntegrations.map((integration) => (
+                              <SpotlightCard
+                                key={integration.id}
+                                className={cn(
+                                  "transition-colors bg-transparent",
+                                  isFreeTier && !isLocalMode() ? "cursor-not-allowed" : "cursor-pointer"
+                                )}
+                              >
+                                <div
+                                  className={cn(
+                                    "flex items-center gap-3 text-sm px-1 py-1 relative",
+                                    isFreeTier && !isLocalMode() && "blur-[3px] opacity-70"
+                                  )}
+                                  onClick={() => {
+                                    if (!isFreeTier || isLocalMode()) {
+                                      setSelectedIntegration(integration.slug);
+                                      setRegistryDialogOpen(true);
+                                    }
+                                  }}
+                                >
+                                  <div className="flex items-center justify-center w-8 h-8 bg-card border-[1.5px] border-border flex-shrink-0" style={{ borderRadius: '10.4px' }}>
+                                    {integrationIcons[integration.id as keyof typeof integrationIcons] ? (
+                                      <img
+                                        src={integrationIcons[integration.id as keyof typeof integrationIcons]}
+                                        alt={integration.name}
+                                        className="h-4 w-4"
+                                      />
+                                    ) : (
+                                      <div className="h-4 w-4 bg-muted rounded" />
+                                    )}
+                                  </div>
+                                  <span className="flex-1 truncate font-medium">{integration.name}</span>
+                                  <span className="text-xs text-muted-foreground">+</span>
+                                </div>
+                              </SpotlightCard>
+                            ))}
                             <div
-                              className={cn(
-                                "flex items-center gap-3 text-sm px-1 py-1 relative",
-                                isFreeTier && !isLocalMode() && "blur-[3px] opacity-70"
-                              )}
+                              className="text-center pt-2 mt-1 border-t border-border cursor-pointer"
                               onClick={() => {
                                 if (!isFreeTier || isLocalMode()) {
-                                  setSelectedIntegration(integration.slug);
+                                  setSelectedIntegration(null);
                                   setRegistryDialogOpen(true);
                                 }
                               }}
                             >
-                              <div className="flex items-center justify-center w-8 h-8 bg-card border-[1.5px] border-border flex-shrink-0" style={{ borderRadius: '10.4px' }}>
-                                {integrationIcons[integration.id as keyof typeof integrationIcons] ? (
-                                  <img
-                                    src={integrationIcons[integration.id as keyof typeof integrationIcons]}
-                                    alt={integration.name}
-                                    className="h-4 w-4"
-                                  />
-                                ) : (
-                                  <div className="h-4 w-4 bg-muted rounded" />
-                                )}
-                              </div>
-                              <span className="flex-1 truncate font-medium">{integration.name}</span>
-                              <span className="text-xs text-muted-foreground">Connect</span>
+                              <span className="text-xs text-muted-foreground hover:text-foreground transition-colors">+ Voir 200+ apps</span>
                             </div>
-                          </SpotlightCard>
-                        ))}
-                        <SpotlightCard 
-                          className={cn(
-                            "transition-colors bg-transparent",
-                            isFreeTier && !isLocalMode() ? "cursor-not-allowed" : "cursor-pointer"
-                          )}
-                        >
-                          <div
-                            className={cn(
-                              "flex items-center gap-3 text-sm cursor-pointer px-1 py-1 min-h-[40px] relative",
-                              isFreeTier && !isLocalMode() && "blur-[3px] opacity-70"
+
+                            {isFreeTier && !isLocalMode() && (
+                              <div className="absolute inset-0 z-10 pointer-events-none">
+                                <div className="absolute inset-0 bg-background/60 backdrop-blur-sm rounded-lg" />
+                                <div className="relative h-full flex flex-col items-center justify-center px-6 py-5 gap-4">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 border border-primary/20">
+                                    <Lock className="h-5 w-5 text-primary" strokeWidth={2} />
+                                  </div>
+                                  <div className="text-center space-y-1">
+                                    <p className="text-sm font-semibold text-foreground">Unlock Integrations</p>
+                                    <p className="text-xs text-muted-foreground max-w-[200px]">
+                                      Connect Google Drive, Slack, Notion, and 100+ apps
+                                    </p>
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedIntegration(null);
+                                      setRegistryDialogOpen(true);
+                                    }}
+                                    className="h-8 px-4 text-xs font-medium shadow-md hover:shadow-lg transition-all pointer-events-auto"
+                                  >
+                                    Explore
+                                  </Button>
+                                </div>
+                              </div>
                             )}
-                            onClick={() => {
-                              if (!isFreeTier || isLocalMode()) {
-                                setSelectedIntegration(null);
-                                setRegistryDialogOpen(true);
-                              }
-                            }}
-                          >
-                            <span className="text-muted-foreground font-medium">+ See all integrations</span>
                           </div>
-                        </SpotlightCard>
-                        
-                        {isFreeTier && !isLocalMode() && (
-                          <div className="absolute inset-0 z-10 pointer-events-none">
-                            {/* Subtle backdrop blur */}
-                            <div className="absolute inset-0 bg-background/60 backdrop-blur-sm rounded-lg" />
-                            
-                            {/* Content overlay - proper flex column layout */}
-                            <div className="relative h-full flex flex-col items-center justify-center px-6 py-5 gap-4">
-                              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 border border-primary/20">
-                                <Lock className="h-5 w-5 text-primary" strokeWidth={2} />
-                              </div>
-                              <div className="text-center space-y-1">
-                                <p className="text-sm font-semibold text-foreground">Unlock Integrations</p>
-                                <p className="text-xs text-muted-foreground max-w-[200px]">
-                                  Connect Google Drive, Slack, Notion, and 100+ apps
-                                </p>
-                              </div>
-                              
-                              {/* Explore button - opens registry dialog */}
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => {
-                                  setSelectedIntegration(null);
-                                  setRegistryDialogOpen(true);
-                                }}
-                                className="h-8 px-4 text-xs font-medium shadow-md hover:shadow-lg transition-all pointer-events-auto"
-                              >
-                                Explore
-                              </Button>
-                            </div>
-                          </div>
-                        )}
+                        </div>
                       </div>
                     </DropdownMenuContent>
                   </DropdownMenu>

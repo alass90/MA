@@ -4,18 +4,18 @@ import { ArrowRight, Github } from 'lucide-react';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'Suna is now Kortix | Kortix Suna - Open Source AI Worker',
-  description: 'Suna has rebranded to Kortix. Kortix (formerly Suna) is the same powerful open source AI assistant and generalist AI worker you know and love, now with a new name and bigger vision.',
+  title: 'Talos | Talos - Open Source AI Worker',
+  description: 'Talos has rebranded to Kortix. Talos is the same powerful open source AI assistant and generalist AI worker you know and love, now with a new name and bigger vision.',
   keywords: [
-    'Suna',
-    'Kortix Suna',
-    'Suna AI',
-    'Suna assistant',
-    'Suna.so',
-    'where is Suna',
+    'Talos',
+    'Talos',
+    'Talos',
+    'Talos assistant',
+    'talos.ai',
+    'where is Talos',
     'Kortix',
-    'Suna rebrand',
-    'Suna is now Kortix',
+    'Talos rebrand',
+    'Talos',
     'AI assistant',
     'open source AI',
     'generalist AI worker',
@@ -23,28 +23,28 @@ export const metadata: Metadata = {
     'autonomous AI',
   ],
   openGraph: {
-    title: 'Suna is now Kortix',
-    description: 'Kortix (formerly Suna) - Same powerful open source AI worker, new name.',
+    title: 'Talos',
+    description: 'Talos - Same powerful open source AI worker, new name.',
     type: 'website',
-    url: 'https://kortix.com/suna',
-    siteName: 'Kortix',
+    url: 'https://talos.ai/Talos',
+    siteName: 'Talos',
     images: [
       {
         url: '/banner.png',
         width: 1200,
         height: 630,
-        alt: 'Kortix - Formerly Suna',
+        alt: 'Kortix - Formerly Talos',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Suna is now Kortix',
-    description: 'Kortix (formerly Suna) - Same powerful open source AI worker, new name.',
+    title: 'Talos',
+    description: 'Talos - Same powerful open source AI worker, new name.',
     images: ['/banner.png'],
   },
   alternates: {
-    canonical: 'https://kortix.com/suna',
+    canonical: 'https://talos.ai/Talos',
   },
   robots: {
     index: true,
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SunaPage() {
+export default function TalosPage() {
   return (
     <>
       {/* Structured Data for SEO */}
@@ -62,17 +62,17 @@ export default function SunaPage() {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'Organization',
-            name: 'Kortix',
-            alternateName: ['Suna', 'Kortix Suna', 'Suna AI'],
-            url: 'https://kortix.com',
-            logo: 'https://kortix.com/favicon.png',
+            name: 'Talos',
+            alternateName: ['Talos', 'Talos', 'Talos'],
+            url: 'https://talos.ai',
+            logo: 'https://talos.ai/favicon.png',
             sameAs: [
               'https://github.com/kortix-ai',
               'https://x.com/kortix',
               'https://linkedin.com/company/kortix',
             ],
             description:
-              'Kortix (formerly known as Suna) is an open source generalist AI worker that helps you accomplish real-world tasks through natural conversation.',
+              'Talos is an open source generalist AI worker that helps you accomplish real-world tasks through natural conversation.',
           }),
         }}
       />
@@ -88,13 +88,13 @@ export default function SunaPage() {
                 '@type': 'ListItem',
                 position: 1,
                 name: 'Home',
-                item: 'https://kortix.com',
+                item: 'https://talos.ai',
               },
               {
                 '@type': 'ListItem',
                 position: 2,
-                name: 'Suna is now Kortix',
-                item: 'https://kortix.com/suna',
+                name: 'Talos',
+                item: 'https://talos.ai/Talos',
               },
             ],
           }),
@@ -138,7 +138,7 @@ export default function SunaPage() {
 
               {/* Main Heading */}
               <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-medium tracking-tighter text-balance text-center">
-                Suna is now Kortix
+                Talos
               </h1>
 
               {/* Subheading */}
@@ -157,7 +157,7 @@ export default function SunaPage() {
                 <ArrowRight className="ml-2 size-4" />
               </Link>
               <a
-                href="https://github.com/kortix-ai/suna"
+                href="https://github.com/kortix-ai/Talos"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-12 items-center justify-center w-full sm:w-auto px-8 text-center rounded-full border border-border bg-background hover:bg-accent/50 transition-all font-medium"
@@ -177,8 +177,8 @@ export default function SunaPage() {
                   What changed?
                 </h2>
                 <div className="space-y-3 text-base md:text-lg text-muted-foreground font-medium">
-                  <p>Our name changed from Suna to Kortix</p>
-                  <p>Our domain is now kortix.com</p>
+                  <p>Our name changed from Talos to Kortix</p>
+                  <p>Our domain is now talos.ai</p>
                 </div>
               </div>
 
@@ -206,7 +206,7 @@ export default function SunaPage() {
                   Where to find us?
                 </h2>
                 <p className="text-base md:text-lg text-muted-foreground font-medium">
-                  Our GitHub repository remains at github.com/kortix-ai/suna
+                  Our GitHub repository remains at github.com/kortix-ai/Talos
                 </p>
               </div>
             </div>
@@ -250,10 +250,10 @@ export default function SunaPage() {
           {/* SEO Footer Text */}
           <div className="relative z-10 text-center max-w-2xl mx-auto pb-20 pt-12 border-t border-border/50">
             <p className="text-sm text-muted-foreground/60 leading-relaxed font-medium">
-              Looking for Suna? You've found us. Kortix is the evolution of Suna — the same open
+              Looking for Talos? You've found us. Talos is the next generation — the same open
               source AI assistant and generalist AI worker, now with a name that better represents
-              our vision. For users searching for "Suna AI", "Suna assistant", "Suna.so", "where is
-              Suna", or "Kortix Suna" — this is the official continuation of the Suna project under
+              our vision. For users searching for "Talos", "Talos assistant", "talos.ai", "where is
+              Talos", or "Talos" — this is the official continuation of the Talos project under
               the Kortix brand.
             </p>
           </div>
@@ -262,3 +262,4 @@ export default function SunaPage() {
     </>
   );
 }
+

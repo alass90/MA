@@ -521,43 +521,6 @@ function PricingTier({
         !insideDialog && ringClass,
       )}
     >
-      {/* AnimatedBg for Ultra plan */}
-      {isUltraPlan && (
-        <AnimatedBg
-          variant="header"
-          blurMultiplier={0.8}
-          sizeMultiplier={0.7}
-          customArcs={{
-            left: [
-              {
-                pos: { left: -120, top: -30 },
-                size: 350,
-                tone: 'light',
-                opacity: 0.15,
-                delay: 0.02,
-                x: [0, 12, -6, 0],
-                y: [0, 8, -4, 0],
-                scale: [0.85, 1.05, 0.95, 0.85],
-                blur: ['10px', '15px', '12px', '10px'],
-              },
-            ],
-            right: [
-              {
-                pos: { right: -110, top: 200 },
-                size: 380,
-                tone: 'dark',
-                opacity: 0.2,
-                delay: 1.0,
-                x: [0, -15, 8, 0],
-                y: [0, 10, -6, 0],
-                scale: [0.9, 1.1, 0.98, 0.9],
-                blur: ['8px', '4px', '6px', '8px'],
-              },
-            ],
-          }}
-        />
-      )}
-
       <div className={cn(
         "flex flex-col gap-2 sm:gap-3 relative z-10",
         insideDialog ? "p-2.5 sm:p-3" : "p-3 sm:p-4"
@@ -827,7 +790,7 @@ function PricingTier({
               } else if (feature.includes('100+ integrations') || feature === '100+ integrations' || feature.includes('100+ App Integrations')) {
                 translatedFeature = t('features.integrations');
               } else if (feature.includes('Power mode') || feature.includes('POWER Mode')) {
-                translatedFeature = 'Kortix Power mode';
+                translatedFeature = 'Talos Power mode';
               } else if (feature.includes('Priority Support') || feature === 'Priority Support') {
                 translatedFeature = t('features.prioritySupport');
               }

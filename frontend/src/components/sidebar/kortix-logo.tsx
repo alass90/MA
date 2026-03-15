@@ -23,25 +23,24 @@ export function KortixLogo({ size = 24, variant = 'symbol', className }: KortixL
     theme === 'dark' || (theme === 'system' && systemTheme === 'dark')
   );
 
-  // For logomark variant, use logomark-white.svg which is already white
-  // and invert it for light mode instead
+  // For logomark variant, use talos-logo (white for dark mode, black for light mode)
   if (variant === 'logomark') {
     return (
       <img
-        src="/logomark-white.svg"
-        alt="Kortix"
-        className={cn(`${shouldInvert ? '' : 'invert'} flex-shrink-0`, className)}
+        src={shouldInvert ? "/talos-logo-white.png" : "/talos-logo-black.png"}
+        alt="Talos"
+        className={cn('flex-shrink-0', className)}
         style={{ height: `${size}px`, width: 'auto' }}
       />
     );
   }
 
-  // Default symbol variant behavior
+  // Default symbol variant behavior - use talos symbol
   return (
     <img
-      src="/kortix-symbol.svg"
-      alt="Kortix"
-      className={cn(`${shouldInvert ? 'invert' : ''} flex-shrink-0`, className)}
+      src={shouldInvert ? "/talos-symbol-white.svg" : "/talos-symbol-black.svg"}
+      alt="Talos"
+      className={cn('flex-shrink-0', className)}
       style={{ width: `${size}px`, height: `${size}px` }}
     />
   );

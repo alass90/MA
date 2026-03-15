@@ -261,8 +261,8 @@
   "dashboard": {
     "title": "Painel",
     "welcome": "Bem-vindo",
-    "whatWouldYouLike": "O que tu queres fazer?",
-    "describeWhatYouNeed": "Descreve com o que precisas de ajuda...",
+    "whatWouldYouLike": "Como posso ajudar-te?",
+    "describeWhatYouNeed": "O que queres que o Talos faça",
     "usageLimits": "Limites de Uso",
     "threads": "Threads",
     "customWorkers": "Workers Personalizados",
@@ -755,8 +755,8 @@
     "chooseTemplate": "Escolhe um template",
     "chooseOutputFormat": "Escolhe formato de saída",
     "preferredCharts": "Gráficos preferidos",
-    "whatWouldYouLike": "O que tu queres fazer?",
-    "describeTask": "Descreve a tarefa que queres que teu Worker complete...",
+    "whatWouldYouLike": "Como posso ajudar-te?",
+    "describeTask": "O que queres que o Talos faça",
     "modes": {
       "image": "Imagem",
       "slides": "Slides",

@@ -2,5 +2,6 @@
   "python.analysis.typeCheckingMode": "off",
   "cursorpyright.analysis.typeCheckingMode": "off",
   "python.defaultInterpreterPath": "./backend/.venv/bin/python",
-  "claude-code.environmentVariables": []
+  "claude-code.environmentVariables": [],
+  "claude-code.selectedModel": "default"
 }

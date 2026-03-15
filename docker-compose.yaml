@@ -92,6 +92,13 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    environment:
+      - COMPOSE_HTTP_TIMEOUT=3600
+      - DOCKER_CLIENT_TIMEOUT=3600
+    deploy:
+      resources:
+        limits:
+          memory: 6G
     ports:
       - "3000:3000"
     depends_on:

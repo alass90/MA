@@ -38,12 +38,12 @@ import { useAccountState, accountStateSelectors } from '@/hooks/billing';
 import { isLocalMode } from '@/lib/config';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
-// Helper to render model labels with special styling for Kortix modes
+// Helper to render model labels with special styling for Talos modes
 const ModelLabel = ({ label, className }: { label: string; className?: string }) => {
     if (label === 'Kortix POWER Mode') {
         return (
             <span className={cn("flex items-center gap-2 flex-wrap", className)}>
-                <span className="font-medium">Kortix</span>
+                <span className="font-medium">Talos</span>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 dark:bg-primary/15 rounded-full flex-shrink-0">
                     <KortixLogo size={12} variant="symbol" />
                     <span className="text-[11px] font-semibold tracking-wide uppercase text-primary whitespace-nowrap">
@@ -56,7 +56,7 @@ const ModelLabel = ({ label, className }: { label: string; className?: string })
     if (label === 'Kortix Basic') {
         return (
             <span className={cn("flex items-center gap-2 flex-wrap", className)}>
-                <span className="font-medium">Kortix</span>
+                <span className="font-medium">Talos</span>
                 <span className="text-xs font-medium text-muted-foreground px-1.5 py-0.5 bg-muted/50 rounded-md flex-shrink-0 whitespace-nowrap">
                     Basic
                 </span>
@@ -158,7 +158,7 @@ const LoggedInMenu: React.FC<UnifiedConfigMenuProps> = memo(function LoggedInMen
     
     const placeholderSunaAgent = useMemo(() => ({
         agent_id: undefined,
-        name: 'Suna',
+        name: 'Talos',
         metadata: { is_suna_default: true }
     }), []);
 
@@ -226,7 +226,7 @@ const LoggedInMenu: React.FC<UnifiedConfigMenuProps> = memo(function LoggedInMen
 
     const renderAgentIcon = useCallback((agent: any, size: number = 32) => {
         if (!agent && (isLoading || sunaAgent)) {
-            return <AgentAvatar isSunaDefault={true} agentName="Suna" size={size} className="flex-shrink-0 !border-0" />;
+            return <AgentAvatar isSunaDefault={true} agentName="Talos" size={size} className="flex-shrink-0 !border-0" />;
         }
         return <AgentAvatar agent={agent} agentId={agent?.agent_id} size={size} className="flex-shrink-0 !border-0" />;
     }, [isLoading, sunaAgent]);
@@ -418,7 +418,7 @@ const LoggedInMenu: React.FC<UnifiedConfigMenuProps> = memo(function LoggedInMen
                                 setIsOpen(false);
                                 usePricingModalStore.getState().openPricingModal({ 
                                     isAlert: true, 
-                                    alertTitle: 'Upgrade to access Kortix Power mode'
+                                    alertTitle: 'Upgrade to access Talos Power mode'
                                 });
                             }
                         }
@@ -564,7 +564,7 @@ const LoggedInMenu: React.FC<UnifiedConfigMenuProps> = memo(function LoggedInMen
                                     {renderAgentIcon(isLoading && !displayAgent ? placeholderSunaAgent : displayAgent, 40)}
                                 </div>
                                 <span className="flex-1 truncate text-base font-medium text-left min-w-0">
-                                    {displayAgent?.name || 'Suna'}
+                                    {displayAgent?.name || 'Talos'}
                                 </span>
                                 <ChevronDown className="h-5 w-5 text-muted-foreground rotate-[-90deg] flex-shrink-0" />
                             </button>
@@ -603,7 +603,7 @@ const LoggedInMenu: React.FC<UnifiedConfigMenuProps> = memo(function LoggedInMen
                 <div className="flex items-center gap-2 min-w-0 max-w-[180px]">
                     {renderAgentIcon(isLoading && !displayAgent ? placeholderSunaAgent : displayAgent)}
                     <span className="truncate text-sm font-medium">
-                        {displayAgent?.name || 'Suna'}
+                        {displayAgent?.name || 'Talos'}
                     </span>
                     <ChevronDown size={12} className="opacity-60 flex-shrink-0" />
                 </div>
@@ -660,7 +660,7 @@ const LoggedInMenu: React.FC<UnifiedConfigMenuProps> = memo(function LoggedInMen
                                                 <div className="flex items-center justify-center w-8 h-8 bg-card border-[1.5px] border-border flex-shrink-0" style={{ borderRadius: '10.4px' }}>
                                                     {renderAgentIcon(isLoading && !displayAgent ? placeholderSunaAgent : displayAgent)}
                                                 </div>
-                                                <span className="flex-1 truncate font-medium text-left">{displayAgent?.name || 'Suna'}</span>
+                                                <span className="flex-1 truncate font-medium text-left">{displayAgent?.name || 'Talos'}</span>
                                             </DropdownMenuSubTrigger>
                                             <DropdownMenuPortal>
                                                 <DropdownMenuSubContent className="w-[320px] px-0 py-3 border-[1.5px] border-border rounded-2xl max-h-[500px] overflow-hidden" sideOffset={8}>
@@ -757,7 +757,7 @@ const GuestMenu: React.FC<UnifiedConfigMenuProps> = memo(function GuestMenu() {
                                 <div className="flex-shrink-0">
                                     <KortixLogo size={20} />
                                 </div>
-                                <span className="truncate text-sm font-medium">Suna</span>
+                                <span className="truncate text-sm font-medium">Talos</span>
                                 <ChevronDown size={12} className="opacity-60 flex-shrink-0" />
                             </div>
                         </Button>

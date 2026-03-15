@@ -85,8 +85,8 @@ export async function POST(request: NextRequest) {
         right: 720,
       },
       title: fileName,
-      creator: 'Suna AI',
-      description: 'Document exported from Suna AI',
+      creator: 'Talos',
+      description: 'Document exported from Talos',
       font: 'Calibri',
       fontSize: 22,
     };

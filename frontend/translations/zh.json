@@ -261,8 +261,8 @@
   "dashboard": {
     "title": "仪表板",
     "welcome": "欢迎",
-    "whatWouldYouLike": "你想完成什么？",
-    "describeWhatYouNeed": "描述你需要什么帮助...",
+    "whatWouldYouLike": "我能帮你什么？",
+    "describeWhatYouNeed": "你想让 Talos 做什么",
     "usageLimits": "使用限制",
     "threads": "线程",
     "customWorkers": "自定义 Workers",
@@ -755,8 +755,8 @@
     "chooseTemplate": "选择模板",
     "chooseOutputFormat": "选择输出格式",
     "preferredCharts": "首选图表",
-    "whatWouldYouLike": "你想完成什么？",
-    "describeTask": "描述你想让你的 Worker 完成的任务...",
+    "whatWouldYouLike": "我能帮你什么？",
+    "describeTask": "你想让 Talos 做什么",
     "modes": {
       "image": "图片",
       "slides": "幻灯片",

@@ -11,7 +11,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 // Lazy load heavy components
-const AnimatedBg = lazy(() => import('@/components/ui/animated-bg').then(mod => ({ default: mod.AnimatedBg })));
 const KortixLoader = lazy(() => import('@/components/ui/kortix-loader').then(mod => ({ default: mod.KortixLoader })));
 
 export default function SettingUpPage() {
@@ -123,10 +122,6 @@ export default function SettingUpPage() {
   return (
     <div className="w-full relative overflow-hidden min-h-screen">
       <div className="relative flex flex-col items-center w-full px-4 sm:px-6 min-h-screen justify-center">
-        <Suspense fallback={null}>
-          <AnimatedBg variant="hero" />
-        </Suspense>
-
         <div className="relative z-10 w-full max-w-[456px] flex flex-col items-center gap-8">
           <KortixLogo size={32} />
 

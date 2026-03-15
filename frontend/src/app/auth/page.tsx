@@ -375,8 +375,8 @@ function LoginContent() {
           <KortixLogo size={28} />
         </Link>
       </div>
-      <div className="flex min-h-screen">
-        <div className="relative flex-1 flex items-center justify-center p-4 lg:p-8">
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="relative w-full flex items-center justify-center p-4 lg:p-8">
           <div className="w-full max-w-sm">
             <div className="mb-4 flex items-center flex-col gap-3 sm:gap-4 justify-center">
               <h1 className="text-xl sm:text-2xl font-semibold text-foreground text-center leading-tight">
@@ -504,26 +504,6 @@ function LoginContent() {
                 setShowReferralDialog(false);
               }}
             />
-          </div>
-        </div>
-        <div className="hidden lg:flex flex-1 items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-accent/10" />
-          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-            <Suspense fallback={null}>
-              <AnimatedBg
-                variant="hero"
-                customArcs={{
-                  left: [
-                    { pos: { left: -120, top: 150 }, opacity: 0.15 },
-                    { pos: { left: -120, top: 400 }, opacity: 0.18 },
-                  ],
-                  right: [
-                    { pos: { right: -150, top: 50 }, opacity: 0.2 },
-                    { pos: { right: 10, top: 650 }, opacity: 0.17 },
-                  ]
-                }}
-              />
-            </Suspense>
           </div>
         </div>
       </div>
