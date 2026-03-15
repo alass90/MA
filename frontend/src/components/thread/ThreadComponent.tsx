@@ -1024,6 +1024,12 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           compact={true}
           streamingTextContent={isShared ? '' : streamingTextContent}
           streamingToolCall={isShared ? undefined : streamingToolCall}
+          isPreviewPanelOpen={isPreviewPanelOpen}
+          previewUrl={deployment?.url}
+          previewProjectPath={deployment?.projectPath}
+          previewFramework={deployment?.framework}
+          previewProjectName={deployment?.projectName}
+          onClosePreview={closePanel}
         >
           {/* Thread Content - Scrollable */}
           <div
@@ -1255,32 +1261,6 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           runningCount={agentLimitData.runningCount}
           runningThreadIds={agentLimitData.runningThreadIds}
           projectId={projectId}
-        />
-      )}
-
-      {/* Website Preview Panel */}
-      {deployment && (
-        <WebsitePreviewPanel
-          isOpen={isPreviewPanelOpen}
-          onClose={closePanel}
-          previewUrl={deployment.url}
-          projectPath={deployment.projectPath}
-          framework={deployment.framework}
-          deploymentId={deployment.deploymentId}
-          projectName={deployment.projectName}
-          databaseUrl={deployment.databaseUrl}
-          databaseProvider={deployment.databaseProvider}
-          threadId={threadId}
-          projectId={projectId}
-          onPublish={async () => {
-            // Send a message to deploy permanently with Vercel
-            if (deployment.projectPath && !isShared) {
-              const message = `Please deploy this project to Vercel for permanent hosting using deploy_app with action="deploy" and project_path="${deployment.projectPath}"`;
-              setChatInputValue(message);
-              // Optionally auto-send the message
-              // await handleSendMessage(message);
-            }
-          }}
         />
       )}
     </>

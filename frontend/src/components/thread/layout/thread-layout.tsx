@@ -3,6 +3,7 @@ import * as ResizablePrimitive from 'react-resizable-panels';
 import { SiteHeader } from '@/components/thread/thread-site-header';
 import { FileViewerModal } from '@/components/thread/file-viewer-modal';
 import { ToolCallSidePanel } from '@/components/thread/tool-call-side-panel';
+import { WebsitePreviewPanel } from '@/components/thread/website-preview-panel';
 import { Project } from '@/lib/api/threads';
 import { ApiMessageType } from '@/components/thread/types';
 import { ToolCallInput } from '@/components/thread/tool-call-side-panel';
@@ -49,6 +50,13 @@ interface ThreadLayoutProps {
   leftSidebarState?: 'collapsed' | 'expanded';
   streamingTextContent?: string; // Live streaming content from assistant (includes text + XML)
   streamingToolCall?: any; // Live streaming tool call with arguments
+  // Preview panel props
+  isPreviewPanelOpen?: boolean;
+  previewUrl?: string;
+  previewProjectPath?: string;
+  previewFramework?: string;
+  previewProjectName?: string;
+  onClosePreview?: () => void;
 }
 
 export const ThreadLayout = memo(function ThreadLayout({
@@ -86,6 +94,12 @@ export const ThreadLayout = memo(function ThreadLayout({
   leftSidebarState = 'collapsed',
   streamingTextContent,
   streamingToolCall,
+  isPreviewPanelOpen = false,
+  previewUrl,
+  previewProjectPath,
+  previewFramework,
+  previewProjectName,
+  onClosePreview,
 }: ThreadLayoutProps) {
   const isActuallyMobile = useIsMobile();
 
@@ -147,8 +161,22 @@ export const ThreadLayout = memo(function ThreadLayout({
             {children}
           </div>
 
-          {/* Tool Call Side Panel - Full replacement overlay for compact */}
-          {isSidePanelOpen && initialLoadCompleted && (
+          {/* Preview Panel OR Tool Call Side Panel - Full replacement overlay for compact */}
+          {isPreviewPanelOpen && previewUrl && onClosePreview ? (
+            <div className="absolute inset-0 bg-background z-40">
+              <WebsitePreviewPanel
+                isOpen={true}
+                onClose={onClosePreview}
+                previewUrl={previewUrl}
+                projectPath={previewProjectPath}
+                framework={previewFramework}
+                projectName={previewProjectName}
+                threadId={threadId}
+                projectId={projectId}
+                onPublish={async () => {}}
+              />
+            </div>
+          ) : isSidePanelOpen && initialLoadCompleted && (
             <div className="absolute inset-0 bg-background z-40">
               <ToolCallSidePanel
                 isOpen={true}

@@ -76,7 +76,7 @@ interface ToolCallSnapshot {
 }
 
 type NavigationMode = 'live' | 'manual';
-type ViewType = 'tools' | 'browser';
+type ViewType = 'tools' | 'browser' | 'preview';
 
 // ============================================================================
 // Constants
