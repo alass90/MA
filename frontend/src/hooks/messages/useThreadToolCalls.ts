@@ -26,9 +26,35 @@ interface UseThreadToolCallsReturn {
 
 // Helper function to check if a tool should be filtered out from the side panel
 // Uses the shared utility from streaming-utils
-function shouldFilterTool(toolName: string): boolean {
+function shouldFilterTool(toolName: string, metadata?: any): boolean {
   // Always filter out ask and complete tools - they're rendered inline in ThreadContent
-  return isAskOrCompleteTool(toolName);
+  if (isAskOrCompleteTool(toolName)) return true;
+
+  // Filter web file creation - they're handled by Preview panel instead of Computer panel
+  if (toolName === 'create_file' || toolName === 'create-file') {
+    if (metadata) {
+      try {
+        // Get file path from tool call arguments
+        const toolCallMetadata = metadata.tool_call_metadata;
+        if (toolCallMetadata) {
+          const args = typeof toolCallMetadata.arguments === 'string'
+            ? JSON.parse(toolCallMetadata.arguments)
+            : toolCallMetadata.arguments;
+
+          const filePath = args?.file_path || '';
+
+          // Check if web file
+          if (/\.(html|htm|jsx|tsx|vue|svelte)$/i.test(filePath)) {
+            return true; // Filter out - Preview panel will handle it
+          }
+        }
+      } catch (e) {
+        // If parsing fails, don't filter - show in Computer panel
+      }
+    }
+  }
+
+  return false;
 }
 
 export function useThreadToolCalls(
@@ -112,7 +138,7 @@ export function useThreadToolCalls(
         const isSuccess = toolResult.success !== false;
 
         // Check if this tool should be filtered out
-        if (shouldFilterTool(toolName)) {
+        if (shouldFilterTool(toolName, toolMetadata)) {
           return;
         }
 

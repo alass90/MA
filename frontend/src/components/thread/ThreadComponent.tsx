@@ -54,6 +54,10 @@ import { useProjectRealtime } from '@/hooks/threads';
 import { handleGoogleSlidesUpload } from './tool-views/utils/presentation-utils';
 import { useTranslations } from 'next-intl';
 import { backendApi } from '@/lib/api-client';
+import { WebsitePreviewPanel } from '@/components/thread/website-preview-panel';
+import { usePreviewPanelStore } from '@/stores/use-preview-panel-store';
+import { useDeploymentDetector } from '@/hooks/use-deployment-detector';
+import { useWebFileDetector } from '@/hooks/use-web-file-detector';
 
 interface ThreadComponentProps {
   projectId: string;
@@ -163,6 +167,9 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
     userClosedPanelRef,
   } = useThreadToolCalls(messages, setLeftSidebarOpen, agentStatus, compact);
 
+  // Auto-detect web file creation and switch to Preview panel (Manus.ai style)
+  useWebFileDetector(messages, sandboxId, setIsSidePanelOpen, agentStatus);
+
   // Memoized callback for closing side panel to prevent unnecessary re-renders
   const handleSidePanelClose = useCallback(() => {
     setIsSidePanelOpen(false);
@@ -212,6 +219,12 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
     setLeftSidebarOpen,
     userClosedPanelRef,
   });
+
+  // Deployment detector - detects deploy_app tool calls and opens preview panel
+  useDeploymentDetector(messages, projectId);
+
+  // Preview panel state
+  const { isOpen: isPreviewPanelOpen, deployment, closePanel } = usePreviewPanelStore();
 
   // Mutations - always call unconditionally
   const addUserMessageMutation = useAddUserMessageMutation();
@@ -805,7 +818,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
   // SEO title update
   useEffect(() => {
     if (projectName) {
-      document.title = `${projectName} | Kortix`;
+      document.title = `${projectName} | Talos`;
 
       const metaDescription = document.querySelector(
         'meta[name="description"]',
@@ -813,13 +826,13 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
       if (metaDescription) {
         metaDescription.setAttribute(
           'content',
-          `${projectName} - Interactive agent conversation powered by Kortix`,
+          `${projectName} - Interactive agent conversation powered by Talos`,
         );
       }
 
       const ogTitle = document.querySelector('meta[property="og:title"]');
       if (ogTitle) {
-        ogTitle.setAttribute('content', `${projectName} | Kortix`);
+        ogTitle.setAttribute('content', `${projectName} | Talos`);
       }
 
       const ogDescription = document.querySelector(
@@ -1242,6 +1255,32 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           runningCount={agentLimitData.runningCount}
           runningThreadIds={agentLimitData.runningThreadIds}
           projectId={projectId}
+        />
+      )}
+
+      {/* Website Preview Panel */}
+      {deployment && (
+        <WebsitePreviewPanel
+          isOpen={isPreviewPanelOpen}
+          onClose={closePanel}
+          previewUrl={deployment.url}
+          projectPath={deployment.projectPath}
+          framework={deployment.framework}
+          deploymentId={deployment.deploymentId}
+          projectName={deployment.projectName}
+          databaseUrl={deployment.databaseUrl}
+          databaseProvider={deployment.databaseProvider}
+          threadId={threadId}
+          projectId={projectId}
+          onPublish={async () => {
+            // Send a message to deploy permanently with Vercel
+            if (deployment.projectPath && !isShared) {
+              const message = `Please deploy this project to Vercel for permanent hosting using deploy_app with action="deploy" and project_path="${deployment.projectPath}"`;
+              setChatInputValue(message);
+              // Optionally auto-send the message
+              // await handleSendMessage(message);
+            }
+          }}
         />
       )}
     </>

@@ -5,7 +5,15 @@ const withNextIntl = createNextIntlPlugin('./i18n.ts');
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  
+
+  // Skip type checking and linting during build (done in CI/dev)
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // Performance optimizations
   experimental: {
     // Optimize package imports for faster builds and smaller bundles
