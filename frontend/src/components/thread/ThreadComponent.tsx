@@ -990,6 +990,25 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
     );
   }
 
+  const handleDeploy = async () => {
+    handleSubmitMessage('Deploy the app');
+  };
+
+  const commonPreviewProps = {
+    isPreviewPanelOpen,
+    previewUrl: deployment?.url,
+    previewProjectPath: deployment?.projectPath,
+    previewFramework: deployment?.framework,
+    previewProjectName: deployment?.projectName,
+    onClosePreview: closePanel,
+    onPublish: handleDeploy,
+    onEdit: () => {
+      closePanel();
+      // Focus chat input if possible
+      document.getElementById('chat-input')?.focus();
+    },
+  };
+
   if (compact) {
     return (
       <>
@@ -997,6 +1016,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           threadId={threadId}
           projectName={projectName}
           projectId={project?.id || ''}
+          {...commonPreviewProps}
           project={project}
           sandboxId={sandboxId}
           isSidePanelOpen={isSidePanelOpen}
@@ -1012,7 +1032,6 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           externalNavIndex={externalNavIndex}
           agentStatus={agentStatus}
           currentToolIndex={currentToolIndex}
-          onSidePanelNavigate={handleSidePanelNavigate}
           onSidePanelClose={handleSidePanelClose}
           renderAssistantMessage={toolViewAssistant}
           renderToolResult={toolViewResult}
@@ -1024,12 +1043,6 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           compact={true}
           streamingTextContent={isShared ? '' : streamingTextContent}
           streamingToolCall={isShared ? undefined : streamingToolCall}
-          isPreviewPanelOpen={isPreviewPanelOpen}
-          previewUrl={deployment?.url}
-          previewProjectPath={deployment?.projectPath}
-          previewFramework={deployment?.framework}
-          previewProjectName={deployment?.projectName}
-          onClosePreview={closePanel}
         >
           {/* Thread Content - Scrollable */}
           <div
@@ -1210,6 +1223,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         leftSidebarState={leftSidebarState}
         streamingTextContent={isShared ? '' : streamingTextContent}
         streamingToolCall={isShared ? undefined : streamingToolCall}
+        {...commonPreviewProps}
       >
         <ThreadContent
           messages={isShared ? playback.playbackState.visibleMessages : messages}
