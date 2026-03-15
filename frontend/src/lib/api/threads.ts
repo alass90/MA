@@ -46,7 +46,6 @@ export type Project = {
   };
   is_public?: boolean;
   icon_name?: string | null;
-  repo_url?: string;
   [key: string]: any;
 };
 
@@ -61,7 +60,6 @@ export const getProject = async (projectId: string): Promise<Project> => {
     sandbox: any;
     is_public?: boolean;
     icon_name?: string | null;
-    repo_url?: string;
   }>(`/projects/${projectId}`, {
     showErrors: true
   });
@@ -92,7 +90,6 @@ export const getProject = async (projectId: string): Promise<Project> => {
       sandbox_url: '',
     },
     icon_name: projectData.icon_name,
-    repo_url: projectData.repo_url,
   };
 };
 

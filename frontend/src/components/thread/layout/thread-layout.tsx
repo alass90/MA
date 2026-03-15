@@ -35,7 +35,7 @@ interface ThreadLayoutProps {
   externalNavIndex?: number;
   agentStatus: 'idle' | 'running' | 'connecting' | 'error';
   currentToolIndex: number;
-  onSidePanelNavigate?: (index: number) => void;
+  onSidePanelNavigate: (index: number) => void;
   onSidePanelClose: () => void;
   renderAssistantMessage: (assistantContent?: string, toolContent?: string) => React.ReactNode;
   renderToolResult: (toolContent?: string, isSuccess?: boolean) => React.ReactNode;
@@ -57,8 +57,6 @@ interface ThreadLayoutProps {
   previewFramework?: string;
   previewProjectName?: string;
   onClosePreview?: () => void;
-  onPublish?: () => Promise<void>;
-  onEdit?: () => void;
 }
 
 export const ThreadLayout = memo(function ThreadLayout({
@@ -102,8 +100,6 @@ export const ThreadLayout = memo(function ThreadLayout({
   previewFramework,
   previewProjectName,
   onClosePreview,
-  onPublish,
-  onEdit,
 }: ThreadLayoutProps) {
   const isActuallyMobile = useIsMobile();
 
@@ -330,7 +326,7 @@ export const ThreadLayout = memo(function ThreadLayout({
         {/* Side panel - always render but control size */}
         <ResizablePanel
           ref={sidePanelRef}
-          defaultSize={shouldShowPanel ? 70 : 0}
+          defaultSize={shouldShowPanel ? 40 : 0}
           minSize={shouldShowPanel ? 20 : 0}
           maxSize={shouldShowPanel ? 70 : 0}
           collapsible={true}
@@ -341,44 +337,24 @@ export const ThreadLayout = memo(function ThreadLayout({
             !shouldShowPanel ? "hidden" : ""
           )}
         >
-          {isPreviewPanelOpen && previewUrl && onClosePreview ? (
-            <div className="h-full w-full bg-background rounded-xl border border-border/50 overflow-hidden shadow-2xl">
-              <WebsitePreviewPanel
-                isOpen={true}
-                onClose={onClosePreview}
-                previewUrl={previewUrl}
-                projectPath={previewProjectPath}
-                framework={previewFramework}
-                projectName={previewProjectName}
-                threadId={threadId}
-                projectId={projectId}
-                onPublish={onPublish}
-                onEdit={onEdit}
-                agentStatus={agentStatus}
-                project={project}
-                toolCalls={toolCalls}
-              />
-            </div>
-          ) : (
-            <ToolCallSidePanel
-              isOpen={isSidePanelOpen && initialLoadCompleted}
-              onClose={onSidePanelClose}
-              toolCalls={toolCalls}
-              messages={messages}
-              externalNavigateToIndex={externalNavIndex}
-              agentStatus={agentStatus}
-              currentIndex={currentToolIndex}
-              onNavigate={onSidePanelNavigate}
-              project={project || undefined}
-              renderAssistantMessage={renderAssistantMessage}
-              renderToolResult={renderToolResult}
-              isLoading={!initialLoadCompleted || isLoading}
-              onFileClick={onViewFiles}
-              agentName={agentName}
-              disableInitialAnimation={disableInitialAnimation}
-              streamingText={streamingToolArgsJson}
-            />
-          )}
+          <ToolCallSidePanel
+            isOpen={isSidePanelOpen && initialLoadCompleted}
+            onClose={onSidePanelClose}
+            toolCalls={toolCalls}
+            messages={messages}
+            externalNavigateToIndex={externalNavIndex}
+            agentStatus={agentStatus}
+            currentIndex={currentToolIndex}
+            onNavigate={onSidePanelNavigate}
+            project={project || undefined}
+            renderAssistantMessage={renderAssistantMessage}
+            renderToolResult={renderToolResult}
+            isLoading={!initialLoadCompleted || isLoading}
+            onFileClick={onViewFiles}
+            agentName={agentName}
+            disableInitialAnimation={disableInitialAnimation}
+            streamingText={streamingToolArgsJson}
+          />
         </ResizablePanel>
       </ResizablePanelGroup>
 
