@@ -19,12 +19,10 @@ export const siteConfig = {
   },
   nav: {
     links: [
-      { id: 1, name: 'Home', href: '#hero' },
-      { id: 2, name: 'Process', href: '#process' },
-      // { id: 3, name: 'Use Cases', href: '#use-cases' },
-      { id: 4, name: 'Open Source', href: '#open-source' },
-      { id: 5, name: 'Pricing', href: '#pricing' },
-      { id: 6, name: 'Enterprise', href: '/enterprise' },
+      { id: 7, name: 'Features', href: '/features' },
+      { id: 8, name: 'About', href: '/about' },
+      { id: 9, name: 'Campus', href: '/campus' },
+      { id: 5, name: 'Pricing', href: '/pricing' },
     ],
   },
   hero: {

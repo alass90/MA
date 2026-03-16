@@ -275,7 +275,7 @@ export function HeroSection() {
 
                     {/* Modes Panel - Below chat input, visible for Suna agent */}
                     {isSunaAgent && (
-                        <div className="w-full max-w-3xl mx-auto mt-4 px-4 sm:px-0">
+                        <div className="w-full max-w-3xl mx-auto mt-2 px-4 sm:px-0">
                             <Suspense fallback={<div className="h-24 animate-pulse bg-muted/10 rounded-lg" />}>
                                 <SunaModesPanel
                                     selectedMode={selectedMode}

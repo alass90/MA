@@ -463,7 +463,7 @@ export function DashboardContent() {
               {viewMode === 'super-worker' && (
                 <div className="w-full animate-in fade-in-0 duration-300">
                   <div className="px-4 py-6 sm:py-8">
-                    <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-5 sm:space-y-6 md:space-y-8">
+                    <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-1">
                       {alertType === 'thread_limit' && (
                         <div className='inline-flex items-center justify-center gap-2.5 px-4 py-2 rounded-lg bg-muted/40 text-sm mb-4'>
                           <span className='font-normal text-muted-foreground'>
@@ -534,30 +534,28 @@ export function DashboardContent() {
                           </div>
                         )}
                       </div>
+
+                      {/* Modes Panel - Below chat input */}
+                      {isSunaAgent && (
+                        <div className="w-full">
+                          <Suspense fallback={<div className="h-24 bg-muted/10 rounded-lg animate-pulse" />}>
+                            <SunaModesPanel
+                              selectedMode={selectedMode}
+                              onModeSelect={setSelectedMode}
+                              onSelectPrompt={setInputValue}
+                              isMobile={isMobile}
+                              selectedCharts={selectedCharts}
+                              onChartsChange={setSelectedCharts}
+                              selectedOutputFormat={selectedOutputFormat}
+                              onOutputFormatChange={setSelectedOutputFormat}
+                              selectedTemplate={selectedTemplate}
+                              onTemplateChange={setSelectedTemplate}
+                            />
+                          </Suspense>
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {/* Modes Panel - Below chat input, doesn't affect its position */}
-                  {isSunaAgent && (
-                    <div className="px-4 pb-6 sm:pb-8">
-                      <div className="max-w-3xl mx-auto">
-                        <Suspense fallback={<div className="h-24 bg-muted/10 rounded-lg animate-pulse" />}>
-                          <SunaModesPanel
-                            selectedMode={selectedMode}
-                            onModeSelect={setSelectedMode}
-                            onSelectPrompt={setInputValue}
-                            isMobile={isMobile}
-                            selectedCharts={selectedCharts}
-                            onChartsChange={setSelectedCharts}
-                            selectedOutputFormat={selectedOutputFormat}
-                            onOutputFormatChange={setSelectedOutputFormat}
-                            selectedTemplate={selectedTemplate}
-                            onTemplateChange={setSelectedTemplate}
-                          />
-                        </Suspense>
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
               {(viewMode === 'worker-templates') && (

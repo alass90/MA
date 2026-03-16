@@ -1140,7 +1140,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
     <div className={cn('mx-auto', isMobile ? 'w-full' : 'max-w-3xl')}>
       <ChatInput
         onSubmit={handleSubmitMessage}
-        placeholder={t('describeWhatYouNeed')}
+        placeholder="Ask Talos"
         loading={isSending}
         disabled={isSending}
         isAgentRunning={
@@ -1156,6 +1156,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         agentName={agent && agent.name}
         selectedAgentId={selectedAgentId}
         onAgentSelect={handleAgentSelect}
+        bgColor='bg-white'
         threadId={threadId}
         hideAgentSelection={!!configuredAgentId}
         toolCalls={toolCalls}

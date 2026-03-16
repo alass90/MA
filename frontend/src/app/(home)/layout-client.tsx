@@ -14,9 +14,8 @@ export function HomeLayoutClient({
   // Determine tabs based on local mode and current path
   let tabs: string[] | undefined;
   if (isLocalMode()) {
-    // On consumer page (/), show home navigation links + enterprise
-    // On enterprise page, only show enterprise
-    tabs = pathname === '/enterprise' ? ['enterprise'] : ['home', 'enterprise'];
+    // Only show requested navigation links
+    tabs = ['features', 'about', 'campus', 'pricing'];
   }
 
   return (

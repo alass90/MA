@@ -1250,7 +1250,7 @@ export function SunaModesPanel({
                 variant="outline"
                 size="sm"
                 onClick={() => onModeSelect(mode.id)}
-                className="flex items-center justify-center sm:justify-start gap-2 shrink-0 transition-all duration-200 bg-background hover:bg-accent rounded-xl text-muted-foreground hover:text-foreground border-border cursor-pointer"
+                className="flex items-center justify-center sm:justify-start gap-2.5 shrink-0 transition-all duration-200 bg-background/50 hover:bg-accent/50 rounded-full px-4 text-muted-foreground hover:text-foreground border-border/60 hover:border-border cursor-pointer h-9 shadow-sm"
               >
                 {mode.icon}
                 <span>{mode.label}</span>

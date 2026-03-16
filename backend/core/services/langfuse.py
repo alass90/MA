@@ -11,15 +11,15 @@ host = os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
 # Determine if Langfuse should be enabled
 enabled = bool(public_key and secret_key)
 
-logger.debug(f"🔍 Langfuse Environment Check:")
-logger.debug(f"  - Public Key: {'✅ Set' if public_key else '❌ Missing'}")
-logger.debug(f"  - Secret Key: {'✅ Set' if secret_key else '❌ Missing'}")
+logger.debug(f"Langfuse Environment Check:")
+logger.debug(f"  - Public Key: {'Set' if public_key else 'Missing'}")
+logger.debug(f"  - Secret Key: {'Set' if secret_key else 'Missing'}")
 logger.debug(f"  - Host: {host}")
 logger.debug(f"  - Enabled: {enabled}")
 
 # Initialize client using singleton pattern
 if enabled:
-    logger.debug(f"🔍 Initializing Langfuse with host: {host}")
+    logger.debug(f"Initializing Langfuse with host: {host}")
     try:
         # Initialize with constructor arguments (recommended approach)
         # Disable SSL verification for local/development environments if needed
@@ -39,33 +39,33 @@ if enabled:
             host=host,
             httpx_client=httpx_client
         )
-        logger.info(f"✅ Langfuse initialized successfully - Host: {host}")
-        logger.info(f"🔍 Langfuse Public Key: {public_key[:8]}...{public_key[-4:] if len(public_key) > 12 else public_key}")
-        
+        logger.info(f"Langfuse initialized successfully - Host: {host}")
+        logger.info(f"Langfuse Public Key: {public_key[:8]}...{public_key[-4:] if len(public_key) > 12 else public_key}")
+
         # Test the connection
         try:
-            logger.debug(f"🔍 Testing authentication with {host}...")
+            logger.debug(f"Testing authentication with {host}...")
             auth_result = langfuse.auth_check()
             if auth_result:
-                logger.info(f"🔗 Langfuse authentication successful with {host}")
+                logger.info(f"Langfuse authentication successful with {host}")
             else:
-                logger.warning(f"❌ Langfuse authentication failed with {host}")
+                logger.warning(f"Langfuse authentication failed with {host}")
         except Exception as auth_error:
-            logger.warning(f"⚠️ Langfuse auth check failed: {auth_error}")
-            
+            logger.warning(f"Langfuse auth check failed: {auth_error}")
+
             # Try alternative host if authentication fails
             if "us.cloud.langfuse.com" in host:
-                logger.info("🔄 Trying EU host as fallback...")
+                logger.info("Trying EU host as fallback...")
                 fallback_host = "https://cloud.langfuse.com"
             elif "cloud.langfuse.com" in host and "us." not in host:
-                logger.info("🔄 Trying US host as fallback...")
+                logger.info("Trying US host as fallback...")
                 fallback_host = "https://us.cloud.langfuse.com"
             else:
                 fallback_host = None
-            
+
             if fallback_host:
                 try:
-                    logger.info(f"🔄 Testing fallback host: {fallback_host}")
+                    logger.info(f"Testing fallback host: {fallback_host}")
                     langfuse_fallback = Langfuse(
                         public_key=public_key,
                         secret_key=secret_key,
@@ -74,21 +74,21 @@ if enabled:
                     )
                     auth_result_fallback = langfuse_fallback.auth_check()
                     if auth_result_fallback:
-                        logger.info(f"✅ Fallback host authentication successful! Switching to {fallback_host}")
+                        logger.info(f"Fallback host authentication successful! Switching to {fallback_host}")
                         langfuse = langfuse_fallback
                         host = fallback_host
                         # Update the global host for URL generation
                         globals()['host'] = fallback_host
                     else:
-                        logger.warning(f"❌ Fallback host {fallback_host} authentication also failed")
+                        logger.warning(f"Fallback host {fallback_host} authentication also failed")
                 except Exception as fallback_error:
-                    logger.warning(f"⚠️ Fallback host {fallback_host} also failed: {fallback_error}")
+                    logger.warning(f"Fallback host {fallback_host} also failed: {fallback_error}")
 
         # Register shutdown hook for clean exit
         atexit.register(langfuse.shutdown)
 
     except Exception as e:
-        logger.error(f"❌ Failed to initialize Langfuse: {e}")
+        logger.error(f"Failed to initialize Langfuse: {e}")
         # Create disabled instance as fallback with SSL handling
         try:
             import httpx

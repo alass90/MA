@@ -29,16 +29,16 @@ redis_username = redis_config["username"]
 
 if redis_config["url"]:
     auth_info = f" (user={redis_username})" if redis_username else ""
-    logger.info(f"🔧 Configuring Dramatiq broker with Redis at {redis_host}:{redis_port}{auth_info}")
+    logger.info(f"Configuring Dramatiq broker with Redis at {redis_host}:{redis_port}{auth_info}")
     redis_broker = RedisBroker(url=redis_config["url"], middleware=[dramatiq.middleware.AsyncIO()])
 else:
-    logger.info(f"🔧 Configuring Dramatiq broker with Redis at {redis_host}:{redis_port}")
+    logger.info(f"Configuring Dramatiq broker with Redis at {redis_host}:{redis_port}")
     redis_broker = RedisBroker(host=redis_host, port=redis_port, middleware=[dramatiq.middleware.AsyncIO()])
 
 dramatiq.set_broker(redis_broker)
 
 warm_up_tools_cache()
-logger.info("✅ Worker process ready, tool cache warmed")
+logger.info("Worker process ready, tool cache warmed")
 
 _initialized = False
 db = DBConnection()

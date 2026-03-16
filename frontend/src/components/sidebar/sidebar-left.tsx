@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Bot, Menu, Plus, Zap, MessageCircle, PanelLeftOpen, PanelLeftClose } from 'lucide-react';
+import { Bot, Menu, Plus, Zap, MessageCircle, PanelLeftOpen, PanelLeftClose, PanelLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { NavAgents } from '@/components/sidebar/nav-agents';
@@ -255,7 +255,7 @@ export function SidebarLeft({
                 }
               }}
             >
-              <PanelLeftClose className="!h-5 !w-5" />
+              <PanelLeft className="!h-5 !w-5" />
             </Button>
           </div>
         </div>

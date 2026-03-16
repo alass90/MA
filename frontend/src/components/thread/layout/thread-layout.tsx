@@ -369,4 +369,3 @@ export const ThreadLayout = memo(function ThreadLayout({
     </div>
   );
 });
-

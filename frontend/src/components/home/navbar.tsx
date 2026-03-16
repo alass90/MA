@@ -145,10 +145,9 @@ export function Navbar({ tabs }: NavbarProps = {}) {
                 <KortixLogo size={24} variant='logomark' />
               </Link>
             </div>
-            {/* 
             <div className="hidden md:flex items-center justify-center flex-grow">
               <NavMenu links={filteredNavLinks} />
-            </div> */}
+            </div>
 
             {/* Right Section - Actions */}
             <div className="flex items-center justify-end flex-shrink-0 w-auto md:w-[200px] ml-auto">

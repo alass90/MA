@@ -18,7 +18,7 @@ import { handleFiles, FileUploadHandler } from './file-upload-handler';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowUp, X, Image as ImageIcon, Presentation, BarChart3, FileText, Search, Users, Code2, Sparkles, Brain as BrainIcon, MessageSquare, CornerDownLeft, Plug, Lock } from 'lucide-react';
+import { ArrowUp, X, Image as ImageIcon, Presentation, BarChart3, FileText, Search, Users, Code2, Sparkles, Brain as BrainIcon, MessageSquare, CornerDownLeft, Plug, Lock, Loader2 } from 'lucide-react';
 import { KortixLoader } from '@/components/ui/kortix-loader';
 import { VoiceRecorder } from './voice-recorder';
 import { useTheme } from 'next-themes';
@@ -117,7 +117,7 @@ const SubmitButton = memo(function SubmitButton({
               disabled={isDisabled}
             >
               {((loading || isUploading) && !isAgentRunning) ? (
-                <KortixLoader size="small" customSize={20} variant={buttonLoaderVariant} />
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : isAgentRunning ? (
                 <div className="min-h-[14px] min-w-[14px] w-[14px] h-[14px] rounded-sm bg-current" />
               ) : (
@@ -218,7 +218,7 @@ export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
       onAgentSelect,
       agentName,
       messages = [],
-      bgColor = 'bg-card',
+      bgColor = 'bg-white dark:bg-[#161618]',
       toolCalls = [],
       toolCallIndex = 0,
       showToolPreview = false,
@@ -807,7 +807,7 @@ export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
                         {/* Left Column: CONNECTÉS */}
                         <div className="p-3">
                           <div className="px-1 mb-3">
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Connectés</span>
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Connected</span>
                           </div>
                           <div className="space-y-1">
                             {/* Empty state for now - will show connected integrations */}
@@ -820,7 +820,7 @@ export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
                         {/* Right Column: AJOUTER */}
                         <div className="p-3 relative">
                           <div className="px-1 mb-3">
-                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ajouter</span>
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Add</span>
                           </div>
                           <div className="space-y-0.5 relative">
                             {quickIntegrations.map((integration) => (
@@ -868,7 +868,7 @@ export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
                                 }
                               }}
                             >
-                              <span className="text-xs text-muted-foreground hover:text-foreground transition-colors">+ Voir 200+ apps</span>
+                              <span className="text-xs text-muted-foreground hover:text-foreground transition-colors">See all apps</span>
                             </div>
 
                             {isFreeTier && !isLocalMode() && (
@@ -1102,7 +1102,7 @@ export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
                     {isUploading && pendingFiles.length > 0 && (
                       <div className="absolute inset-0 bg-background/50 backdrop-blur-sm rounded-xl flex items-center justify-center">
                         <div className="flex items-center gap-2 bg-background/90 px-3 py-2 rounded-lg border border-border">
-                          <KortixLoader size="small" customSize={16} variant="auto" />
+                          <Loader2 className="h-4 w-4 animate-spin" />
                           <span className="text-sm">Uploading {pendingFiles.length} file{pendingFiles.length !== 1 ? 's' : ''}...</span>
                         </div>
                       </div>

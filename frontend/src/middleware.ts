@@ -12,6 +12,10 @@ const MARKETING_ROUTES = [
   '/legal',
   '/support',
   '/templates',
+  '/features',
+  '/about',
+  '/campus',
+  '/pricing',
 ];
 
 // Routes that don't require authentication
