@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Clay - Key Points</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #f5ece0; display: flex; font-family: 'Fraunces', serif; }
+    .sidebar {
+      width: 480px; background: #2d1f14; padding: 90px 60px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .sidebar-label { font-size: 14px; color: #c4705a; letter-spacing: 4px; text-transform: uppercase; font-family: 'Crimson Text', serif; }
+    .sidebar-title { font-size: 58px; font-weight: 700; color: white; line-height: 1.15; margin-top: 24px; }
+    .sidebar-quote { font-size: 20px; color: rgba(255,255,255,0.5); font-family: 'Crimson Text', serif; font-style: italic; line-height: 1.7; }
+    .accent-dot { width: 12px; height: 12px; background: #c4705a; border-radius: 50%; margin-bottom: 20px; }
+    .main { flex: 1; padding: 90px 90px; display: flex; flex-direction: column; justify-content: center; gap: 28px; }
+    .point {
+      background: white; border-radius: 16px; padding: 36px 44px;
+      display: flex; align-items: center; gap: 28px;
+      border-left: 5px solid #c4705a;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .point-icon { font-size: 32px; min-width: 50px; text-align: center; }
+    .point-title { font-size: 26px; font-weight: 600; color: #2d1f14; margin-bottom: 6px; }
+    .point-text { font-size: 18px; color: #8b6e57; font-family: 'Crimson Text', serif; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="sidebar">
+      <div>
+        <div class="sidebar-label">Key Points</div>
+        <div class="sidebar-title">What Matters Most</div>
+      </div>
+      <div>
+        <div class="accent-dot"></div>
+        <div class="sidebar-quote">"Great results come from clarity of purpose and consistency of effort."</div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="point">
+        <div class="point-icon">🌱</div>
+        <div>
+          <div class="point-title">Sustainable Growth</div>
+          <div class="point-text">Building compounding value through disciplined, long-term thinking rather than short-term optimization</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="point-icon">🤝</div>
+        <div>
+          <div class="point-title">People-First Culture</div>
+          <div class="point-text">Investing in team development creates the foundation for everything else — innovation, retention, and trust</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="point-icon">🎯</div>
+        <div>
+          <div class="point-title">Focused Execution</div>
+          <div class="point-text">Prioritizing ruthlessly and saying no to good ideas in order to say yes to the great ones</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "id": "launch",
+  "name": "Launch",
+  "description": "Professional presentation template for launch.",
+  "number_of_slides": 5,
+  "style": {
+    "theme": "minimalist"
+  }
+}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Glass - Slide 2 (Content)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text-primary: #FFFFFF;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --accent: #0AFFFF;
+    }
+    body, html {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      font-family: 'Outfit', sans-serif;
+      background: url('assets/bg.png') no-repeat center center fixed; 
+      background-size: cover;
+      color: var(--text-primary);
+      overflow: hidden;
+    }
+    .slide-container {
+      width: 1920px; height: 1080px; position: relative;
+      padding: 100px; box-sizing: border-box;
+      display: flex; flex-direction: column;
+    }
+    .header {
+      display: flex; align-items: center; margin-bottom: 60px;
+    }
+    .accent-line {
+      width: 80px; height: 6px; background: var(--accent); border-radius: 3px; margin-right: 30px;
+      box-shadow: 0 0 20px rgba(10,255,255,0.5);
+    }
+    .slide-title {
+      font-size: 64px; font-weight: 600; margin: 0;
+      letter-spacing: -1px;
+    }
+    .content-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; flex: 1;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px; padding: 50px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+      position: relative; overflow: hidden;
+    }
+    .glass-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    }
+    .card-title {
+      font-size: 36px; font-weight: 500; margin: 0 0 20px 0; color: var(--accent);
+    }
+    .card-text {
+      font-size: 28px; line-height: 1.6; color: var(--text-secondary); font-weight: 300; margin: 0;
+    }
+    .list { margin-top: 30px; padding-left: 0; list-style: none; }
+    .list li {
+      font-size: 28px; color: var(--text-secondary); font-weight: 300; margin-bottom: 20px;
+      display: flex; align-items: flex-start;
+    }
+    .list li::before {
+      content: '✦'; color: var(--accent); margin-right: 20px; font-size: 24px;
+    }
+    .slide-number { position: absolute; bottom: 50px; right: 100px; font-size: 24px; font-weight: 500; color: rgba(255,255,255,0.3); }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="header">
+      <div class="accent-line"></div>
+      <h2 class="slide-title">Core Features & Capabilities</h2>
+    </div>
+    
+    <div class="content-grid">
+      <div class="glass-card">
+        <h3 class="card-title">Seamless Integration</h3>
+        <p class="card-text">Our architecture is designed from the ground up to integrate perfectly with your existing workflows, requiring zero downtime and minimal configuration.</p>
+        <ul class="list">
+          <li>Plug-and-play APIs</li>
+          <li>Real-time synchronization</li>
+          <li>Legacy system support</li>
+        </ul>
+      </div>
+      
+      <div class="glass-card">
+        <h3 class="card-title">Infinite Scalability</h3>
+        <p class="card-text">Backed by distributed edge computing, our infrastructure scales dynamically to meet demand spikes without compromising performance or reliability.</p>
+        <ul class="list">
+          <li>Auto-scaling microservices</li>
+          <li>Global edge caching</li>
+          <li>99.99% Guaranteed Uptime</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="slide-number">02</div>
+  </div>
+</body>
+</html>

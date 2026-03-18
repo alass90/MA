@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Circuit - Title Slide</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #020a04; display: flex; font-family: 'JetBrains Mono', monospace; position: relative; overflow: hidden; }
+    .grid-bg {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(0,255,65,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,65,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .scan-line { position: absolute; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, rgba(0,255,65,0.4), transparent); top: 30%; animation: none; }
+    .left { width: 60px; background: rgba(0,255,65,0.05); border-right: 1px solid rgba(0,255,65,0.15); display: flex; flex-direction: column; justify-content: space-between; padding: 30px 0; align-items: center; }
+    .left-dot { width: 8px; height: 8px; background: #00ff41; border-radius: 50%; box-shadow: 0 0 8px #00ff41; }
+    .left-line { flex: 1; width: 1px; background: rgba(0,255,65,0.2); margin: 10px 0; }
+    .main { flex: 1; padding: 80px 100px; display: flex; flex-direction: column; justify-content: space-between; position: relative; z-index: 2; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; }
+    .sys-label { font-size: 13px; color: rgba(0,255,65,0.5); letter-spacing: 3px; }
+    .sys-status { font-size: 13px; color: #00ff41; letter-spacing: 2px; }
+    .center-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .prefix { font-size: 18px; color: rgba(0,255,65,0.6); margin-bottom: 20px; }
+    .title { font-size: 110px; font-weight: 800; line-height: 0.95; letter-spacing: -2px; margin-bottom: 40px; }
+    .title-white { color: white; }
+    .title-green { color: #00ff41; text-shadow: 0 0 30px rgba(0,255,65,0.5); }
+    .subtitle { font-size: 20px; color: rgba(255,255,255,0.4); font-family: 'Inter', sans-serif; letter-spacing: 2px; max-width: 700px; line-height: 1.6; }
+    .bottom-bar { display: flex; gap: 40px; }
+    .stat { display: flex; flex-direction: column; }
+    .stat-val { font-size: 24px; font-weight: 700; color: #00ff41; }
+    .stat-label { font-size: 12px; color: rgba(255,255,255,0.3); letter-spacing: 2px; margin-top: 4px; }
+    .right-panel { width: 400px; border-left: 1px solid rgba(0,255,65,0.1); padding: 80px 50px; display: flex; flex-direction: column; justify-content: center; gap: 24px; position: relative; z-index: 2; }
+    .code-line { font-size: 14px; color: rgba(0,255,65,0.4); line-height: 1.8; }
+    .code-key { color: #4fc3f7; }
+    .code-val { color: #ce93d8; }
+    .code-str { color: #a5d6a7; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="grid-bg"></div>
+    <div class="scan-line"></div>
+    <div class="left">
+      <div class="left-dot"></div>
+      <div class="left-line"></div>
+      <div class="left-dot" style="opacity:0.3"></div>
+      <div class="left-line"></div>
+      <div class="left-dot"></div>
+    </div>
+    <div class="main">
+      <div class="top-bar">
+        <div class="sys-label">SYS://CIRCUIT v2.4.1</div>
+        <div class="sys-status">● ONLINE</div>
+      </div>
+      <div class="center-content">
+        <div class="prefix">$ run presentation.init --mode=deploy</div>
+        <div class="title">
+          <div class="title-white">Build</div>
+          <div class="title-green">Faster.</div>
+        </div>
+        <div class="subtitle">Engineering-first presentation template for technical teams and product builders.</div>
+      </div>
+      <div class="bottom-bar">
+        <div class="stat"><div class="stat-val">99.9%</div><div class="stat-label">UPTIME</div></div>
+        <div class="stat"><div class="stat-val">&lt;50ms</div><div class="stat-label">LATENCY</div></div>
+        <div class="stat"><div class="stat-val">∞</div><div class="stat-label">SCALE</div></div>
+      </div>
+    </div>
+    <div class="right-panel">
+      <div class="code-line"><span class="code-key">const</span> <span style="color:white">config</span> = {</div>
+      <div class="code-line">&nbsp;&nbsp;<span class="code-key">name</span>: <span class="code-str">"Circuit"</span>,</div>
+      <div class="code-line">&nbsp;&nbsp;<span class="code-key">version</span>: <span class="code-val">2</span>,</div>
+      <div class="code-line">&nbsp;&nbsp;<span class="code-key">theme</span>: <span class="code-str">"dark"</span>,</div>
+      <div class="code-line">&nbsp;&nbsp;<span class="code-key">accent</span>: <span class="code-str">"#00ff41"</span>,</div>
+      <div class="code-line">&nbsp;&nbsp;<span class="code-key">ready</span>: <span class="code-val">true</span></div>
+      <div class="code-line">};</div>
+      <div class="code-line" style="margin-top:16px; color:rgba(0,255,65,0.25)">// Initialize presentation</div>
+      <div class="code-line"><span class="code-key">export default</span> config;</div>
+    </div>
+  </div>
+</body>
+</html>

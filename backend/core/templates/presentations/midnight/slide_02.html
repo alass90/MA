@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Midnight - Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #0a0f1e; font-family: 'Raleway', sans-serif; display: flex; flex-direction: column; padding: 90px 140px; }
+    .gold-line-top { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #d4a843, transparent); }
+    .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 70px; }
+    .label { font-size: 13px; color: #d4a843; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 16px; }
+    .title { font-family: 'Cormorant Garamond', serif; font-size: 64px; font-weight: 700; color: white; }
+    .num-bg { font-family: 'Cormorant Garamond', serif; font-size: 120px; font-weight: 300; color: rgba(212,168,67,0.08); line-height: 1; }
+    .items { display: flex; gap: 24px; flex: 1; }
+    .item {
+      flex: 1; border: 1px solid rgba(212,168,67,0.15); border-radius: 4px; padding: 50px 44px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      position: relative; overflow: hidden;
+    }
+    .item::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #d4a843, transparent); }
+    .item-num { font-family: 'Cormorant Garamond', serif; font-size: 64px; font-weight: 300; color: rgba(212,168,67,0.3); line-height: 1; margin-bottom: 20px; }
+    .item-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 600; color: white; margin-bottom: 14px; }
+    .item-text { font-size: 17px; color: rgba(255,255,255,0.4); line-height: 1.7; font-weight: 300; }
+    .item-tag { font-size: 12px; color: #d4a843; letter-spacing: 3px; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="gold-line-top"></div>
+    <div class="header">
+      <div>
+        <div class="label">Agenda</div>
+        <div class="title">Tonight's Programme</div>
+      </div>
+      <div class="num-bg">02</div>
+    </div>
+    <div class="items">
+      <div class="item">
+        <div class="item-num">I</div>
+        <div>
+          <div class="item-title">Market Context</div>
+          <div class="item-text">A clear-eyed view of where the market stands and the forces shaping it</div>
+        </div>
+        <div class="item-tag">Opening</div>
+      </div>
+      <div class="item">
+        <div class="item-num">II</div>
+        <div>
+          <div class="item-title">Strategic Vision</div>
+          <div class="item-text">The long-term thesis that guides our decisions and priorities going forward</div>
+        </div>
+        <div class="item-tag">Strategy</div>
+      </div>
+      <div class="item">
+        <div class="item-num">III</div>
+        <div>
+          <div class="item-title">Financial Overview</div>
+          <div class="item-text">Key metrics, performance highlights, and the financial trajectory ahead</div>
+        </div>
+        <div class="item-tag">Finance</div>
+      </div>
+      <div class="item">
+        <div class="item-num">IV</div>
+        <div>
+          <div class="item-title">Path Forward</div>
+          <div class="item-text">Concrete recommendations, decisions required, and next milestones</div>
+        </div>
+        <div class="item-tag">Closing</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

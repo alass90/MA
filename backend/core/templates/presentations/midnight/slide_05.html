@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Midnight - Closing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #0a0f1e; font-family: 'Raleway', sans-serif; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; position: relative; }
+    .gold-top { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #d4a843, transparent); }
+    .gold-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(212,168,67,0.4), transparent); }
+    .rings { position: absolute; }
+    .ring { position: absolute; border: 1px solid; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    .ring-1 { width: 500px; height: 500px; border-color: rgba(212,168,67,0.06); }
+    .ring-2 { width: 800px; height: 800px; border-color: rgba(212,168,67,0.04); }
+    .ring-3 { width: 1100px; height: 1100px; border-color: rgba(212,168,67,0.02); }
+    .content { position: relative; z-index: 2; }
+    .label { font-size: 13px; color: #d4a843; letter-spacing: 6px; text-transform: uppercase; margin-bottom: 32px; }
+    .title { font-family: 'Cormorant Garamond', serif; font-size: 110px; font-weight: 700; color: white; line-height: 1.0; margin-bottom: 40px; }
+    .gold-divider { width: 80px; height: 1px; background: #d4a843; margin: 0 auto 40px; }
+    .subtitle { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.4); margin-bottom: 70px; }
+    .contact-row { display: flex; gap: 60px; justify-content: center; }
+    .contact { font-size: 16px; color: rgba(212,168,67,0.6); letter-spacing: 2px; }
+    .corner { position: absolute; width: 30px; height: 30px; }
+    .tl { top: 40px; left: 40px; border-top: 1px solid #d4a843; border-left: 1px solid #d4a843; }
+    .tr { top: 40px; right: 40px; border-top: 1px solid #d4a843; border-right: 1px solid #d4a843; }
+    .bl { bottom: 40px; left: 40px; border-bottom: 1px solid #d4a843; border-left: 1px solid #d4a843; }
+    .br { bottom: 40px; right: 40px; border-bottom: 1px solid #d4a843; border-right: 1px solid #d4a843; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="gold-top"></div>
+    <div class="gold-bottom"></div>
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+    <div class="ring ring-3"></div>
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+    <div class="content">
+      <div class="label">Fin</div>
+      <div class="title">Thank You</div>
+      <div class="gold-divider"></div>
+      <div class="subtitle">We look forward to the conversation that follows</div>
+      <div class="contact-row">
+        <div class="contact">hello@yourcompany.com</div>
+        <div class="contact">www.yourcompany.com</div>
+        <div class="contact">Confidential · 2025</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Clay - Closing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #c4705a; display: flex; font-family: 'Fraunces', serif; position: relative; overflow: hidden; }
+    .circle1 { position: absolute; width: 800px; height: 800px; background: rgba(255,255,255,0.07); border-radius: 50%; bottom: -300px; right: -200px; }
+    .circle2 { position: absolute; width: 400px; height: 400px; background: rgba(255,255,255,0.05); border-radius: 50%; top: -100px; left: 300px; }
+    .left { width: 800px; padding: 100px 100px; display: flex; flex-direction: column; justify-content: space-between; position: relative; z-index: 2; }
+    .eyebrow { font-size: 16px; color: rgba(255,255,255,0.6); letter-spacing: 4px; text-transform: uppercase; font-family: 'Crimson Text', serif; }
+    .title { font-size: 100px; font-weight: 900; color: white; line-height: 0.95; margin-top: 40px; letter-spacing: -2px; }
+    .footer-text { font-size: 20px; color: rgba(255,255,255,0.6); font-family: 'Crimson Text', serif; }
+    .right { flex: 1; padding: 100px 80px; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2; }
+    .message { font-size: 36px; color: rgba(255,255,255,0.9); font-family: 'Crimson Text', serif; font-style: italic; line-height: 1.6; margin-bottom: 60px; max-width: 700px; }
+    .contact-title { font-size: 20px; color: rgba(255,255,255,0.5); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; }
+    .contact-item { font-size: 24px; color: white; margin-bottom: 12px; font-family: 'Crimson Text', serif; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="circle1"></div>
+    <div class="circle2"></div>
+    <div class="left">
+      <div class="eyebrow">Thank You</div>
+      <div class="title">Let's Create Something<br>Wonderful</div>
+      <div class="footer-text">2025 · Your Company Name</div>
+    </div>
+    <div class="right">
+      <div class="message">"The best work comes from people who care deeply about what they're building — and who they're building it for."</div>
+      <div class="contact-title">Stay in Touch</div>
+      <div class="contact-item">hello@yourcompany.com</div>
+      <div class="contact-item">www.yourcompany.com</div>
+      <div class="contact-item">@yourhandle</div>
+    </div>
+  </div>
+</body>
+</html>

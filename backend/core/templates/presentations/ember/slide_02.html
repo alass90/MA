@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ember - Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #0f0500; font-family: 'Barlow', sans-serif; display: flex; flex-direction: column; padding: 80px 120px; }
+    .header { margin-bottom: 60px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .label { font-size: 13px; color: #ff6b35; letter-spacing: 5px; text-transform: uppercase; font-weight: 600; margin-bottom: 12px; }
+    .title { font-family: 'Barlow Condensed', sans-serif; font-size: 72px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: -1px; }
+    .title span { color: #ff4500; }
+    .num { font-family: 'Barlow Condensed', sans-serif; font-size: 120px; font-weight: 900; color: rgba(255,69,0,0.1); line-height: 1; }
+    .items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; flex: 1; }
+    .item { border: 1px solid rgba(255,69,0,0.2); border-radius: 4px; padding: 44px 36px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+    .item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #ff4500; }
+    .item-num { font-family: 'Barlow Condensed', sans-serif; font-size: 60px; font-weight: 900; color: rgba(255,69,0,0.25); line-height: 1; }
+    .item-title { font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 900; color: white; text-transform: uppercase; margin-bottom: 10px; }
+    .item-text { font-size: 17px; color: rgba(255,255,255,0.4); line-height: 1.6; flex: 1; }
+    .item-arrow { font-size: 22px; color: #ff4500; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="header">
+      <div>
+        <div class="label">What's Coming</div>
+        <div class="title">The <span>Game Plan</span></div>
+      </div>
+      <div class="num">02</div>
+    </div>
+    <div class="items">
+      <div class="item">
+        <div class="item-num">01</div>
+        <div>
+          <div class="item-title">The Opportunity</div>
+          <div class="item-text">The massive window in front of us and why now is the time to act decisively</div>
+        </div>
+        <div class="item-arrow">→</div>
+      </div>
+      <div class="item">
+        <div class="item-num">02</div>
+        <div>
+          <div class="item-title">Our Edge</div>
+          <div class="item-text">The unfair advantages we've built that no competitor can easily replicate</div>
+        </div>
+        <div class="item-arrow">→</div>
+      </div>
+      <div class="item">
+        <div class="item-num">03</div>
+        <div>
+          <div class="item-title">The Numbers</div>
+          <div class="item-text">Cold hard data on traction, growth, and the trajectory we're on</div>
+        </div>
+        <div class="item-arrow">→</div>
+      </div>
+      <div class="item">
+        <div class="item-num">04</div>
+        <div>
+          <div class="item-title">The Mission</div>
+          <div class="item-text">What we're asking for and how we'll use it to dominate our market</div>
+        </div>
+        <div class="item-arrow">→</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nova - Stats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide {
+      width: 1920px; height: 1080px;
+      background: linear-gradient(135deg, #0d0b2a 0%, #08071a 50%, #0d0b2a 100%);
+      font-family: 'Space Grotesk', sans-serif; display: flex; align-items: center;
+      padding: 80px 120px; gap: 80px;
+    }
+    .left { flex: 1; }
+    .slide-label { font-size: 14px; color: #7c3aed; letter-spacing: 4px; text-transform: uppercase; font-weight: 500; margin-bottom: 24px; }
+    .section-title { font-size: 72px; font-weight: 700; color: white; line-height: 1.1; margin-bottom: 32px; }
+    .section-desc { font-size: 22px; color: #6b7280; font-family: 'Inter', sans-serif; line-height: 1.7; max-width: 500px; }
+    .accent-line { width: 60px; height: 3px; background: linear-gradient(90deg, #7c3aed, #e879f9); margin: 32px 0; }
+    .right { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .stat-card {
+      background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 20px; padding: 48px 40px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .stat-value {
+      font-size: 80px; font-weight: 700; line-height: 1;
+      background: linear-gradient(135deg, #ffffff, #c4b5fd);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-unit { font-size: 40px; font-weight: 500; color: #7c3aed; }
+    .stat-label { font-size: 18px; color: #9ca3af; font-family: 'Inter', sans-serif; margin-top: 12px; }
+    .stat-change { font-size: 16px; color: #34d399; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="left">
+      <div class="slide-label">By the Numbers</div>
+      <div class="section-title">Results That Speak for Themselves</div>
+      <div class="accent-line"></div>
+      <div class="section-desc">Every metric reflects real impact achieved through disciplined execution and continuous iteration.</div>
+    </div>
+    <div class="right">
+      <div class="stat-card">
+        <div>
+          <span class="stat-value">94</span><span class="stat-unit">%</span>
+        </div>
+        <div>
+          <div class="stat-label">Customer Satisfaction</div>
+          <div class="stat-change">↑ +12% vs last year</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div>
+          <span class="stat-value">3.2</span><span class="stat-unit">M</span>
+        </div>
+        <div>
+          <div class="stat-label">Active Users</div>
+          <div class="stat-change">↑ +180% growth</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div>
+          <span class="stat-value">48</span><span class="stat-unit">h</span>
+        </div>
+        <div>
+          <div class="stat-label">Avg Time Saved / Month</div>
+          <div class="stat-change">↑ +35% efficiency</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div>
+          <span class="stat-value">$8</span><span class="stat-unit">M</span>
+        </div>
+        <div>
+          <div class="stat-label">Annual Revenue</div>
+          <div class="stat-change">↑ +220% YoY</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

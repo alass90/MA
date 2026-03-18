@@ -1,0 +1,27 @@
+{
+  "title": "Cyberpunk Neon - Electric Futuristic Template",
+  "description": "A high-tech cyberpunk presentation template with neon cyan and magenta accents over dark grids.",
+  "layout": "16:9",
+  "fonts": [
+    "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+  ],
+  "colors": {
+    "background": "url('./assets/bg.png') no-repeat center center / cover",
+    "text_primary": "#E0E0E0",
+    "text_secondary": "#A0A0A0",
+    "accent": "#00F0FF",
+    "accent_secondary": "#FF003C",
+    "panel_bg": "rgba(10, 10, 15, 0.8)",
+    "panel_border": "rgba(0, 240, 255, 0.3)"
+  },
+  "slide_types": [
+    "title",
+    "agenda",
+    "content",
+    "two_column",
+    "image_showcase",
+    "metrics",
+    "quote",
+    "conclusion"
+  ]
+}

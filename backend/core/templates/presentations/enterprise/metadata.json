@@ -1,0 +1,9 @@
+{
+  "id": "enterprise",
+  "name": "Enterprise",
+  "description": "Professional presentation template for enterprise.",
+  "number_of_slides": 5,
+  "style": {
+    "theme": "minimalist"
+  }
+}

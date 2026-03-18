@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nova - Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; background: #08071a; }
+    .slide {
+      width: 1920px; height: 1080px;
+      background: #08071a;
+      display: flex; font-family: 'Space Grotesk', sans-serif; position: relative;
+    }
+    .left-panel {
+      width: 480px; background: linear-gradient(180deg, #1a0a3d 0%, #0d0b2a 100%);
+      padding: 80px 60px; display: flex; flex-direction: column; justify-content: space-between;
+      border-right: 1px solid rgba(124,58,237,0.3);
+    }
+    .slide-label { font-size: 14px; color: #7c3aed; letter-spacing: 4px; text-transform: uppercase; font-weight: 500; }
+    .section-title {
+      font-size: 64px; font-weight: 700; color: white; line-height: 1.1;
+      margin-top: 40px;
+    }
+    .accent-line { width: 60px; height: 3px; background: linear-gradient(90deg, #7c3aed, #e879f9); margin-top: 30px; }
+    .slide-num { font-size: 120px; font-weight: 700; color: rgba(124,58,237,0.15); line-height: 1; align-self: flex-end; }
+    .right-panel { flex: 1; padding: 80px 100px; display: flex; flex-direction: column; justify-content: center; }
+    .agenda-item {
+      display: flex; align-items: flex-start; gap: 32px;
+      padding: 32px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .agenda-item:last-child { border-bottom: none; }
+    .num {
+      font-size: 48px; font-weight: 700; min-width: 70px;
+      background: linear-gradient(135deg, #7c3aed, #c084fc);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .agenda-content {}
+    .agenda-title { font-size: 28px; font-weight: 600; color: white; margin-bottom: 8px; }
+    .agenda-desc { font-size: 18px; color: #6b7280; font-family: 'Inter', sans-serif; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="left-panel">
+      <div>
+        <div class="slide-label">Overview</div>
+        <div class="section-title">What We'll Cover</div>
+        <div class="accent-line"></div>
+      </div>
+      <div class="slide-num">02</div>
+    </div>
+    <div class="right-panel">
+      <div class="agenda-item">
+        <div class="num">01</div>
+        <div class="agenda-content">
+          <div class="agenda-title">Introduction & Context</div>
+          <div class="agenda-desc">Background, goals, and key stakeholders involved in this initiative</div>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="num">02</div>
+        <div class="agenda-content">
+          <div class="agenda-title">Core Strategy</div>
+          <div class="agenda-desc">The strategic pillars and approach we've developed to address the challenge</div>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="num">03</div>
+        <div class="agenda-content">
+          <div class="agenda-title">Results & Impact</div>
+          <div class="agenda-desc">Key metrics, outcomes, and the measurable difference we aim to achieve</div>
+        </div>
+      </div>
+      <div class="agenda-item">
+        <div class="num">04</div>
+        <div class="agenda-content">
+          <div class="agenda-title">Next Steps</div>
+          <div class="agenda-desc">Roadmap, timeline, and actions required to move forward</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

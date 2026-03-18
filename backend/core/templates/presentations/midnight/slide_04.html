@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Midnight - Stats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #0a0f1e; font-family: 'Raleway', sans-serif; display: flex; flex-direction: column; padding: 90px 140px; }
+    .gold-line-top { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #d4a843, transparent); }
+    .header { margin-bottom: 60px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .label { font-size: 13px; color: #d4a843; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 14px; }
+    .title { font-family: 'Cormorant Garamond', serif; font-size: 64px; font-weight: 700; color: white; }
+    .num-bg { font-family: 'Cormorant Garamond', serif; font-size: 120px; font-weight: 300; color: rgba(212,168,67,0.06); }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 30px; }
+    .stat { border: 1px solid rgba(212,168,67,0.15); border-radius: 2px; padding: 44px 40px; position: relative; }
+    .stat::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #d4a843, transparent); }
+    .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 80px; font-weight: 700; color: white; line-height: 1; margin-bottom: 8px; }
+    .stat-value .unit { font-size: 40px; color: #d4a843; }
+    .stat-label { font-size: 14px; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+    .stat-change { font-size: 14px; color: #d4a843; }
+    .divider { border: none; border-top: 1px solid rgba(212,168,67,0.1); margin: 10px 0; }
+    .footnote { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; color: rgba(255,255,255,0.3); text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="gold-line-top"></div>
+    <div class="header">
+      <div>
+        <div class="label">Financial Summary</div>
+        <div class="title">Numbers Tell the Story</div>
+      </div>
+      <div class="num-bg">04</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-value">$18<span class="unit">M</span></div>
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-change">↑ +280% vs prior year</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">89<span class="unit">%</span></div>
+        <div class="stat-label">Gross Margin</div>
+        <div class="stat-change">↑ +14pp improvement</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">2.4<span class="unit">x</span></div>
+        <div class="stat-label">Revenue Multiple</div>
+        <div class="stat-change">↑ exceeds benchmark</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">18<span class="unit">mo</span></div>
+        <div class="stat-label">Runway</div>
+        <div class="stat-change">↑ well capitalized</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="footnote">All figures are unaudited estimates as of Q4 2025. Subject to final accounting review.</div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "id": "systems",
+  "name": "Systems",
+  "description": "Professional presentation template for systems.",
+  "number_of_slides": 5,
+  "style": {
+    "theme": "minimalist"
+  }
+}

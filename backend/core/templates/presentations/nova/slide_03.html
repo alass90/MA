@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nova - Key Points</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide {
+      width: 1920px; height: 1080px;
+      background: #08071a; padding: 80px 120px;
+      font-family: 'Space Grotesk', sans-serif; display: flex; flex-direction: column;
+    }
+    .header { margin-bottom: 60px; }
+    .slide-label { font-size: 14px; color: #7c3aed; letter-spacing: 4px; text-transform: uppercase; font-weight: 500; margin-bottom: 16px; }
+    .section-title { font-size: 56px; font-weight: 700; color: white; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; flex: 1; }
+    .card {
+      background: linear-gradient(145deg, rgba(124,58,237,0.12) 0%, rgba(8,7,26,0.8) 100%);
+      border: 1px solid rgba(124,58,237,0.25); border-radius: 20px;
+      padding: 48px 40px; display: flex; flex-direction: column; position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, #7c3aed, #e879f9);
+    }
+    .card-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: rgba(124,58,237,0.2); display: flex; align-items: center; justify-content: center;
+      font-size: 26px; margin-bottom: 28px;
+    }
+    .card-title { font-size: 28px; font-weight: 600; color: white; margin-bottom: 16px; }
+    .card-text { font-size: 18px; color: #6b7280; font-family: 'Inter', sans-serif; line-height: 1.7; flex: 1; }
+    .card-tag {
+      display: inline-block; margin-top: 24px;
+      padding: 6px 16px; border-radius: 20px;
+      background: rgba(124,58,237,0.2); color: #a78bfa; font-size: 14px; font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="header">
+      <div class="slide-label">Key Points</div>
+      <div class="section-title">Core Concepts</div>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <div class="card-title">Speed & Performance</div>
+        <div class="card-text">Optimized systems deliver results 3x faster than industry standard benchmarks, enabling real-time decision making at scale.</div>
+        <div class="card-tag">Performance</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔮</div>
+        <div class="card-title">Intelligent Automation</div>
+        <div class="card-text">AI-driven workflows handle repetitive tasks autonomously, freeing your team to focus on high-impact strategic work.</div>
+        <div class="card-tag">AI & ML</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <div class="card-title">Global Scalability</div>
+        <div class="card-text">Infrastructure built to scale seamlessly from 100 to 100 million users without architectural changes or performance loss.</div>
+        <div class="card-tag">Scale</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prism - Closing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #0d0d0d; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; align-items: stretch; }
+    .left { flex: 1; background: linear-gradient(135deg, #f72585 0%, #7209b7 50%, #4361ee 100%); padding: 100px 100px; display: flex; flex-direction: column; justify-content: space-between; }
+    .left-top { font-size: 16px; color: rgba(255,255,255,0.6); letter-spacing: 5px; text-transform: uppercase; font-weight: 600; }
+    .left-title { font-size: 100px; font-weight: 800; color: white; line-height: 0.95; letter-spacing: -2px; }
+    .left-bottom { font-size: 20px; color: rgba(255,255,255,0.6); }
+    .right { width: 700px; padding: 100px 90px; display: flex; flex-direction: column; justify-content: center; }
+    .right-label { font-size: 13px; color: #f72585; letter-spacing: 5px; text-transform: uppercase; font-weight: 700; margin-bottom: 40px; }
+    .right-msg { font-size: 30px; color: rgba(255,255,255,0.7); line-height: 1.6; margin-bottom: 60px; }
+    .right-msg strong { color: white; font-weight: 700; }
+    .contact-block { display: flex; flex-direction: column; gap: 16px; }
+    .contact-item { display: flex; align-items: center; gap: 16px; }
+    .contact-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-1 { background: #f72585; }
+    .dot-2 { background: #7209b7; }
+    .dot-3 { background: #4361ee; }
+    .contact-text { font-size: 20px; color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="left">
+      <div class="left-top">Thank You</div>
+      <div class="left-title">Let's Make<br>It Happen.</div>
+      <div class="left-bottom">2025 · Your Company</div>
+    </div>
+    <div class="right">
+      <div class="right-label">What's Next</div>
+      <div class="right-msg">We're <strong>ready to move fast</strong> and we'd love to have you along for the ride. Reach out and let's start the conversation.</div>
+      <div class="contact-block">
+        <div class="contact-item"><div class="contact-dot dot-1"></div><div class="contact-text">hello@yourcompany.com</div></div>
+        <div class="contact-item"><div class="contact-dot dot-2"></div><div class="contact-text">www.yourcompany.com</div></div>
+        <div class="contact-item"><div class="contact-dot dot-3"></div><div class="contact-text">@yourhandle</div></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

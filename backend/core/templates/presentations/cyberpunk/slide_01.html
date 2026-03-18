@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cyberpunk - Slide 1 (Title)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text-primary: #E0E0E0;
+      --text-secondary: #A0A0A0;
+      --accent: #00F0FF;
+      --accent-secondary: #FF003C;
+    }
+    body, html {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      font-family: 'Rajdhani', sans-serif;
+      background: #000;
+      background: url('assets/bg.png') no-repeat center center fixed; 
+      background-size: cover;
+      display: flex; justify-content: center; align-items: center;
+      color: var(--text-primary);
+      overflow: hidden;
+    }
+    .slide-container {
+      width: 1920px; height: 1080px; position: relative;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%);
+    }
+    .glitch-panel {
+      background: rgba(10, 10, 15, 0.85);
+      border: 2px solid var(--accent-secondary);
+      border-radius: 4px;
+      padding: 100px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 0 30px rgba(255, 0, 60, 0.3), inset 0 0 20px rgba(255, 0, 60, 0.2);
+    }
+    /* Tech corners */
+    .glitch-panel::before, .glitch-panel::after {
+      content: ''; position: absolute; width: 30px; height: 30px;
+      border: 3px solid var(--accent);
+    }
+    .glitch-panel::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+    .glitch-panel::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+    
+    .title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 110px; font-weight: 900; margin: 0 0 20px 0;
+      color: var(--text-primary);
+      text-transform: uppercase; letter-spacing: 5px;
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 2px 2px var(--accent-secondary);
+    }
+    .subtitle {
+      font-size: 45px; font-weight: 500; color: var(--accent); margin: 0;
+      text-transform: uppercase; letter-spacing: 10px;
+    }
+    .barcode {
+      margin-top: 40px; font-family: 'Libre Barcode 39 Extended Text', monospace;
+      font-size: 40px; color: var(--accent-secondary); letter-spacing: 5px; opacity: 0.8;
+    }
+    .footer {
+      position: absolute; bottom: 50px; left: 80px; right: 80px;
+      display: flex; justify-content: space-between;
+      font-size: 24px; color: var(--text-primary); font-weight: 600; font-family: 'Orbitron', sans-serif;
+      border-top: 1px solid rgba(0,240,255,0.3); padding-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="slide-container">
+    <div class="glitch-panel">
+      <h1 class="title">CYBERPUNK NEON</h1>
+      <p class="subtitle">SYSTEM INTERFACE v 2.0</p>
+      <div class="barcode">|||| | || |||| | ||||</div>
+    </div>
+    
+    <div class="footer">
+      <div>SYSCON: //AUTHORIZED</div>
+      <div>NET: SECURE</div>
+    </div>
+  </div>
+</body>
+</html>

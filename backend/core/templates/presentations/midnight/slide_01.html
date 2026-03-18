@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Midnight - Title Slide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #0a0f1e; display: flex; font-family: 'Raleway', sans-serif; position: relative; overflow: hidden; }
+    .gold-line-top { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, #d4a843, #f0c060, #d4a843, transparent); }
+    .gold-line-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #d4a843, transparent); }
+    .left { width: 800px; padding: 100px 100px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid rgba(212,168,67,0.2); }
+    .logo { font-size: 14px; color: #d4a843; letter-spacing: 6px; text-transform: uppercase; font-weight: 400; }
+    .main-title { font-family: 'Cormorant Garamond', serif; font-size: 96px; font-weight: 700; color: white; line-height: 0.95; letter-spacing: -1px; }
+    .gold-accent { color: #d4a843; }
+    .year-block { display: flex; align-items: center; gap: 20px; }
+    .year { font-size: 14px; color: rgba(255,255,255,0.3); letter-spacing: 4px; }
+    .year-line { flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
+    .right { flex: 1; padding: 100px 100px; display: flex; flex-direction: column; justify-content: center; }
+    .right-eyebrow { font-size: 13px; color: #d4a843; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 40px; }
+    .right-desc { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 300; color: rgba(255,255,255,0.8); line-height: 1.4; font-style: italic; margin-bottom: 60px; }
+    .divider { width: 50px; height: 1px; background: #d4a843; margin-bottom: 40px; }
+    .details { display: flex; flex-direction: column; gap: 16px; }
+    .detail { display: flex; align-items: center; gap: 16px; }
+    .detail-dot { width: 6px; height: 6px; background: #d4a843; border-radius: 50%; }
+    .detail-text { font-size: 18px; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="gold-line-top"></div>
+    <div class="gold-line-bottom"></div>
+    <div class="left">
+      <div class="logo">Midnight</div>
+      <div class="main-title">Premium<br><span class="gold-accent">Excellence</span><br>Delivered</div>
+      <div class="year-block">
+        <div class="year">2025</div>
+        <div class="year-line"></div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="right-eyebrow">Presentation</div>
+      <div class="right-desc">"Crafted for those who understand that details are not the details — they make the design."</div>
+      <div class="divider"></div>
+      <div class="details">
+        <div class="detail"><div class="detail-dot"></div><div class="detail-text">Confidential · Internal Use</div></div>
+        <div class="detail"><div class="detail-dot"></div><div class="detail-text">Your Company Name</div></div>
+        <div class="detail"><div class="detail-dot"></div><div class="detail-text">Q1 2025 Review</div></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

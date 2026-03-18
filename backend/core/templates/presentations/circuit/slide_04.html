@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Circuit - Stats</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #020a04; font-family: 'JetBrains Mono', monospace; display: flex; flex-direction: column; padding: 70px 100px; }
+    .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,255,65,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,65,0.03) 1px, transparent 1px); background-size: 60px 60px; }
+    .header { margin-bottom: 50px; position: relative; z-index: 2; }
+    .breadcrumb { font-size: 12px; color: rgba(0,255,65,0.4); letter-spacing: 3px; margin-bottom: 12px; }
+    .title { font-size: 48px; font-weight: 800; color: white; }
+    .title span { color: #00ff41; }
+    .dashboard { display: grid; grid-template-columns: repeat(4, 1fr) 1.5fr; gap: 20px; flex: 1; position: relative; z-index: 2; }
+    .metric { border: 1px solid rgba(0,255,65,0.15); border-radius: 8px; padding: 36px 32px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+    .metric::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: #00ff41; }
+    .metric-id { font-size: 11px; color: rgba(0,255,65,0.4); letter-spacing: 3px; margin-bottom: 16px; }
+    .metric-value { font-size: 64px; font-weight: 800; color: white; line-height: 1; }
+    .metric-unit { font-size: 32px; color: #00ff41; }
+    .metric-label { font-size: 14px; color: rgba(255,255,255,0.35); font-family: 'Inter', sans-serif; margin-top: 8px; }
+    .metric-change { font-size: 13px; color: #00ff41; margin-top: 4px; }
+    .log-panel { border: 1px solid rgba(0,255,65,0.15); border-radius: 8px; padding: 32px; display: flex; flex-direction: column; }
+    .log-title { font-size: 12px; color: rgba(0,255,65,0.5); letter-spacing: 3px; margin-bottom: 20px; }
+    .log-line { font-size: 13px; color: rgba(0,255,65,0.45); padding: 6px 0; border-bottom: 1px solid rgba(0,255,65,0.06); line-height: 1.4; }
+    .log-line:last-child { border-bottom: none; }
+    .log-time { color: rgba(0,255,65,0.25); }
+    .log-ok { color: #00ff41; }
+    .log-warn { color: #fcbf49; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="grid-bg"></div>
+    <div class="header">
+      <div class="breadcrumb">SYS:// METRICS &gt; LIVE_DASHBOARD</div>
+      <div class="title">System <span>Metrics</span></div>
+    </div>
+    <div class="dashboard">
+      <div class="metric">
+        <div class="metric-id">MTR_01</div>
+        <div><span class="metric-value">99.9</span><span class="metric-unit">%</span></div>
+        <div>
+          <div class="metric-label">Uptime SLA</div>
+          <div class="metric-change">↑ target exceeded</div>
+        </div>
+      </div>
+      <div class="metric">
+        <div class="metric-id">MTR_02</div>
+        <div><span class="metric-value">47</span><span class="metric-unit">ms</span></div>
+        <div>
+          <div class="metric-label">Avg. Response Time</div>
+          <div class="metric-change">↓ -23ms optimized</div>
+        </div>
+      </div>
+      <div class="metric">
+        <div class="metric-id">MTR_03</div>
+        <div><span class="metric-value">4.2</span><span class="metric-unit">M</span></div>
+        <div>
+          <div class="metric-label">API Calls/Day</div>
+          <div class="metric-change">↑ +180% growth</div>
+        </div>
+      </div>
+      <div class="metric">
+        <div class="metric-id">MTR_04</div>
+        <div><span class="metric-value">0.01</span><span class="metric-unit">%</span></div>
+        <div>
+          <div class="metric-label">Error Rate</div>
+          <div class="metric-change">↓ industry lowest</div>
+        </div>
+      </div>
+      <div class="log-panel">
+        <div class="log-title">LIVE_LOG // RECENT_EVENTS</div>
+        <div class="log-line"><span class="log-time">2025-03-06 09:14:32</span> <span class="log-ok">[OK]</span> deployment_v2.4.1 completed</div>
+        <div class="log-line"><span class="log-time">2025-03-06 08:58:01</span> <span class="log-ok">[OK]</span> auto_scaling triggered +3 nodes</div>
+        <div class="log-line"><span class="log-time">2025-03-06 08:44:17</span> <span class="log-ok">[OK]</span> health_check all services nominal</div>
+        <div class="log-line"><span class="log-time">2025-03-06 07:30:55</span> <span class="log-warn">[WARN]</span> traffic spike detected, handled</div>
+        <div class="log-line"><span class="log-time">2025-03-06 06:15:00</span> <span class="log-ok">[OK]</span> backup_job completed successfully</div>
+        <div class="log-line"><span class="log-time">2025-03-06 05:00:00</span> <span class="log-ok">[OK]</span> nightly_maintenance finished</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

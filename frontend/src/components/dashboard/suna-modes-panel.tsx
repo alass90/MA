@@ -130,24 +130,22 @@ const modes: Mode[] = [
     options: {
       title: 'Choose a template',
       items: [
-        { id: 'minimalist', name: 'Minimalist', description: 'Clean and simple design', image: '/images/presentation-templates/minimalist-min.png' },
-        { id: 'minimalist_2', name: 'Minimalist 2', description: 'Alternative minimal style', image: '/images/presentation-templates/minimalist_2-min.png' },
-        { id: 'black_and_white_clean', name: 'Black & White', description: 'Classic monochrome', image: '/images/presentation-templates/black_and_white_clean-min.png' },
-        { id: 'colorful', name: 'Colorful', description: 'Vibrant and energetic', image: '/images/presentation-templates/colorful-min.png' },
-        { id: 'startup', name: 'Startup', description: 'Dynamic and innovative', image: '/images/presentation-templates/startup-min.png' },
-        { id: 'elevator_pitch', name: 'Elevator Pitch', description: 'Quick and impactful', image: '/images/presentation-templates/elevator_pitch-min.png' },
-        { id: 'portfolio', name: 'Portfolio', description: 'Showcase your work', image: '/images/presentation-templates/portfolio-min.png' },
-        { id: 'textbook', name: 'Textbook', description: 'Educational and structured', image: '/images/presentation-templates/textbook-min.png' },
-        { id: 'architect', name: 'Architect', description: 'Professional and precise', image: '/images/presentation-templates/architect-min.png' },
-        { id: 'hipster', name: 'Hipster', description: 'Modern and trendy', image: '/images/presentation-templates/hipster-min.png' },
-        { id: 'green', name: 'Green', description: 'Nature-inspired design', image: '/images/presentation-templates/green-min.png' },
-        { id: 'premium_black', name: 'Premium Black', description: 'Luxury dark theme', image: '/images/presentation-templates/premium_black-min.png' },
-        { id: 'premium_green', name: 'Premium Green', description: 'Sophisticated green', image: '/images/presentation-templates/premium_green-min.png' },
-        { id: 'professor_gray', name: 'Professor Gray', description: 'Academic and scholarly', image: '/images/presentation-templates/professor_gray-min.png' },
-        { id: 'gamer_gray', name: 'Gamer Gray', description: 'Gaming-inspired design', image: '/images/presentation-templates/gamer_gray-min.png' },
-        { id: 'competitor_analysis_blue', name: 'Analysis Blue', description: 'Business analysis focused', image: '/images/presentation-templates/competitor_analysis_blue-min.png' },
-        { id: 'numbers_clean', name: 'Numbers Clean', description: 'Clean data visualization', image: '/images/presentation-templates/numbers_clean-min.png' },
-        { id: 'numbers_colorful', name: 'Numbers Colorful', description: 'Vibrant data presentation', image: '/images/presentation-templates/numbers_colorful-min.png' },
+        { id: 'venture', name: 'Venture', description: 'Startup Pitch Deck', image: '/images/presentation-templates/venture-min.png' },
+        { id: 'enterprise', name: 'Enterprise', description: 'Corporate Strategy Review', image: '/images/presentation-templates/enterprise-min.png' },
+        { id: 'agency', name: 'Agency', description: 'Marketing Campaign Launch', image: '/images/presentation-templates/agency-min.png' },
+        { id: 'systems', name: 'Systems', description: 'Tech Architecture Proposal', image: '/images/presentation-templates/systems-min.png' },
+        { id: 'report', name: 'Report', description: 'Annual Financial Results', image: '/images/presentation-templates/report-min.png' },
+        { id: 'academy', name: 'Academy', description: 'Professional Development', image: '/images/presentation-templates/academy-min.png' },
+        { id: 'studio', name: 'Studio', description: 'Design & Branding Studio', image: '/images/presentation-templates/studio-min.png' },
+        { id: 'launch', name: 'Launch', description: 'Project Kickoff Meeting', image: '/images/presentation-templates/launch-min.png' },
+        { id: 'nova', name: 'Nova', description: 'Dark Cosmic Tech Deck', image: '/images/presentation-templates/nova-min.png' },
+        { id: 'clay', name: 'Clay', description: 'Minimalist Portfolio', image: '/images/presentation-templates/clay-min.png' },
+        { id: 'prism', name: 'Prism', description: 'Vibrant Creative Agency', image: '/images/presentation-templates/prism-min.png' },
+        { id: 'midnight', name: 'Midnight', description: 'Deep Corporate Dark Mode', image: '/images/presentation-templates/midnight-min.png' },
+        { id: 'bloom', name: 'Bloom', description: 'Clean Floral Presentation', image: '/images/presentation-templates/bloom-min.png' },
+        { id: 'circuit', name: 'Circuit', description: 'Engineering & Hardware', image: '/images/presentation-templates/circuit-min.png' },
+        { id: 'sand', name: 'Sand', description: 'Warm Business Report', image: '/images/presentation-templates/sand-min.png' },
+        { id: 'ember', name: 'Ember', description: 'High-Impact Brand Launch', image: '/images/presentation-templates/ember-min.png' },
       ],
     },
   },
@@ -1118,10 +1116,16 @@ export function SunaModesPanel({
     const maxPrompts = 20; // Safety limit
     
     while (index < maxPrompts) {
+      const key = `prompts.${modeId}.${index}`;
+      
+      // Safety check: only call t(key) if it exists to avoid MISSING_MESSAGE error
+      if (!t.has(key)) {
+        break;
+      }
+
       try {
-        const key = `prompts.${modeId}.${index}`;
         const prompt = t(key);
-        // Check if translation exists (next-intl returns the key if missing)
+        // Additional check for fallback behavior
         if (!prompt || prompt === `suna.${key}` || prompt.startsWith('suna.prompts.')) {
           break;
         }
@@ -1408,11 +1412,11 @@ export function SunaModesPanel({
                     </div>
                     <div className="space-y-0.5">
                       <p className="text-xs font-medium text-foreground group-hover:text-primary transition-colors duration-200">
-                        {t(`templates.${item.id}.name`) || item.name}
+                        {t(`templates.${item.id}.name`).includes('suna.templates') ? item.name : t(`templates.${item.id}.name`)}
                       </p>
                       {item.description && (
                         <p className="text-xs text-muted-foreground line-clamp-1">
-                          {t(`templates.${item.id}.description`) || item.description}
+                          {t(`templates.${item.id}.description`).includes('suna.templates') ? item.description : t(`templates.${item.id}.description`)}
                         </p>
                       )}
                     </div>

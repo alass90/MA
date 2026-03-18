@@ -868,8 +868,8 @@
         "description": "商业提案"
       },
       "report": {
-        "name": "报告",
-        "description": "详细报告格式"
+        "name": "Report",
+        "description": "Financial data report with structured, trust-focused layout"
       },
       "guide": {
         "name": "指南",
@@ -886,6 +886,66 @@
       "meeting-notes": {
         "name": "会议记录",
         "description": "会议记录"
+      },
+      "venture": {
+        "name": "Venture",
+        "description": "Startup pitch deck with dynamic and energetic flow"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate strategy review with professional navy blue styling"
+      },
+      "agency": {
+        "name": "Agency",
+        "description": "Vibrant and creative marketing campaign launch"
+      },
+      "systems": {
+        "name": "Systems",
+        "description": "Tech architecture proposal with dark mode monospace design"
+      },
+      "academy": {
+        "name": "Academy",
+        "description": "Clean and readable educational course module"
+      },
+      "studio": {
+        "name": "Studio",
+        "description": "Visual and minimalist creative portfolio"
+      },
+      "launch": {
+        "name": "Launch",
+        "description": "Structured and efficient project kickoff"
+      },
+      "nova": {
+        "name": "Nova",
+        "description": "Dark Cosmic Tech Deck"
+      },
+      "clay": {
+        "name": "Clay",
+        "description": "Minimalist Portfolio"
+      },
+      "prism": {
+        "name": "Prism",
+        "description": "Vibrant Creative Agency"
+      },
+      "midnight": {
+        "name": "Midnight",
+        "description": "Deep Corporate Dark Mode"
+      },
+      "bloom": {
+        "name": "Bloom",
+        "description": "Clean Floral Presentation"
+      },
+      "circuit": {
+        "name": "Circuit",
+        "description": "Engineering & Hardware"
+      },
+      "sand": {
+        "name": "Sand",
+        "description": "Warm Business Report"
+      },
+      "ember": {
+        "name": "Ember",
+        "description": "High-Impact Brand Launch"
       }
     },
     "outputFormats": {

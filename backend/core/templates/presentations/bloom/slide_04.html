@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bloom - Stats</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #fdf6f0; font-family: 'Nunito', sans-serif; display: flex; flex-direction: column; padding: 80px 120px; }
+    .header { margin-bottom: 60px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .label { font-size: 14px; color: #e87d8d; letter-spacing: 4px; text-transform: uppercase; font-weight: 600; margin-bottom: 12px; }
+    .title { font-family: 'DM Serif Display', serif; font-size: 60px; color: #3d2b35; }
+    .deco { font-size: 70px; opacity: 0.15; }
+    .top-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 28px; }
+    .stat { background: white; border-radius: 24px; padding: 40px 36px; border: 1px solid rgba(232,125,141,0.15); box-shadow: 0 4px 20px rgba(232,125,141,0.06); }
+    .stat-icon { font-size: 28px; margin-bottom: 16px; }
+    .stat-value { font-family: 'DM Serif Display', serif; font-size: 64px; color: #3d2b35; line-height: 1; margin-bottom: 8px; }
+    .stat-unit { font-size: 32px; color: #e87d8d; }
+    .stat-label { font-size: 16px; color: #9a7a85; font-weight: 600; margin-bottom: 6px; }
+    .stat-change { font-size: 14px; color: #81c784; font-weight: 700; }
+    .bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .bottom-card { background: white; border-radius: 24px; padding: 40px 44px; border: 1px solid rgba(232,125,141,0.15); }
+    .bottom-card-title { font-size: 18px; font-weight: 700; color: #3d2b35; margin-bottom: 16px; }
+    .bar-row { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+    .bar-label { font-size: 15px; color: #9a7a85; min-width: 140px; }
+    .bar-track { flex: 1; height: 8px; background: rgba(232,125,141,0.15); border-radius: 4px; }
+    .bar-fill { height: 8px; border-radius: 4px; background: linear-gradient(90deg, #e87d8d, #f4a3b0); }
+    .bar-pct { font-size: 15px; color: #e87d8d; font-weight: 700; min-width: 40px; text-align: right; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="header">
+      <div>
+        <div class="label">Our Impact</div>
+        <div class="title">Growth with Heart</div>
+      </div>
+      <div class="deco">💐</div>
+    </div>
+    <div class="top-stats">
+      <div class="stat">
+        <div class="stat-icon">👥</div>
+        <div><span class="stat-value">52</span><span class="stat-unit">k</span></div>
+        <div class="stat-label">Community Members</div>
+        <div class="stat-change">↑ +320% this year</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon">⭐</div>
+        <div><span class="stat-value">4.9</span><span class="stat-unit">★</span></div>
+        <div class="stat-label">Avg. User Rating</div>
+        <div class="stat-change">↑ consistently highest</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon">🔄</div>
+        <div><span class="stat-value">88</span><span class="stat-unit">%</span></div>
+        <div class="stat-label">Renewal Rate</div>
+        <div class="stat-change">↑ +11pp vs last year</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon">🌍</div>
+        <div><span class="stat-value">32</span><span class="stat-unit">+</span></div>
+        <div class="stat-label">Countries</div>
+        <div class="stat-change">↑ +12 new markets</div>
+      </div>
+    </div>
+    <div class="bottom">
+      <div class="bottom-card">
+        <div class="bottom-card-title">Engagement by Channel</div>
+        <div class="bar-row"><div class="bar-label">Community</div><div class="bar-track"><div class="bar-fill" style="width:78%"></div></div><div class="bar-pct">78%</div></div>
+        <div class="bar-row"><div class="bar-label">Email</div><div class="bar-track"><div class="bar-fill" style="width:54%"></div></div><div class="bar-pct">54%</div></div>
+        <div class="bar-row"><div class="bar-label">Events</div><div class="bar-track"><div class="bar-fill" style="width:42%"></div></div><div class="bar-pct">42%</div></div>
+      </div>
+      <div class="bottom-card">
+        <div class="bottom-card-title">Satisfaction Drivers</div>
+        <div class="bar-row"><div class="bar-label">Product Quality</div><div class="bar-track"><div class="bar-fill" style="width:92%"></div></div><div class="bar-pct">92%</div></div>
+        <div class="bar-row"><div class="bar-label">Support</div><div class="bar-track"><div class="bar-fill" style="width:87%"></div></div><div class="bar-pct">87%</div></div>
+        <div class="bar-row"><div class="bar-label">Community</div><div class="bar-track"><div class="bar-fill" style="width:95%"></div></div><div class="bar-pct">95%</div></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

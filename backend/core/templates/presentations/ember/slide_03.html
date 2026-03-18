@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ember - Key Points</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #0f0500; font-family: 'Barlow', sans-serif; display: flex; flex-direction: column; padding: 80px 120px; }
+    .header { margin-bottom: 50px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .label { font-size: 13px; color: #ff6b35; letter-spacing: 5px; text-transform: uppercase; font-weight: 600; margin-bottom: 12px; }
+    .title { font-family: 'Barlow Condensed', sans-serif; font-size: 72px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: -1px; }
+    .title span { color: #ff4500; }
+    .num { font-family: 'Barlow Condensed', sans-serif; font-size: 120px; font-weight: 900; color: rgba(255,69,0,0.1); line-height: 1; }
+    .points { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; flex: 1; }
+    .point { border: 1px solid rgba(255,69,0,0.2); padding: 50px 44px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+    .point::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #ff4500, #ff6b35); }
+    .point-num { font-family: 'Barlow Condensed', sans-serif; font-size: 80px; font-weight: 900; color: rgba(255,69,0,0.15); line-height: 1; }
+    .point-content {}
+    .point-title { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 900; color: white; text-transform: uppercase; margin-bottom: 14px; }
+    .point-text { font-size: 18px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+    .point-stat { font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 900; color: #ff4500; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="header">
+      <div>
+        <div class="label">Why We Win</div>
+        <div class="title">Our <span>Unfair</span> Advantages</div>
+      </div>
+      <div class="num">03</div>
+    </div>
+    <div class="points">
+      <div class="point">
+        <div class="point-num">01</div>
+        <div class="point-content">
+          <div class="point-title">First-Mover Position</div>
+          <div class="point-text">We entered the market 18 months before the competition, building moats in data, distribution, and brand that are nearly impossible to replicate.</div>
+        </div>
+        <div class="point-stat">18mo ahead</div>
+      </div>
+      <div class="point">
+        <div class="point-num">02</div>
+        <div class="point-content">
+          <div class="point-title">Proprietary Technology</div>
+          <div class="point-text">Our core algorithm is patent-pending and delivers results 4x better than any open-source alternative. It is our secret weapon.</div>
+        </div>
+        <div class="point-stat">4x better</div>
+      </div>
+      <div class="point">
+        <div class="point-num">03</div>
+        <div class="point-content">
+          <div class="point-title">Distribution Network</div>
+          <div class="point-text">200+ enterprise partners already integrated into our platform, creating a flywheel that drives exponential customer acquisition without paid ads.</div>
+        </div>
+        <div class="point-stat">200+ partners</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

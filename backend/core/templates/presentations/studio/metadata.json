@@ -1,0 +1,9 @@
+{
+  "id": "studio",
+  "name": "Studio",
+  "description": "Professional presentation template for studio.",
+  "number_of_slides": 5,
+  "style": {
+    "theme": "minimalist"
+  }
+}

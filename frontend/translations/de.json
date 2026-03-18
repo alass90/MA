@@ -810,38 +810,188 @@
       "surreal": "Surreal"
     },
     "templates": {
-      "minimalist": { "name": "Minimalistisch", "description": "Sauberes und einfaches Design" },
-      "minimalist_2": { "name": "Minimalistisch 2", "description": "Alternativer minimalistischer Stil" },
-      "black_and_white_clean": { "name": "Schwarz & Weiß", "description": "Klassisches Monochrom" },
-      "colorful": { "name": "Bunt", "description": "Lebendig und energisch" },
-      "startup": { "name": "Startup", "description": "Dynamisch und innovativ" },
-      "elevator_pitch": { "name": "Elevator Pitch", "description": "Schnell und wirkungsvoll" },
-      "portfolio": { "name": "Portfolio", "description": "Zeige deine Arbeit" },
-      "textbook": { "name": "Lehrbuch", "description": "Bildend und strukturiert" },
-      "architect": { "name": "Architekt", "description": "Professionell und präzise" },
-      "hipster": { "name": "Hipster", "description": "Modern und trendy" },
-      "green": { "name": "Grün", "description": "Naturinspiriertes Design" },
-      "premium_black": { "name": "Premium Schwarz", "description": "Luxuriöses dunkles Theme" },
-      "premium_green": { "name": "Premium Grün", "description": "Raffiniertes Grün" },
-      "professor_gray": { "name": "Professor Grau", "description": "Akademisch und gelehrt" },
-      "gamer_gray": { "name": "Gamer Grau", "description": "Gaming-inspiriertes Design" },
-      "competitor_analysis_blue": { "name": "Analyse Blau", "description": "Fokus auf Geschäftsanalyse" },
-      "numbers_clean": { "name": "Zahlen Sauber", "description": "Saubere Datenvisualisierung" },
-      "numbers_colorful": { "name": "Zahlen Bunt", "description": "Lebendige Datenpräsentation" },
-      "prd": { "name": "PRD", "description": "Produktanforderungsdokument" },
-      "technical": { "name": "Technisch", "description": "Technische Dokumentation" },
-      "proposal": { "name": "Vorschlag", "description": "Geschäftsvorschlag" },
-      "report": { "name": "Bericht", "description": "Detailliertes Berichtsformat" },
-      "guide": { "name": "Anleitung", "description": "Schritt-für-Schritt-Anleitung" },
-      "wiki": { "name": "Wiki", "description": "Wissensbasis-Artikel" },
-      "policy": { "name": "Richtlinie", "description": "Richtliniendokument" },
-      "meeting-notes": { "name": "Besprechungsnotizen", "description": "Besprechungsprotokoll" }
+      "minimalist": {
+        "name": "Minimalistisch",
+        "description": "Sauberes und einfaches Design"
+      },
+      "minimalist_2": {
+        "name": "Minimalistisch 2",
+        "description": "Alternativer minimalistischer Stil"
+      },
+      "black_and_white_clean": {
+        "name": "Schwarz & Weiß",
+        "description": "Klassisches Monochrom"
+      },
+      "colorful": {
+        "name": "Bunt",
+        "description": "Lebendig und energisch"
+      },
+      "startup": {
+        "name": "Startup",
+        "description": "Dynamisch und innovativ"
+      },
+      "elevator_pitch": {
+        "name": "Elevator Pitch",
+        "description": "Schnell und wirkungsvoll"
+      },
+      "portfolio": {
+        "name": "Portfolio",
+        "description": "Zeige deine Arbeit"
+      },
+      "textbook": {
+        "name": "Lehrbuch",
+        "description": "Bildend und strukturiert"
+      },
+      "architect": {
+        "name": "Architekt",
+        "description": "Professionell und präzise"
+      },
+      "hipster": {
+        "name": "Hipster",
+        "description": "Modern und trendy"
+      },
+      "green": {
+        "name": "Grün",
+        "description": "Naturinspiriertes Design"
+      },
+      "premium_black": {
+        "name": "Premium Schwarz",
+        "description": "Luxuriöses dunkles Theme"
+      },
+      "premium_green": {
+        "name": "Premium Grün",
+        "description": "Raffiniertes Grün"
+      },
+      "professor_gray": {
+        "name": "Professor Grau",
+        "description": "Akademisch und gelehrt"
+      },
+      "gamer_gray": {
+        "name": "Gamer Grau",
+        "description": "Gaming-inspiriertes Design"
+      },
+      "competitor_analysis_blue": {
+        "name": "Analyse Blau",
+        "description": "Fokus auf Geschäftsanalyse"
+      },
+      "numbers_clean": {
+        "name": "Zahlen Sauber",
+        "description": "Saubere Datenvisualisierung"
+      },
+      "numbers_colorful": {
+        "name": "Zahlen Bunt",
+        "description": "Lebendige Datenpräsentation"
+      },
+      "prd": {
+        "name": "PRD",
+        "description": "Produktanforderungsdokument"
+      },
+      "technical": {
+        "name": "Technisch",
+        "description": "Technische Dokumentation"
+      },
+      "proposal": {
+        "name": "Vorschlag",
+        "description": "Geschäftsvorschlag"
+      },
+      "report": {
+        "name": "Report",
+        "description": "Financial data report with structured, trust-focused layout"
+      },
+      "guide": {
+        "name": "Anleitung",
+        "description": "Schritt-für-Schritt-Anleitung"
+      },
+      "wiki": {
+        "name": "Wiki",
+        "description": "Wissensbasis-Artikel"
+      },
+      "policy": {
+        "name": "Richtlinie",
+        "description": "Richtliniendokument"
+      },
+      "meeting-notes": {
+        "name": "Besprechungsnotizen",
+        "description": "Besprechungsprotokoll"
+      },
+      "venture": {
+        "name": "Venture",
+        "description": "Startup pitch deck with dynamic and energetic flow"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate strategy review with professional navy blue styling"
+      },
+      "agency": {
+        "name": "Agency",
+        "description": "Vibrant and creative marketing campaign launch"
+      },
+      "systems": {
+        "name": "Systems",
+        "description": "Tech architecture proposal with dark mode monospace design"
+      },
+      "academy": {
+        "name": "Academy",
+        "description": "Clean and readable educational course module"
+      },
+      "studio": {
+        "name": "Studio",
+        "description": "Visual and minimalist creative portfolio"
+      },
+      "launch": {
+        "name": "Launch",
+        "description": "Structured and efficient project kickoff"
+      },
+      "nova": {
+        "name": "Nova",
+        "description": "Dark Cosmic Tech Deck"
+      },
+      "clay": {
+        "name": "Clay",
+        "description": "Minimalist Portfolio"
+      },
+      "prism": {
+        "name": "Prism",
+        "description": "Vibrant Creative Agency"
+      },
+      "midnight": {
+        "name": "Midnight",
+        "description": "Deep Corporate Dark Mode"
+      },
+      "bloom": {
+        "name": "Bloom",
+        "description": "Clean Floral Presentation"
+      },
+      "circuit": {
+        "name": "Circuit",
+        "description": "Engineering & Hardware"
+      },
+      "sand": {
+        "name": "Sand",
+        "description": "Warm Business Report"
+      },
+      "ember": {
+        "name": "Ember",
+        "description": "High-Impact Brand Launch"
+      }
     },
     "outputFormats": {
-      "spreadsheet": { "name": "Tabelle", "description": "Tabelle mit Formeln" },
-      "dashboard": { "name": "Dashboard", "description": "Interaktive Diagramme" },
-      "report": { "name": "Bericht", "description": "Analyse mit Visualisierungen" },
-      "slides": { "name": "Folien", "description": "Präsentationsformat" }
+      "spreadsheet": {
+        "name": "Tabelle",
+        "description": "Tabelle mit Formeln"
+      },
+      "dashboard": {
+        "name": "Dashboard",
+        "description": "Interaktive Diagramme"
+      },
+      "report": {
+        "name": "Bericht",
+        "description": "Analyse mit Visualisierungen"
+      },
+      "slides": {
+        "name": "Folien",
+        "description": "Präsentationsformat"
+      }
     },
     "charts": {
       "bar": "Balken",

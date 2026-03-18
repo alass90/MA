@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bloom - Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #fdf6f0; font-family: 'Nunito', sans-serif; display: flex; flex-direction: column; padding: 80px 120px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 60px; }
+    .label { font-size: 14px; color: #e87d8d; letter-spacing: 4px; text-transform: uppercase; font-weight: 600; margin-bottom: 12px; }
+    .title { font-family: 'DM Serif Display', serif; font-size: 60px; color: #3d2b35; }
+    .deco { font-size: 80px; opacity: 0.15; }
+    .items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; flex: 1; }
+    .item {
+      background: white; border-radius: 28px; padding: 50px 44px;
+      border: 1px solid rgba(232,125,141,0.15);
+      box-shadow: 0 4px 20px rgba(232,125,141,0.08);
+      display: flex; flex-direction: column;
+      position: relative; overflow: hidden;
+    }
+    .item-deco {
+      position: absolute; width: 120px; height: 120px; border-radius: 50%;
+      top: -40px; right: -40px; opacity: 0.15;
+    }
+    .item-1 .item-deco { background: #e87d8d; }
+    .item-2 .item-deco { background: #81c784; }
+    .item-3 .item-deco { background: #64b5f6; }
+    .item-emoji { font-size: 36px; margin-bottom: 20px; }
+    .item-num { font-size: 14px; color: #e87d8d; letter-spacing: 3px; text-transform: uppercase; font-weight: 600; margin-bottom: 14px; }
+    .item-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: #3d2b35; margin-bottom: 16px; }
+    .item-text { font-size: 18px; color: #9a7a85; line-height: 1.7; flex: 1; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="header">
+      <div>
+        <div class="label">Overview</div>
+        <div class="title">Our Story in Three Parts</div>
+      </div>
+      <div class="deco">🌸</div>
+    </div>
+    <div class="items">
+      <div class="item item-1">
+        <div class="item-deco"></div>
+        <div class="item-emoji">🌱</div>
+        <div class="item-num">Chapter 01</div>
+        <div class="item-title">Where We Started</div>
+        <div class="item-text">The origin story, the problem we saw, and why we knew we had to do something about it</div>
+      </div>
+      <div class="item item-2">
+        <div class="item-deco"></div>
+        <div class="item-emoji">🌿</div>
+        <div class="item-num">Chapter 02</div>
+        <div class="item-title">How We Grew</div>
+        <div class="item-text">The journey, the lessons learned, and the people who made it all possible along the way</div>
+      </div>
+      <div class="item item-3">
+        <div class="item-deco"></div>
+        <div class="item-emoji">🌺</div>
+        <div class="item-num">Chapter 03</div>
+        <div class="item-title">Where We're Going</div>
+        <div class="item-text">Our vision for the future and the exciting opportunities that lie just ahead of us</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

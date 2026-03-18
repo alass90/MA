@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Clay - Stats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #faf4ec; font-family: 'Fraunces', serif; display: flex; flex-direction: column; padding: 80px 120px; }
+    .header { margin-bottom: 60px; }
+    .label { font-size: 15px; color: #c4705a; letter-spacing: 4px; text-transform: uppercase; font-family: 'Crimson Text', serif; margin-bottom: 12px; }
+    .title { font-size: 58px; font-weight: 700; color: #2d1f14; }
+    .stats-row { display: flex; gap: 32px; margin-bottom: 32px; }
+    .stat-main {
+      flex: 1.5; background: #c4705a; border-radius: 24px; padding: 60px 70px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .stat-main .value { font-size: 120px; font-weight: 900; color: white; line-height: 1; }
+    .stat-main .label-txt { font-size: 24px; color: rgba(255,255,255,0.8); font-family: 'Crimson Text', serif; }
+    .stat-main .desc { font-size: 18px; color: rgba(255,255,255,0.6); font-family: 'Crimson Text', serif; }
+    .stats-side { flex: 1; display: flex; flex-direction: column; gap: 24px; }
+    .stat-small {
+      flex: 1; background: white; border-radius: 20px; padding: 40px 44px;
+      border: 1px solid rgba(196,112,90,0.15);
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .stat-small .value { font-size: 64px; font-weight: 900; color: #c4705a; line-height: 1; }
+    .stat-small .label-txt { font-size: 18px; color: #8b6e57; font-family: 'Crimson Text', serif; }
+    .stat-small .change { font-size: 15px; color: #5a8a5a; font-weight: 500; }
+    .bottom-row { display: flex; gap: 32px; }
+    .stat-wide {
+      flex: 1; background: #2d1f14; border-radius: 20px; padding: 44px 54px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .stat-wide .value { font-size: 72px; font-weight: 900; color: #e8c4a0; }
+    .stat-wide .info .label-txt { font-size: 20px; color: rgba(255,255,255,0.7); font-family: 'Crimson Text', serif; }
+    .stat-wide .info .change { font-size: 15px; color: #8fcf8f; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="header">
+      <div class="label">By the Numbers</div>
+      <div class="title">Impact We're Proud Of</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-main">
+        <div class="value">92%</div>
+        <div>
+          <div class="label-txt">Retention Rate</div>
+          <div class="desc">Customers who renew year after year</div>
+        </div>
+      </div>
+      <div class="stats-side">
+        <div class="stat-small">
+          <div class="value">4.8★</div>
+          <div>
+            <div class="label-txt">Average Rating</div>
+            <div class="change">↑ from 4.2 last year</div>
+          </div>
+        </div>
+        <div class="stat-small">
+          <div class="value">140k</div>
+          <div>
+            <div class="label-txt">Active Users</div>
+            <div class="change">↑ +85% growth</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-row">
+      <div class="stat-wide">
+        <div class="value">$12M</div>
+        <div class="info">
+          <div class="label-txt">Annual Revenue</div>
+          <div class="change">↑ +160% YoY</div>
+        </div>
+      </div>
+      <div class="stat-wide">
+        <div class="value">28</div>
+        <div class="info">
+          <div class="label-txt">Countries Served</div>
+          <div class="change">↑ +8 new markets</div>
+        </div>
+      </div>
+      <div class="stat-wide">
+        <div class="value">99.9%</div>
+        <div class="info">
+          <div class="label-txt">Uptime SLA</div>
+          <div class="change">↑ industry leading</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

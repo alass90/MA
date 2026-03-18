@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prism - Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #0d0d0d; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; padding: 80px 120px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 60px; }
+    .label { font-size: 14px; color: #f72585; letter-spacing: 5px; text-transform: uppercase; font-weight: 600; margin-bottom: 16px; }
+    .title { font-size: 56px; font-weight: 800; color: white; }
+    .slide-counter { font-size: 80px; font-weight: 800; color: rgba(255,255,255,0.05); line-height: 1; }
+    .items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; flex: 1; }
+    .item { border-radius: 20px; padding: 44px 36px; display: flex; flex-direction: column; justify-content: space-between; }
+    .item-1 { background: linear-gradient(135deg, #f72585, #b5179e); }
+    .item-2 { background: linear-gradient(135deg, #7209b7, #4361ee); }
+    .item-3 { background: linear-gradient(135deg, #4361ee, #4cc9f0); }
+    .item-4 { background: linear-gradient(135deg, #f77f00, #fcbf49); }
+    .item-num { font-size: 48px; font-weight: 800; color: rgba(255,255,255,0.3); line-height: 1; }
+    .item-title { font-size: 26px; font-weight: 700; color: white; margin-bottom: 12px; }
+    .item-text { font-size: 17px; color: rgba(255,255,255,0.7); line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="header">
+      <div>
+        <div class="label">Agenda</div>
+        <div class="title">Four Big Ideas</div>
+      </div>
+      <div class="slide-counter">02</div>
+    </div>
+    <div class="items">
+      <div class="item item-1">
+        <div class="item-num">01</div>
+        <div>
+          <div class="item-title">The Problem</div>
+          <div class="item-text">Understanding the gap between where we are and where we need to be</div>
+        </div>
+      </div>
+      <div class="item item-2">
+        <div class="item-num">02</div>
+        <div>
+          <div class="item-title">Our Solution</div>
+          <div class="item-text">A bold, tested approach that directly addresses the core challenge</div>
+        </div>
+      </div>
+      <div class="item item-3">
+        <div class="item-num">03</div>
+        <div>
+          <div class="item-title">The Proof</div>
+          <div class="item-text">Data, case studies, and results that validate our direction</div>
+        </div>
+      </div>
+      <div class="item item-4">
+        <div class="item-num">04</div>
+        <div>
+          <div class="item-title">The Ask</div>
+          <div class="item-text">What we need from you to make this happen, and by when</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

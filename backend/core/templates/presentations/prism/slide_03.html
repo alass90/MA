@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prism - Key Points</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; padding: 80px 120px; }
+    .header { margin-bottom: 60px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .label { font-size: 14px; color: #7209b7; letter-spacing: 5px; text-transform: uppercase; font-weight: 600; margin-bottom: 14px; }
+    .title { font-size: 60px; font-weight: 800; color: #0d0d0d; }
+    .slide-num { font-size: 100px; font-weight: 800; color: rgba(0,0,0,0.04); line-height: 1; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; flex: 1; }
+    .card { border-radius: 24px; padding: 50px 44px; display: flex; flex-direction: column; border: 2px solid; }
+    .card-1 { border-color: #f72585; background: #fff0f7; }
+    .card-2 { border-color: #7209b7; background: #f8f0ff; }
+    .card-3 { border-color: #4cc9f0; background: #f0fbff; }
+    .card-num { font-size: 14px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 28px; }
+    .card-1 .card-num { color: #f72585; }
+    .card-2 .card-num { color: #7209b7; }
+    .card-3 .card-num { color: #4361ee; }
+    .card-title { font-size: 34px; font-weight: 800; color: #0d0d0d; margin-bottom: 20px; line-height: 1.2; }
+    .card-text { font-size: 19px; color: #4b5563; line-height: 1.7; flex: 1; }
+    .card-cta { display: flex; align-items: center; gap: 10px; margin-top: 32px; font-size: 16px; font-weight: 700; }
+    .card-1 .card-cta { color: #f72585; }
+    .card-2 .card-cta { color: #7209b7; }
+    .card-3 .card-cta { color: #4361ee; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="header">
+      <div>
+        <div class="label">Key Points</div>
+        <div class="title">Three Things to Remember</div>
+      </div>
+      <div class="slide-num">03</div>
+    </div>
+    <div class="cards">
+      <div class="card card-1">
+        <div class="card-num">Point 01</div>
+        <div class="card-title">Customer-Led Growth</div>
+        <div class="card-text">Every decision we make starts and ends with one question: does this genuinely make our customers' lives better? This principle drives everything from product to pricing.</div>
+        <div class="card-cta">Learn more →</div>
+      </div>
+      <div class="card card-2">
+        <div class="card-num">Point 02</div>
+        <div class="card-title">Speed as Strategy</div>
+        <div class="card-text">Velocity isn't just a nice-to-have — it's a core competitive advantage. We ship faster, learn faster, and adapt faster than anyone in our space.</div>
+        <div class="card-cta">Learn more →</div>
+      </div>
+      <div class="card card-3">
+        <div class="card-num">Point 03</div>
+        <div class="card-title">Network Effects</div>
+        <div class="card-text">Each new user makes the product more valuable for everyone. We've designed our system from day one to benefit from compounding network dynamics.</div>
+        <div class="card-cta">Learn more →</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "id": "report",
+  "name": "Report",
+  "description": "Professional presentation template for report.",
+  "number_of_slides": 5,
+  "style": {
+    "theme": "minimalist"
+  }
+}

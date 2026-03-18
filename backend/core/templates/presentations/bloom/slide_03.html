@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bloom - Key Points</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #fce4ec; font-family: 'Nunito', sans-serif; display: flex; }
+    .left { width: 580px; background: #e87d8d; padding: 90px 70px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+    .left::after { content: ''; position: absolute; width: 400px; height: 400px; background: rgba(255,255,255,0.1); border-radius: 50%; bottom: -150px; right: -150px; }
+    .left-label { font-size: 14px; color: rgba(255,255,255,0.7); letter-spacing: 4px; text-transform: uppercase; font-weight: 600; }
+    .left-title { font-family: 'DM Serif Display', serif; font-size: 64px; color: white; line-height: 1.1; position: relative; z-index: 2; }
+    .left-bottom { font-size: 18px; color: rgba(255,255,255,0.7); position: relative; z-index: 2; }
+    .right { flex: 1; padding: 80px 80px; display: flex; flex-direction: column; justify-content: center; gap: 28px; }
+    .point {
+      background: white; border-radius: 20px; padding: 36px 44px;
+      display: flex; gap: 24px; align-items: flex-start;
+      box-shadow: 0 4px 20px rgba(232,125,141,0.1);
+    }
+    .point-emoji { font-size: 32px; min-width: 44px; }
+    .point-num { font-size: 14px; color: #e87d8d; font-weight: 700; letter-spacing: 3px; margin-bottom: 8px; text-transform: uppercase; }
+    .point-title { font-family: 'DM Serif Display', serif; font-size: 26px; color: #3d2b35; margin-bottom: 8px; }
+    .point-text { font-size: 17px; color: #9a7a85; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="left">
+      <div class="left-label">Key Insights</div>
+      <div class="left-title">What We've Learned Along the Way</div>
+      <div class="left-bottom">3 core principles that guide everything we do</div>
+    </div>
+    <div class="right">
+      <div class="point">
+        <div class="point-emoji">💡</div>
+        <div>
+          <div class="point-num">Insight 01</div>
+          <div class="point-title">Empathy Drives Everything</div>
+          <div class="point-text">The best solutions come from deeply understanding what people actually need, not what we assume they want</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="point-emoji">🌿</div>
+        <div>
+          <div class="point-num">Insight 02</div>
+          <div class="point-title">Progress Over Perfection</div>
+          <div class="point-text">Shipping something good that helps people today beats waiting to ship something perfect that never arrives</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="point-emoji">🤝</div>
+        <div>
+          <div class="point-num">Insight 03</div>
+          <div class="point-title">Community is the Product</div>
+          <div class="point-text">The connections we enable between people are often more valuable than any feature we could build ourselves</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

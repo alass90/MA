@@ -809,38 +809,188 @@
       "surreal": "Surreale"
     },
     "templates": {
-      "minimalist": { "name": "Minimalista", "description": "Design pulito e semplice" },
-      "minimalist_2": { "name": "Minimalista 2", "description": "Stile minimalista alternativo" },
-      "black_and_white_clean": { "name": "Bianco e nero", "description": "Monocromatico classico" },
-      "colorful": { "name": "Colorato", "description": "Vibrante ed energico" },
-      "startup": { "name": "Startup", "description": "Dinamico e innovativo" },
-      "elevator_pitch": { "name": "Elevator Pitch", "description": "Rapido e impattante" },
-      "portfolio": { "name": "Portfolio", "description": "Mostra il tuo lavoro" },
-      "textbook": { "name": "Manuale", "description": "Educativo e strutturato" },
-      "architect": { "name": "Architetto", "description": "Professionale e preciso" },
-      "hipster": { "name": "Hipster", "description": "Moderno e trendy" },
-      "green": { "name": "Verde", "description": "Design ispirato alla natura" },
-      "premium_black": { "name": "Premium Nero", "description": "Tema scuro di lusso" },
-      "premium_green": { "name": "Premium Verde", "description": "Verde sofisticato" },
-      "professor_gray": { "name": "Professore Grigio", "description": "Accademico e erudito" },
-      "gamer_gray": { "name": "Gamer Grigio", "description": "Design ispirato ai giochi" },
-      "competitor_analysis_blue": { "name": "Analisi Blu", "description": "Focalizzato sull'analisi aziendale" },
-      "numbers_clean": { "name": "Numeri Puliti", "description": "Visualizzazione dati pulita" },
-      "numbers_colorful": { "name": "Numeri Colorati", "description": "Presentazione dati vibrante" },
-      "prd": { "name": "PRD", "description": "Documento dei requisiti del prodotto" },
-      "technical": { "name": "Tecnico", "description": "Documentazione tecnica" },
-      "proposal": { "name": "Proposta", "description": "Proposta commerciale" },
-      "report": { "name": "Report", "description": "Formato report dettagliato" },
-      "guide": { "name": "Guida", "description": "Guida passo-passo" },
-      "wiki": { "name": "Wiki", "description": "Articolo della knowledge base" },
-      "policy": { "name": "Politica", "description": "Documento politico" },
-      "meeting-notes": { "name": "Note di riunione", "description": "Verbale di riunione" }
+      "minimalist": {
+        "name": "Minimalista",
+        "description": "Design pulito e semplice"
+      },
+      "minimalist_2": {
+        "name": "Minimalista 2",
+        "description": "Stile minimalista alternativo"
+      },
+      "black_and_white_clean": {
+        "name": "Bianco e nero",
+        "description": "Monocromatico classico"
+      },
+      "colorful": {
+        "name": "Colorato",
+        "description": "Vibrante ed energico"
+      },
+      "startup": {
+        "name": "Startup",
+        "description": "Dinamico e innovativo"
+      },
+      "elevator_pitch": {
+        "name": "Elevator Pitch",
+        "description": "Rapido e impattante"
+      },
+      "portfolio": {
+        "name": "Portfolio",
+        "description": "Mostra il tuo lavoro"
+      },
+      "textbook": {
+        "name": "Manuale",
+        "description": "Educativo e strutturato"
+      },
+      "architect": {
+        "name": "Architetto",
+        "description": "Professionale e preciso"
+      },
+      "hipster": {
+        "name": "Hipster",
+        "description": "Moderno e trendy"
+      },
+      "green": {
+        "name": "Verde",
+        "description": "Design ispirato alla natura"
+      },
+      "premium_black": {
+        "name": "Premium Nero",
+        "description": "Tema scuro di lusso"
+      },
+      "premium_green": {
+        "name": "Premium Verde",
+        "description": "Verde sofisticato"
+      },
+      "professor_gray": {
+        "name": "Professore Grigio",
+        "description": "Accademico e erudito"
+      },
+      "gamer_gray": {
+        "name": "Gamer Grigio",
+        "description": "Design ispirato ai giochi"
+      },
+      "competitor_analysis_blue": {
+        "name": "Analisi Blu",
+        "description": "Focalizzato sull'analisi aziendale"
+      },
+      "numbers_clean": {
+        "name": "Numeri Puliti",
+        "description": "Visualizzazione dati pulita"
+      },
+      "numbers_colorful": {
+        "name": "Numeri Colorati",
+        "description": "Presentazione dati vibrante"
+      },
+      "prd": {
+        "name": "PRD",
+        "description": "Documento dei requisiti del prodotto"
+      },
+      "technical": {
+        "name": "Tecnico",
+        "description": "Documentazione tecnica"
+      },
+      "proposal": {
+        "name": "Proposta",
+        "description": "Proposta commerciale"
+      },
+      "report": {
+        "name": "Report",
+        "description": "Financial data report with structured, trust-focused layout"
+      },
+      "guide": {
+        "name": "Guida",
+        "description": "Guida passo-passo"
+      },
+      "wiki": {
+        "name": "Wiki",
+        "description": "Articolo della knowledge base"
+      },
+      "policy": {
+        "name": "Politica",
+        "description": "Documento politico"
+      },
+      "meeting-notes": {
+        "name": "Note di riunione",
+        "description": "Verbale di riunione"
+      },
+      "venture": {
+        "name": "Venture",
+        "description": "Startup pitch deck with dynamic and energetic flow"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate strategy review with professional navy blue styling"
+      },
+      "agency": {
+        "name": "Agency",
+        "description": "Vibrant and creative marketing campaign launch"
+      },
+      "systems": {
+        "name": "Systems",
+        "description": "Tech architecture proposal with dark mode monospace design"
+      },
+      "academy": {
+        "name": "Academy",
+        "description": "Clean and readable educational course module"
+      },
+      "studio": {
+        "name": "Studio",
+        "description": "Visual and minimalist creative portfolio"
+      },
+      "launch": {
+        "name": "Launch",
+        "description": "Structured and efficient project kickoff"
+      },
+      "nova": {
+        "name": "Nova",
+        "description": "Dark Cosmic Tech Deck"
+      },
+      "clay": {
+        "name": "Clay",
+        "description": "Minimalist Portfolio"
+      },
+      "prism": {
+        "name": "Prism",
+        "description": "Vibrant Creative Agency"
+      },
+      "midnight": {
+        "name": "Midnight",
+        "description": "Deep Corporate Dark Mode"
+      },
+      "bloom": {
+        "name": "Bloom",
+        "description": "Clean Floral Presentation"
+      },
+      "circuit": {
+        "name": "Circuit",
+        "description": "Engineering & Hardware"
+      },
+      "sand": {
+        "name": "Sand",
+        "description": "Warm Business Report"
+      },
+      "ember": {
+        "name": "Ember",
+        "description": "High-Impact Brand Launch"
+      }
     },
     "outputFormats": {
-      "spreadsheet": { "name": "Foglio di calcolo", "description": "Tabella con formule" },
-      "dashboard": { "name": "Dashboard", "description": "Grafici interattivi" },
-      "report": { "name": "Report", "description": "Analisi con visualizzazioni" },
-      "slides": { "name": "Presentazioni", "description": "Formato presentazione" }
+      "spreadsheet": {
+        "name": "Foglio di calcolo",
+        "description": "Tabella con formule"
+      },
+      "dashboard": {
+        "name": "Dashboard",
+        "description": "Grafici interattivi"
+      },
+      "report": {
+        "name": "Report",
+        "description": "Analisi con visualizzazioni"
+      },
+      "slides": {
+        "name": "Presentazioni",
+        "description": "Formato presentazione"
+      }
     },
     "charts": {
       "bar": "Barra",
@@ -934,4 +1084,3 @@
     }
   }
 }
-

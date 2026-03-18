@@ -1,0 +1,9 @@
+{
+  "id": "academy",
+  "name": "Academy",
+  "description": "Professional presentation template for academy.",
+  "number_of_slides": 5,
+  "style": {
+    "theme": "minimalist"
+  }
+}

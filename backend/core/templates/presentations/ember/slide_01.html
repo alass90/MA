@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ember - Title Slide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;0,900;1,400;1,900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #0f0500; font-family: 'Barlow', sans-serif; display: flex; position: relative; overflow: hidden; }
+    .fire-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 120%, #ff4500 0%, #ff6b35 20%, #c0392b 40%, #0f0500 70%); opacity: 0.7; }
+    .left-block { width: 100px; background: #ff4500; position: relative; z-index: 2; }
+    .left-block::after { content: ''; position: absolute; right: -40px; top: 0; bottom: 0; width: 40px; background: linear-gradient(90deg, #ff4500, transparent); }
+    .main { flex: 1; padding: 90px 100px; display: flex; flex-direction: column; justify-content: space-between; position: relative; z-index: 2; }
+    .top-label { font-size: 14px; color: rgba(255,150,80,0.7); letter-spacing: 6px; text-transform: uppercase; font-weight: 600; }
+    .title-block { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .title { font-family: 'Barlow Condensed', sans-serif; font-size: 180px; font-weight: 900; line-height: 0.85; text-transform: uppercase; letter-spacing: -3px; color: white; }
+    .title-fire { color: #ff4500; -webkit-text-stroke: 0; }
+    .subtitle { font-size: 26px; color: rgba(255,255,255,0.5); font-style: italic; margin-top: 30px; }
+    .bottom { display: flex; align-items: center; justify-content: space-between; }
+    .bottom-line { height: 2px; background: linear-gradient(90deg, #ff4500, transparent); flex: 1; margin-right: 40px; }
+    .company { font-size: 16px; color: rgba(255,255,255,0.3); letter-spacing: 4px; text-transform: uppercase; }
+    .glow-orb { position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(255,69,0,0.4) 0%, transparent 70%); border-radius: 50%; right: 200px; top: 50%; transform: translateY(-50%); z-index: 1; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="fire-bg"></div>
+    <div class="glow-orb"></div>
+    <div class="left-block"></div>
+    <div class="main">
+      <div class="top-label">Ember · 2025</div>
+      <div class="title-block">
+        <div class="title">
+          <div>Ignite</div>
+          <div class="title-fire">Change.</div>
+        </div>
+        <div class="subtitle">For the bold, the driven, and the unstoppable</div>
+      </div>
+      <div class="bottom">
+        <div class="bottom-line"></div>
+        <div class="company">Your Company</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

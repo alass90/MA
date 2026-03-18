@@ -868,8 +868,8 @@
         "description": "Proposition commerciale"
       },
       "report": {
-        "name": "Rapport",
-        "description": "Format de rapport détaillé"
+        "name": "Report",
+        "description": "Financial data report with structured, trust-focused layout"
       },
       "guide": {
         "name": "Guide",
@@ -886,6 +886,66 @@
       "meeting-notes": {
         "name": "Procès-verbal",
         "description": "Procès-verbal de réunion"
+      },
+      "venture": {
+        "name": "Venture",
+        "description": "Startup pitch deck with dynamic and energetic flow"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Corporate strategy review with professional navy blue styling"
+      },
+      "agency": {
+        "name": "Agency",
+        "description": "Vibrant and creative marketing campaign launch"
+      },
+      "systems": {
+        "name": "Systems",
+        "description": "Tech architecture proposal with dark mode monospace design"
+      },
+      "academy": {
+        "name": "Academy",
+        "description": "Clean and readable educational course module"
+      },
+      "studio": {
+        "name": "Studio",
+        "description": "Visual and minimalist creative portfolio"
+      },
+      "launch": {
+        "name": "Launch",
+        "description": "Structured and efficient project kickoff"
+      },
+      "nova": {
+        "name": "Nova",
+        "description": "Deck Tech Cosmique Sombre"
+      },
+      "clay": {
+        "name": "Clay",
+        "description": "Portfolio Minimaliste"
+      },
+      "prism": {
+        "name": "Prism",
+        "description": "Agence Créative Vibrante"
+      },
+      "midnight": {
+        "name": "Midnight",
+        "description": "Mode Sombre Entreprise"
+      },
+      "bloom": {
+        "name": "Bloom",
+        "description": "Présentation Florale Épurée"
+      },
+      "circuit": {
+        "name": "Circuit",
+        "description": "Ingénierie & Matériel"
+      },
+      "sand": {
+        "name": "Sand",
+        "description": "Rapport Business Chaleureux"
+      },
+      "ember": {
+        "name": "Ember",
+        "description": "Lancement de Marque Impactant"
       }
     },
     "outputFormats": {

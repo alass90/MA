@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sand - Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #f7f0e6; font-family: 'Libre Baskerville', serif; display: flex; }
+    .top-strip { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #a08060; }
+    .left { width: 560px; background: #2d1f0a; padding: 90px 70px; display: flex; flex-direction: column; justify-content: space-between; }
+    .left-label { font-family: 'Source Serif 4', serif; font-size: 13px; color: #a08060; letter-spacing: 5px; text-transform: uppercase; font-weight: 300; }
+    .left-title { font-size: 60px; font-weight: 700; color: white; line-height: 1.1; }
+    .left-italic { font-style: italic; color: #c4a07a; }
+    .left-desc { font-family: 'Source Serif 4', serif; font-size: 18px; color: rgba(255,255,255,0.4); line-height: 1.8; font-style: italic; }
+    .right { flex: 1; padding: 90px 90px; display: flex; flex-direction: column; justify-content: center; gap: 32px; }
+    .item { display: flex; gap: 32px; align-items: flex-start; padding-bottom: 32px; border-bottom: 1px solid rgba(160,128,96,0.2); }
+    .item:last-child { border-bottom: none; padding-bottom: 0; }
+    .item-num { font-family: 'Source Serif 4', serif; font-size: 48px; font-weight: 300; color: #c4a07a; line-height: 1; min-width: 60px; font-style: italic; }
+    .item-body {}
+    .item-title { font-size: 26px; font-weight: 700; color: #2d1f0a; margin-bottom: 8px; }
+    .item-text { font-family: 'Source Serif 4', serif; font-size: 18px; color: #8b7355; line-height: 1.6; font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="top-strip"></div>
+    <div class="left">
+      <div class="left-label">Agenda</div>
+      <div>
+        <div class="left-title">The <span class="left-italic">Journey</span> Ahead</div>
+      </div>
+      <div class="left-desc">Every great story has a structure. Here is ours for today.</div>
+    </div>
+    <div class="right">
+      <div class="item">
+        <div class="item-num">I.</div>
+        <div class="item-body">
+          <div class="item-title">The Foundation</div>
+          <div class="item-text">Establishing the context, the challenge, and why this moment matters</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-num">II.</div>
+        <div class="item-body">
+          <div class="item-title">The Craft</div>
+          <div class="item-text">Our approach, methodology, and the principles we refuse to compromise on</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-num">III.</div>
+        <div class="item-body">
+          <div class="item-title">The Evidence</div>
+          <div class="item-text">Results, proof points, and the stories that illustrate our impact</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="item-num">IV.</div>
+        <div class="item-body">
+          <div class="item-title">The Next Chapter</div>
+          <div class="item-text">Where we go from here, and what we need to write it together</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

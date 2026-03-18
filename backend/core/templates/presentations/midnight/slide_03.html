@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Midnight - Key Points</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #0a0f1e; font-family: 'Raleway', sans-serif; display: flex; }
+    .gold-line-top { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #d4a843, transparent); }
+    .left { width: 680px; padding: 90px 80px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid rgba(212,168,67,0.15); }
+    .label { font-size: 13px; color: #d4a843; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 30px; }
+    .title { font-family: 'Cormorant Garamond', serif; font-size: 72px; font-weight: 700; color: white; line-height: 1.1; margin-bottom: 40px; }
+    .quote { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; font-style: italic; color: rgba(212,168,67,0.7); line-height: 1.6; }
+    .divider { width: 40px; height: 1px; background: #d4a843; margin: 30px 0; }
+    .right { flex: 1; padding: 90px 90px; display: flex; flex-direction: column; justify-content: center; gap: 32px; }
+    .point { display: flex; gap: 30px; align-items: flex-start; padding: 36px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .point:last-child { border-bottom: none; }
+    .point-num { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 300; color: rgba(212,168,67,0.4); min-width: 50px; line-height: 1; }
+    .point-content {}
+    .point-title { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 600; color: white; margin-bottom: 10px; }
+    .point-text { font-size: 17px; color: rgba(255,255,255,0.4); line-height: 1.7; font-weight: 300; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="gold-line-top"></div>
+    <div class="left">
+      <div class="label">Strategic Pillars</div>
+      <div class="title">Three Pillars of Excellence</div>
+      <div class="divider"></div>
+      <div class="quote">"Sustained performance is not the result of brilliance, but of consistent, disciplined execution against a clear strategic framework."</div>
+    </div>
+    <div class="right">
+      <div class="point">
+        <div class="point-num">I</div>
+        <div class="point-content">
+          <div class="point-title">Capital Discipline</div>
+          <div class="point-text">Allocating resources with precision, prioritizing investments that generate compounding returns over short-term gains</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="point-num">II</div>
+        <div class="point-content">
+          <div class="point-title">Talent Density</div>
+          <div class="point-text">Building a team of exceptional individuals who raise the bar for everyone around them through their work and standards</div>
+        </div>
+      </div>
+      <div class="point">
+        <div class="point-num">III</div>
+        <div class="point-content">
+          <div class="point-title">Market Leadership</div>
+          <div class="point-text">Maintaining our position through continuous innovation, deep customer understanding, and category-defining moves</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

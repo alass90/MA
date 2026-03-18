@@ -1,0 +1,9 @@
+{
+  "id": "venture",
+  "name": "Venture",
+  "description": "Professional presentation template for venture.",
+  "number_of_slides": 5,
+  "style": {
+    "theme": "minimalist"
+  }
+}

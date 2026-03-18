@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bloom - Closing</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #fdf6f0; font-family: 'Nunito', sans-serif; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .blob1 { position: absolute; width: 900px; height: 900px; background: radial-gradient(circle, #fce4ec 0%, transparent 70%); top: -300px; left: -300px; border-radius: 50%; }
+    .blob2 { position: absolute; width: 700px; height: 700px; background: radial-gradient(circle, #e8f5e9 0%, transparent 70%); bottom: -200px; right: -200px; border-radius: 50%; }
+    .card { position: relative; z-index: 2; background: white; border-radius: 50px; padding: 100px 130px; text-align: center; border: 1px solid rgba(232,125,141,0.2); box-shadow: 0 40px 100px rgba(232,125,141,0.12); max-width: 1100px; }
+    .emoji-row { font-size: 48px; margin-bottom: 24px; display: flex; gap: 16px; justify-content: center; }
+    .label { font-size: 14px; color: #e87d8d; letter-spacing: 4px; text-transform: uppercase; font-weight: 700; margin-bottom: 24px; }
+    .title { font-family: 'DM Serif Display', serif; font-size: 90px; color: #3d2b35; line-height: 1.0; margin-bottom: 30px; }
+    .title em { color: #e87d8d; }
+    .divider { display: flex; align-items: center; gap: 20px; justify-content: center; margin: 30px 0; }
+    .divider-line { width: 70px; height: 1px; background: rgba(232,125,141,0.4); }
+    .divider-dot { width: 8px; height: 8px; background: #e87d8d; border-radius: 50%; }
+    .subtitle { font-size: 24px; color: #9a7a85; line-height: 1.6; margin-bottom: 50px; }
+    .contact-row { display: flex; gap: 40px; justify-content: center; }
+    .contact { font-size: 18px; color: #b8a4ac; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="blob1"></div>
+    <div class="blob2"></div>
+    <div class="card">
+      <div class="emoji-row">🌸 🌿 🌼</div>
+      <div class="label">Thank You</div>
+      <div class="title">Until We <em>Meet</em> Again</div>
+      <div class="divider"><div class="divider-line"></div><div class="divider-dot"></div><div class="divider-line"></div></div>
+      <div class="subtitle">Thank you for your time, your questions, and your open hearts.<br>We're excited to grow together.</div>
+      <div class="contact-row">
+        <div class="contact">hello@yourcompany.com</div>
+        <div class="contact">·</div>
+        <div class="contact">www.yourcompany.com</div>
+        <div class="contact">·</div>
+        <div class="contact">2025</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

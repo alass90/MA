@@ -1,0 +1,27 @@
+{
+  "title": "Glass - Premium Glassmorphism Template",
+  "description": "A stunning, modern glassmorphism design featuring frosted glass panels, vibrant gradient backgrounds, and sleek typography.",
+  "layout": "16:9",
+  "fonts": [
+    "https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+  ],
+  "colors": {
+    "background": "url('./assets/bg.png') no-repeat center center / cover",
+    "text_primary": "#FFFFFF",
+    "text_secondary": "rgba(255, 255, 255, 0.7)",
+    "accent": "#FF2079",
+    "accent_secondary": "#0AFFFF",
+    "glass_bg": "rgba(255, 255, 255, 0.05)",
+    "glass_border": "rgba(255, 255, 255, 0.1)"
+  },
+  "slide_types": [
+    "title",
+    "agenda",
+    "content",
+    "two_column",
+    "image_showcase",
+    "metrics",
+    "quote",
+    "conclusion"
+  ]
+}

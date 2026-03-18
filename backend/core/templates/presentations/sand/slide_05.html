@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sand - Closing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #2d1f0a; font-family: 'Libre Baskerville', serif; display: flex; }
+    .left { width: 900px; padding: 110px 110px; display: flex; flex-direction: column; justify-content: space-between; }
+    .label { font-family: 'Source Serif 4', serif; font-size: 14px; color: #a08060; letter-spacing: 5px; text-transform: uppercase; font-weight: 300; }
+    .title { font-size: 100px; font-weight: 700; color: white; line-height: 0.95; letter-spacing: -2px; }
+    .title-italic { font-style: italic; color: #c4a07a; }
+    .footer { }
+    .divider { width: 50px; height: 1px; background: #a08060; margin-bottom: 24px; }
+    .footer-text { font-family: 'Source Serif 4', serif; font-size: 18px; color: rgba(255,255,255,0.3); font-style: italic; line-height: 1.6; }
+    .right { flex: 1; background: #f7f0e6; padding: 110px 90px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+    .right::before { content: ''; position: absolute; width: 400px; height: 400px; background: rgba(160,128,96,0.08); border-radius: 50%; bottom: -150px; right: -100px; }
+    .right-label { font-family: 'Source Serif 4', serif; font-size: 13px; color: #a08060; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 40px; font-weight: 300; }
+    .right-quote { font-family: 'Source Serif 4', serif; font-size: 32px; font-style: italic; color: #4a3728; line-height: 1.6; margin-bottom: 50px; font-weight: 300; }
+    .contact-list { display: flex; flex-direction: column; gap: 16px; }
+    .contact-item { display: flex; align-items: center; gap: 16px; }
+    .contact-mark { width: 30px; height: 1px; background: #a08060; }
+    .contact-text { font-family: 'Source Serif 4', serif; font-size: 18px; color: #8b7355; font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="left">
+      <div class="label">Merci · Thank You</div>
+      <div class="title">Until<br>Next <span class="title-italic">Time</span></div>
+      <div class="footer">
+        <div class="divider"></div>
+        <div class="footer-text">Your Company · 2025<br>Confidential & Proprietary</div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="right-label">Get in Touch</div>
+      <div class="right-quote">"The best partnerships begin with a single honest conversation. We look forward to having ours."</div>
+      <div class="contact-list">
+        <div class="contact-item"><div class="contact-mark"></div><div class="contact-text">hello@yourcompany.com</div></div>
+        <div class="contact-item"><div class="contact-mark"></div><div class="contact-text">www.yourcompany.com</div></div>
+        <div class="contact-item"><div class="contact-mark"></div><div class="contact-text">+1 (555) 000-0000</div></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "id": "agency",
+  "name": "Agency",
+  "description": "Professional presentation template for agency.",
+  "number_of_slides": 5,
+  "style": {
+    "theme": "minimalist"
+  }
+}

@@ -1,0 +1,255 @@
+<html><head><style>@page { size: 1920px 1080px; margin: 0; } body { margin: 0; padding: 0; }</style><style>
+    :root {
+      --text-primary: #FFFFFF;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --accent: #FF2079;
+    }
+    body, html {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      font-family: 'Outfit', sans-serif;
+      background: #0f0c29;  /* fallback */
+      background: url('assets/bg.png') no-repeat center center fixed; 
+      background-size: cover;
+      display: flex; justify-content: center; align-items: center;
+      color: var(--text-primary);
+      overflow: hidden;
+    }
+    .slide-container {
+      width: 1920px; height: 1080px; position: relative;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+    }
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      padding: 80px 120px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+      max-width: 1400px;
+    }
+    /* Inner glow */
+    .glass-panel::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    }
+    .title {
+      font-size: 110px; font-weight: 700; margin: 0 0 30px 0;
+      letter-spacing: -2px; line-height: 1.1;
+      background: linear-gradient(to right, #fff, rgba(255,255,255,0.7));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 42px; font-weight: 300; color: var(--text-secondary); margin: 0;
+      letter-spacing: 1px;
+    }
+    .badge {
+      display: inline-block; padding: 10px 25px; border-radius: 50px;
+      background: rgba(255,32,121,0.2); border: 1px solid rgba(255,32,121,0.5);
+      color: #FF2079; font-size: 20px; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 40px;
+    }
+    .footer {
+      position: absolute; bottom: 50px; left: 80px; right: 80px;
+      display: flex; justify-content: space-between;
+      font-size: 24px; color: var(--text-secondary); font-weight: 300;
+    }
+    .orb-1, .orb-2 { position: absolute; border-radius: 50%; filter: blur(80px); z-index: -1; }
+    .orb-1 { width: 400px; height: 400px; background: rgba(255,32,121,0.3); top: -100px; left: -100px; }
+    .orb-2 { width: 500px; height: 500px; background: rgba(10,255,255,0.2); bottom: -150px; right: -150px; }
+  </style><style>
+    :root {
+      --text-primary: #FFFFFF;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --accent: #0AFFFF;
+    }
+    body, html {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      font-family: 'Outfit', sans-serif;
+      background: url('assets/bg.png') no-repeat center center fixed; 
+      background-size: cover;
+      color: var(--text-primary);
+      overflow: hidden;
+    }
+    .slide-container {
+      width: 1920px; height: 1080px; position: relative;
+      padding: 100px; box-sizing: border-box;
+      display: flex; flex-direction: column;
+    }
+    .header {
+      display: flex; align-items: center; margin-bottom: 60px;
+    }
+    .accent-line {
+      width: 80px; height: 6px; background: var(--accent); border-radius: 3px; margin-right: 30px;
+      box-shadow: 0 0 20px rgba(10,255,255,0.5);
+    }
+    .slide-title {
+      font-size: 64px; font-weight: 600; margin: 0;
+      letter-spacing: -1px;
+    }
+    .content-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; flex: 1;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px; padding: 50px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+      position: relative; overflow: hidden;
+    }
+    .glass-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    }
+    .card-title {
+      font-size: 36px; font-weight: 500; margin: 0 0 20px 0; color: var(--accent);
+    }
+    .card-text {
+      font-size: 28px; line-height: 1.6; color: var(--text-secondary); font-weight: 300; margin: 0;
+    }
+    .list { margin-top: 30px; padding-left: 0; list-style: none; }
+    .list li {
+      font-size: 28px; color: var(--text-secondary); font-weight: 300; margin-bottom: 20px;
+      display: flex; align-items: flex-start;
+    }
+    .list li::before {
+      content: '✦'; color: var(--accent); margin-right: 20px; font-size: 24px;
+    }
+    .slide-number { position: absolute; bottom: 50px; right: 100px; font-size: 24px; font-weight: 500; color: rgba(255,255,255,0.3); }
+  </style><style>
+    :root {
+      --text-primary: #FFFFFF;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --accent: #FF2079;
+    }
+    body, html {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      font-family: 'Outfit', sans-serif;
+      background: url('assets/bg.png') no-repeat center center fixed; 
+      background-size: cover;
+      color: var(--text-primary);
+      overflow: hidden;
+    }
+    .slide-container {
+      width: 1920px; height: 1080px; position: relative;
+      padding: 100px; box-sizing: border-box;
+      display: flex; flex-direction: column;
+    }
+    .header { display: flex; align-items: center; margin-bottom: 50px; }
+    .accent-line { width: 80px; height: 6px; background: var(--accent); border-radius: 3px; margin-right: 30px; box-shadow: 0 0 20px rgba(255,32,121,0.5); }
+    .slide-title { font-size: 64px; font-weight: 600; margin: 0; letter-spacing: -1px; }
+    
+    .split-layout { display: flex; gap: 80px; flex: 1; align-items: stretch; }
+    
+    .text-side { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .glass-text-box {
+      background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 60px;
+      position: relative;
+    }
+    .glass-text-box::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    }
+    .description { font-size: 32px; line-height: 1.6; color: var(--text-secondary); font-weight: 300; margin-bottom: 40px; }
+    .stat-row { display: flex; gap: 40px; }
+    .stat { display: flex; flex-direction: column; }
+    .stat-val { font-size: 56px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; }
+    .stat-label { font-size: 20px; color: var(--accent); font-weight: 500; text-transform: uppercase; letter-spacing: 2px; }
+    
+    .image-side { flex: 1; border-radius: 24px; overflow: hidden; position: relative; }
+    .image-placeholder {
+      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
+      backdrop-filter: blur(10px);
+    }
+    .image-placeholder img {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 24px;
+    }
+    
+    .slide-number { position: absolute; bottom: 50px; right: 100px; font-size: 24px; font-weight: 500; color: rgba(255,255,255,0.3); }
+  </style></head><body><div style='width: 1920px; height: 1080px; overflow: hidden; page-break-after: always; position: relative;'>
+  <div class="slide-container">
+    <div class="orb-1"></div>
+    <div class="orb-2"></div>
+    <div class="glass-panel">
+      <div class="badge">Innovation</div>
+      <h1 class="title">The Future of<br>Glassmorphism</h1>
+      <p class="subtitle">Elevating presentations to the next aesthetic level</p>
+    </div>
+    
+    <div class="footer">
+      <div>Glass Template v1.0</div>
+      <div>2024 Design Trends</div>
+    </div>
+  </div>
+</div><div style='width: 1920px; height: 1080px; overflow: hidden; page-break-after: always; position: relative;'>
+  <div class="slide-container">
+    <div class="header">
+      <div class="accent-line"></div>
+      <h2 class="slide-title">Core Features & Capabilities</h2>
+    </div>
+    
+    <div class="content-grid">
+      <div class="glass-card">
+        <h3 class="card-title">Seamless Integration</h3>
+        <p class="card-text">Our architecture is designed from the ground up to integrate perfectly with your existing workflows, requiring zero downtime and minimal configuration.</p>
+        <ul class="list">
+          <li>Plug-and-play APIs</li>
+          <li>Real-time synchronization</li>
+          <li>Legacy system support</li>
+        </ul>
+      </div>
+      
+      <div class="glass-card">
+        <h3 class="card-title">Infinite Scalability</h3>
+        <p class="card-text">Backed by distributed edge computing, our infrastructure scales dynamically to meet demand spikes without compromising performance or reliability.</p>
+        <ul class="list">
+          <li>Auto-scaling microservices</li>
+          <li>Global edge caching</li>
+          <li>99.99% Guaranteed Uptime</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="slide-number">02</div>
+  </div>
+</div><div style='width: 1920px; height: 1080px; overflow: hidden; page-break-after: always; position: relative;'>
+  <div class="slide-container">
+    <div class="header">
+      <div class="accent-line"></div>
+      <h2 class="slide-title">Unprecedented Growth</h2>
+    </div>
+    
+    <div class="split-layout">
+      <div class="text-side">
+        <div class="glass-text-box">
+          <p class="description">By leveraging advanced predictive modeling and a modernized tech stack, our Q3 performance shattered all previous constraints, opening the door for global expansion.</p>
+          
+          <div class="stat-row">
+            <div class="stat">
+              <span class="stat-val">340%</span>
+              <span class="stat-label">YoY Growth</span>
+            </div>
+            <div class="stat">
+              <span class="stat-val">2.4M</span>
+              <span class="stat-label">Active Users</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="image-side">
+        <div class="image-placeholder">
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop" alt="Abstract Data Visualization" />
+        </div>
+      </div>
+    </div>
+    
+    <div class="slide-number">03</div>
+  </div>
+</div></body></html>

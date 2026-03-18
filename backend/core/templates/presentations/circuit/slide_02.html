@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Circuit - Overview</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #020a04; font-family: 'JetBrains Mono', monospace; display: flex; flex-direction: column; padding: 70px 100px; }
+    .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(0,255,65,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,65,0.03) 1px, transparent 1px); background-size: 60px 60px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; position: relative; z-index: 2; }
+    .header-left { }
+    .breadcrumb { font-size: 12px; color: rgba(0,255,65,0.4); letter-spacing: 3px; margin-bottom: 12px; }
+    .title { font-size: 48px; font-weight: 800; color: white; }
+    .title span { color: #00ff41; }
+    .status-bar { display: flex; gap: 24px; align-items: center; }
+    .status-item { font-size: 12px; color: rgba(0,255,65,0.5); display: flex; align-items: center; gap: 8px; }
+    .status-dot { width: 6px; height: 6px; background: #00ff41; border-radius: 50%; box-shadow: 0 0 6px #00ff41; }
+    .modules { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; flex: 1; position: relative; z-index: 2; }
+    .module { border: 1px solid rgba(0,255,65,0.15); border-radius: 8px; padding: 36px 32px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+    .module::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, #00ff41, transparent); }
+    .mod-id { font-size: 11px; color: rgba(0,255,65,0.4); letter-spacing: 3px; margin-bottom: 20px; }
+    .mod-title { font-size: 22px; font-weight: 700; color: white; margin-bottom: 12px; }
+    .mod-title span { color: #00ff41; }
+    .mod-text { font-size: 15px; color: rgba(255,255,255,0.35); line-height: 1.7; font-family: 'Inter', sans-serif; flex: 1; }
+    .mod-footer { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
+    .mod-bar { height: 3px; border-radius: 2px; background: rgba(0,255,65,0.2); flex: 1; }
+    .mod-bar-fill { height: 3px; border-radius: 2px; background: #00ff41; }
+    .mod-pct { font-size: 12px; color: rgba(0,255,65,0.6); }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="grid-bg"></div>
+    <div class="header">
+      <div class="header-left">
+        <div class="breadcrumb">SYS:// AGENDA &gt; MODULES</div>
+        <div class="title">System <span>Overview</span></div>
+      </div>
+      <div class="status-bar">
+        <div class="status-item"><div class="status-dot"></div>MODULE_A: READY</div>
+        <div class="status-item"><div class="status-dot"></div>MODULE_B: READY</div>
+        <div class="status-item"><div class="status-dot"></div>MODULE_C: READY</div>
+        <div class="status-item"><div class="status-dot"></div>MODULE_D: READY</div>
+      </div>
+    </div>
+    <div class="modules">
+      <div class="module">
+        <div class="mod-id">MOD_01 // INIT</div>
+        <div>
+          <div class="mod-title"><span>//</span> Architecture</div>
+          <div class="mod-text">System design, tech stack decisions, and the infrastructure powering everything</div>
+        </div>
+        <div class="mod-footer">
+          <div class="mod-bar"><div class="mod-bar-fill" style="width:100%"></div></div>
+          <div class="mod-pct">100%</div>
+        </div>
+      </div>
+      <div class="module">
+        <div class="mod-id">MOD_02 // BUILD</div>
+        <div>
+          <div class="mod-title"><span>//</span> Engineering</div>
+          <div class="mod-text">Development velocity, deployment pipeline, and engineering team structure</div>
+        </div>
+        <div class="mod-footer">
+          <div class="mod-bar"><div class="mod-bar-fill" style="width:80%"></div></div>
+          <div class="mod-pct">80%</div>
+        </div>
+      </div>
+      <div class="module">
+        <div class="mod-id">MOD_03 // TEST</div>
+        <div>
+          <div class="mod-title"><span>//</span> Performance</div>
+          <div class="mod-text">Benchmarks, load testing results, and optimization strategies employed</div>
+        </div>
+        <div class="mod-footer">
+          <div class="mod-bar"><div class="mod-bar-fill" style="width:92%"></div></div>
+          <div class="mod-pct">92%</div>
+        </div>
+      </div>
+      <div class="module">
+        <div class="mod-id">MOD_04 // DEPLOY</div>
+        <div>
+          <div class="mod-title"><span>//</span> Roadmap</div>
+          <div class="mod-text">Next release schedule, feature backlog priorities, and long-term vision</div>
+        </div>
+        <div class="mod-footer">
+          <div class="mod-bar"><div class="mod-bar-fill" style="width:65%"></div></div>
+          <div class="mod-pct">65%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prism - Stats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 1920px; height: 1080px; overflow: hidden; }
+    .slide { width: 1920px; height: 1080px; background: #0d0d0d; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; padding: 80px 120px; }
+    .header { margin-bottom: 60px; }
+    .label { font-size: 14px; color: #f72585; letter-spacing: 5px; text-transform: uppercase; font-weight: 600; margin-bottom: 14px; }
+    .title { font-size: 60px; font-weight: 800; color: white; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 24px; }
+    .stat { border-radius: 20px; padding: 44px 36px; }
+    .stat-1 { background: linear-gradient(135deg, #f72585, #b5179e); }
+    .stat-2 { background: linear-gradient(135deg, #7209b7, #4361ee); }
+    .stat-3 { background: linear-gradient(135deg, #4cc9f0, #4361ee); }
+    .stat-4 { background: linear-gradient(135deg, #f77f00, #fcbf49); }
+    .stat-value { font-size: 80px; font-weight: 800; color: white; line-height: 1; margin-bottom: 8px; }
+    .stat-label { font-size: 18px; color: rgba(255,255,255,0.7); font-weight: 500; margin-bottom: 6px; }
+    .stat-change { font-size: 15px; color: rgba(255,255,255,0.5); }
+    .bottom-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .bar-item { background: rgba(255,255,255,0.04); border-radius: 16px; padding: 32px 36px; }
+    .bar-label { display: flex; justify-content: space-between; margin-bottom: 14px; }
+    .bar-name { font-size: 16px; color: rgba(255,255,255,0.6); font-weight: 600; }
+    .bar-pct { font-size: 16px; color: white; font-weight: 700; }
+    .bar-track { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+    .bar-fill { height: 8px; border-radius: 4px; }
+    .bar-fill-1 { background: linear-gradient(90deg, #f72585, #b5179e); }
+    .bar-fill-2 { background: linear-gradient(90deg, #7209b7, #4361ee); }
+    .bar-fill-3 { background: linear-gradient(90deg, #4cc9f0, #4361ee); }
+  </style>
+</head>
+<body>
+  <div class="slide">
+    <div class="header">
+      <div class="label">Numbers</div>
+      <div class="title">Performance at a Glance</div>
+    </div>
+    <div class="stats">
+      <div class="stat stat-1">
+        <div class="stat-value">$24M</div>
+        <div class="stat-label">ARR</div>
+        <div class="stat-change">↑ +340% YoY</div>
+      </div>
+      <div class="stat stat-2">
+        <div class="stat-value">850k</div>
+        <div class="stat-label">Active Users</div>
+        <div class="stat-change">↑ +210% growth</div>
+      </div>
+      <div class="stat stat-3">
+        <div class="stat-value">97%</div>
+        <div class="stat-label">Satisfaction</div>
+        <div class="stat-change">↑ top quartile</div>
+      </div>
+      <div class="stat stat-4">
+        <div class="stat-value">4.2x</div>
+        <div class="stat-label">LTV/CAC Ratio</div>
+        <div class="stat-change">↑ industry leading</div>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <div class="bar-item">
+        <div class="bar-label"><div class="bar-name">North America</div><div class="bar-pct">68%</div></div>
+        <div class="bar-track"><div class="bar-fill bar-fill-1" style="width:68%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label"><div class="bar-name">Europe</div><div class="bar-pct">22%</div></div>
+        <div class="bar-track"><div class="bar-fill bar-fill-2" style="width:22%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-label"><div class="bar-name">APAC & Other</div><div class="bar-pct">10%</div></div>
+        <div class="bar-track"><div class="bar-fill bar-fill-3" style="width:10%"></div></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
