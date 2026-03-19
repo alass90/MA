@@ -170,41 +170,8 @@ export function UploadFileToolView({
   const FileIcon = getFileIcon(fileName);
 
   return (
-    <Card className="gap-0 flex border shadow-none border-t border-b-0 border-x-0 p-0 rounded-none flex-col h-full overflow-hidden bg-card">
-      <CardHeader className="h-14 bg-zinc-50/80 dark:bg-zinc-900/80 backdrop-blur-sm border-b p-2 px-4 space-y-2">
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative p-2 rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/20">
-              <Upload className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
-            </div>
-            <div>
-              <CardTitle className="text-base font-medium text-zinc-900 dark:text-zinc-100">
-                {toolTitle}
-              </CardTitle>
-            </div>
-          </div>
-
-          {!isStreaming && (
-            <Badge
-              variant="secondary"
-              className={
-                actualIsSuccess
-                  ? "bg-gradient-to-b from-emerald-200 to-emerald-100 text-emerald-700 dark:from-emerald-800/50 dark:to-emerald-900/60 dark:text-emerald-300"
-                  : "bg-gradient-to-b from-rose-200 to-rose-100 text-rose-700 dark:from-rose-800/50 dark:to-rose-900/60 dark:text-rose-300"
-              }
-            >
-              {actualIsSuccess ? (
-                <CheckCircle className="h-3.5 w-3.5 mr-1" />
-              ) : (
-                <AlertTriangle className="h-3.5 w-3.5 mr-1" />
-              )}
-              {actualIsSuccess ? 'Upload successful' : 'Upload failed'}
-            </Badge>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-0 h-full flex-1 overflow-hidden relative">
+    <div className="flex flex-col h-full overflow-hidden bg-transparent">
+      <div className="h-full flex-1 overflow-hidden relative">
         {isStreaming ? (
           <LoadingState
             icon={Upload}
@@ -220,7 +187,7 @@ export function UploadFileToolView({
             <div className="p-4">
               {actualIsSuccess && uploadResult ? (
                 <div className="space-y-4">
-                  <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm">
+                  <div className="bg-white dark:bg-[#1a1a1b] border border-black/[0.08] dark:border-white/[0.08] rounded-xl shadow-[0px_0px_4px_0px_rgba(0,0,0,0.01)]">
                     <div className="p-3">
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div className="flex items-center gap-2">
@@ -239,8 +206,8 @@ export function UploadFileToolView({
                     </div>
                   </div>
                   {uploadResult.secure_url && (
-                    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm">
-                      <div className="p-3">
+                    <div className="bg-[#f8f8f7]/50 dark:bg-[#1a1a1b]/50 border border-black/[0.08] dark:border-white/[0.08] rounded-[18px] overflow-hidden backdrop-blur-[2px]">
+                      <div className="p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-6 h-6 rounded bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                             <ExternalLink className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -253,7 +220,7 @@ export function UploadFileToolView({
                           </Badge>
                         </div>
 
-                        <div className="bg-zinc-50 dark:bg-zinc-800 rounded p-2 mb-3">
+                        <div className="bg-white/80 dark:bg-[#1a1a1b]/80 rounded-[14px] p-3 mb-4 border border-black/[0.06] dark:border-white/[0.06] backdrop-blur-sm">
                           <code className="text-xs font-mono text-zinc-700 dark:text-zinc-300 break-all">
                             {uploadResult.secure_url}
                           </code>
@@ -322,7 +289,7 @@ export function UploadFileToolView({
             </div>
           </ScrollArea>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
-} 
+}

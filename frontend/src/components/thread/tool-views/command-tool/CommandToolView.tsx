@@ -151,51 +151,43 @@ export function CommandToolView({
   const emptyLines = Array.from({ length: 30 }, () => '');
 
   return (
-    <Card className="gap-0 flex border shadow-none border-t border-b-0 border-x-0 p-0 rounded-none flex-col h-full overflow-hidden bg-card">
-      <CardHeader className="h-14 bg-zinc-50/80 dark:bg-zinc-900/80 backdrop-blur-sm border-b p-2 px-4 space-y-2">
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative p-2 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/20">
-              <Terminal className="w-5 h-5 text-blue-500 dark:text-blue-400" />
-            </div>
-            <div>
-              <CardTitle className="text-base font-medium text-zinc-900 dark:text-zinc-100">
-                {toolTitle}
-              </CardTitle>
-            </div>
-          </div>
-
+    <div className="flex flex-col h-full overflow-hidden bg-transparent">
+      <div className="flex items-center justify-between px-4 py-2 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
+        <div className="flex items-center gap-2">
           {!isStreaming && (
             <Badge
               variant="secondary"
-              className={
+              className={cn(
+                "text-[10px] h-4 px-1 leading-none border-none",
                 actualIsSuccess
-                  ? "bg-gradient-to-b from-emerald-200 to-emerald-100 text-emerald-700 dark:from-emerald-800/50 dark:to-emerald-900/60 dark:text-emerald-300"
-                  : "bg-gradient-to-b from-rose-200 to-rose-100 text-rose-700 dark:from-rose-800/50 dark:to-rose-900/60 dark:text-rose-300"
-              }
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+              )}
             >
               {actualIsSuccess ? (
-                <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                <CheckCircle className="h-3 w-3 mr-1" />
               ) : (
-                <AlertTriangle className="h-3.5 w-3.5 mr-1" />
+                <AlertTriangle className="h-3 w-3 mr-1" />
               )}
-              {actualIsSuccess ?
-                (name === 'check-command-output' ? 'Output retrieved successfully' : 'Command executed successfully') :
-                (name === 'check-command-output' ? 'Failed to retrieve output' : 'Command failed')
-              }
+              {actualIsSuccess ? 'Completed' : 'Failed'}
             </Badge>
           )}
 
           {isStreaming && (
-            <Badge className="bg-gradient-to-b from-blue-200 to-blue-100 text-blue-700 dark:from-blue-800/50 dark:to-blue-900/60 dark:text-blue-300">
-              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
-              {name === 'check-command-output' ? 'Retrieving output' : 'Executing'}
-            </Badge>
+            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+              <Loader2 className="h-3 w-3 animate-spin text-blue-600 dark:text-blue-400" />
+              <span className="text-[10px] font-medium text-blue-700 dark:text-blue-300">
+                {name === 'check-command-output' ? 'Checking output' : 'Executing command'}
+              </span>
+            </div>
           )}
         </div>
-      </CardHeader>
+        <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+          {toolTitle}
+        </div>
+      </div>
 
-      <CardContent className="p-0 h-full flex-1 overflow-hidden relative">
+      <div className="p-0 h-full flex-1 overflow-hidden relative">
         {isStreaming ? (
           <div className="h-full flex flex-col overflow-hidden">
             <div className="flex-shrink-0 p-4 pb-2">
@@ -207,10 +199,24 @@ export function CommandToolView({
                       <TerminalIcon className="h-2.5 w-2.5 mr-1 opacity-70" />
                       Command
                     </Badge>
-                    <Badge className="bg-gradient-to-b from-blue-200 to-blue-100 text-blue-700 dark:from-blue-800/50 dark:to-blue-900/60 dark:text-blue-300">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
-                      Streaming
-                    </Badge>
+                    {!isStreaming ? (
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "text-[10px] h-4 px-1 leading-none border-none",
+                          actualIsSuccess
+                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                            : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                        )}
+                      >
+                        {actualIsSuccess ? "Success" : "Failed"}
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-none text-[10px] h-4 px-1 leading-none">
+                        <Loader2 className="h-2.5 w-2.5 animate-spin mr-1" />
+                        Running
+                      </Badge>
+                    )}
                   </div>
                   <div className="font-mono text-xs text-foreground">
                     <span className="text-green-500 dark:text-green-400 font-semibold">{displayPrefix} </span>
@@ -240,6 +246,17 @@ export function CommandToolView({
                     <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 font-normal">
                       <TerminalIcon className="h-2.5 w-2.5 mr-1 opacity-70" />
                       Command
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className={cn(
+                        "text-[10px] h-4 px-1 leading-none border-none",
+                        actualIsSuccess
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+                      )}
+                    >
+                      {actualIsSuccess ? "Success" : "Failed"}
                     </Badge>
                   </div>
                   <div className="font-mono text-xs text-foreground">
@@ -327,7 +344,7 @@ export function CommandToolView({
             </p>
           </div>
         )}
-      </CardContent>
+      </div>
 
       <div className="px-4 py-2 h-10 bg-gradient-to-r from-zinc-50/90 to-zinc-100/90 dark:from-zinc-900/90 dark:to-zinc-800/90 backdrop-blur-sm border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center gap-4">
         <div className="h-full flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
@@ -348,6 +365,6 @@ export function CommandToolView({
               : ''}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

@@ -217,99 +217,88 @@ export function DocsToolView({
   
   return (
     <>
-    <Card className="gap-0 flex border shadow-none border-t border-b-0 border-x-0 p-0 rounded-none flex-col h-full overflow-hidden bg-card">
-      <CardHeader className="h-14 bg-zinc-50/80 dark:bg-zinc-900/80 backdrop-blur-sm border-b p-2 px-4 space-y-2">
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative p-2 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-600/10 border border-blue-500/20">
-              <FileText className="w-5 h-5 text-blue-500 dark:text-blue-400" />
+    <div className="flex flex-col h-full overflow-hidden bg-transparent">
+      <div className="flex items-center justify-between px-4 py-2 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
+        <div className="flex items-center gap-2">
+          {isStreaming && (
+            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+              <Loader2 className="h-3 w-3 animate-spin text-blue-600 dark:text-blue-400" />
+              <span className="text-[10px] font-medium text-blue-700 dark:text-blue-300">Streaming</span>
             </div>
-            <div>
-              {getActionTitle(toolName)}
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            {isStreaming && (
-              <div className="flex items-center gap-1.5 px-2 py-1 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-                <Loader2 className="h-3 w-3 animate-spin text-blue-600 dark:text-blue-400" />
-                <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Streaming</span>
-              </div>
-            )}
-            {!isStreaming && data.document?.format === 'doc' && (
-              <>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    let content = data.document.content || '';
-                    if (typeof content === 'string' && content.includes('"type":"tiptap_document"')) {
-                      try {
-                        const parsed = JSON.parse(content);
-                        if (parsed.type === 'tiptap_document' && parsed.content) {
-                          content = parsed.content;
-                        }
-                      } catch {}
-                    }
-                    handleOpenInEditor(data.document, content, data);
-                  }}
-                >
-                  <Pen className="h-3 w-3" />
-                  Edit
-                </Button>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="outline" disabled={isExporting}>
-                      {isExporting ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Download className="h-3 w-3" />
-                      )}
-                      Export
-                      <ChevronDown className="h-3 w-3" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {project?.sandbox?.sandbox_url && data?.document?.path && (
-                      <>
-                        <DropdownMenuItem onClick={() => handleExport('google-docs')}>
-                          <Share/>
-                          Upload to Google Docs
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleExport('docx')}>
-                          Export as DOCX
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                    {!project?.sandbox?.sandbox_url && (
+          )}
+          {!isStreaming && (
+            <Badge
+              variant="secondary"
+              className={cn(
+                "text-[10px] h-4 px-1 leading-none border-none",
+                data && data.success && !data.error
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+              )}
+            >
+              {data && data.success && !data.error ? 'Ready' : 'Failed'}
+            </Badge>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          {!isStreaming && data.document?.format === 'doc' && (
+            <>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 px-2 text-xs"
+                onClick={() => {
+                  let content = data.document.content || '';
+                  if (typeof content === 'string' && content.includes('"type":"tiptap_document"')) {
+                    try {
+                      const parsed = JSON.parse(content);
+                      if (parsed.type === 'tiptap_document' && parsed.content) {
+                        content = parsed.content;
+                      }
+                    } catch {}
+                  }
+                  handleOpenInEditor(data.document, content, data);
+                }}
+              >
+                <Pen className="h-3 w-3 mr-1.5" />
+                Edit
+              </Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" disabled={isExporting}>
+                    {isExporting ? <Loader2 className="h-3 w-3 animate-spin mr-1.5" /> : <Download className="h-3 w-3 mr-1.5" />}
+                    Export
+                    <ChevronDown className="h-3 w-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {project?.sandbox?.sandbox_url && data?.document?.path && (
+                    <>
+                      <DropdownMenuItem onClick={() => handleExport('google-docs')}>
+                        <Share className="h-3 w-3 mr-2" />
+                        Upload to Google Docs
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleExport('docx')}>
                         Export as DOCX
                       </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem onClick={() => handleExport('txt')}>
-                      Export as Text
+                    </>
+                  )}
+                  {!project?.sandbox?.sandbox_url && (
+                    <DropdownMenuItem onClick={() => handleExport('docx')}>
+                      Export as DOCX
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            )}
-            {!isStreaming && (
-              <Badge
-                variant="secondary"
-                className={cn(
-                  data && data.success && !data.error
-                    ? "bg-gradient-to-b from-emerald-200 to-emerald-100 text-emerald-700 dark:from-emerald-800/50 dark:to-emerald-900/60 dark:text-emerald-300"
-                    : "bg-gradient-to-b from-rose-200 to-rose-100 text-rose-700 dark:from-rose-800/50 dark:to-rose-900/60 dark:text-rose-300"
-                )}
-              >
-                {getStatusIcon()}
-                {data && data.success && !data.error ? 'Success' : 'Failed'}
-              </Badge>
-            )}
-          </div>
+                  )}
+                  <DropdownMenuItem onClick={() => handleExport('txt')}>
+                    Export as Text
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
         </div>
-      </CardHeader>
+      </div>
       
       <CardContent className="flex-1 px-0 overflow-hidden flex flex-col">
         {data.error ? (
@@ -377,7 +366,7 @@ export function DocsToolView({
           </div>
         )}
       </CardContent>
-    </Card>
+    </div>
     {(data?.sandbox_id || project?.id) && selectedDocPath && (
       <FileViewerModal
         open={fileViewerOpen}

@@ -515,111 +515,104 @@ export function PresentationViewer({
   
 
   return (
-    <Card className="gap-0 flex border shadow-none border-t border-b-0 border-x-0 p-0 rounded-none flex-col h-full overflow-hidden bg-card">
-      {showHeader && <CardHeader className="h-14 bg-zinc-50/80 dark:bg-zinc-900/80 backdrop-blur-sm border-b p-2 px-4 space-y-2">
-        <div className="flex flex-row items-center justify-between">
+    <div className="flex flex-col h-full overflow-hidden bg-transparent">
+      {showHeader && (
+        <div className="flex items-center justify-between px-4 py-2 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
           <div className="flex items-center gap-2">
-            <div className="relative p-2 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/20">
-              <Presentation className="w-5 h-5 text-blue-500 dark:text-blue-400" />
-            </div>
-            <div>
-              <CardTitle className="text-base font-medium text-zinc-900 dark:text-zinc-100">
-                {metadata?.title || metadata?.presentation_name || toolTitle}
-              </CardTitle>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* Export actions */}
-            {metadata && slides.length > 0 && !isStreaming && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    if (openPresentation && project?.sandbox?.sandbox_url && extractedPresentationName) {
-                      openPresentation(
-                        extractedPresentationName,
-                        project.sandbox.sandbox_url,
-                        visibleSlide || currentSlideNumber || slides[0]?.number || 1
-                      );
-                    }
-                  }}
-                  className="h-8 w-8 p-0"
-                  title="Open in full screen"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </Button>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 w-8 p-0"
-                      title="Export presentation"
-                      disabled={isDownloading}
-                    >
-                      {isDownloading ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <Download className="h-3.5 w-3.5" />
-                      )}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-32">
-                    <DropdownMenuItem 
-                      onClick={() => handleDownload(setIsDownloading, DownloadFormat.PDF)}
-                      className="cursor-pointer"
-                      disabled={isDownloading}
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      PDF
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleDownload(setIsDownloading, DownloadFormat.PPTX)}
-                      className="cursor-pointer"
-                      disabled={isDownloading}
-                    >
-                      <Presentation className="h-4 w-4 mr-2" />
-                      PPTX
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleDownload(setIsDownloading, DownloadFormat.GOOGLE_SLIDES)}
-                      className="cursor-pointer"
-                      disabled={isDownloading}
-                    >
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      Google Slides
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            )}
-
             {!isStreaming && (
               <Badge
                 variant="secondary"
-                className="bg-gradient-to-b from-emerald-200 to-emerald-100 text-emerald-700 dark:from-emerald-800/50 dark:to-emerald-900/60 dark:text-emerald-300"
+                className="text-[10px] h-4 px-1 leading-none border-none bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
               >
-                <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                <CheckCircle className="h-3 w-3 mr-1" />
                 Success
               </Badge>
             )}
 
             {isStreaming && (
-              <Badge className="bg-gradient-to-b from-blue-200 to-blue-100 text-blue-700 dark:from-blue-800/50 dark:to-blue-900/60 dark:text-blue-300">
-                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
-                Loading
-              </Badge>
+              <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <Loader2 className="h-3 w-3 animate-spin text-blue-600 dark:text-blue-400" />
+                <span className="text-[10px] font-medium text-blue-700 dark:text-blue-300">Loading</span>
+              </div>
             )}
+
+            <div className="flex items-center gap-1">
+              {metadata && slides.length > 0 && !isStreaming && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (openPresentation && project?.sandbox?.sandbox_url && extractedPresentationName) {
+                        openPresentation(
+                          extractedPresentationName,
+                          project.sandbox.sandbox_url,
+                          visibleSlide || currentSlideNumber || slides[0]?.number || 1
+                        );
+                      }
+                    }}
+                    className="h-6 w-6 p-0"
+                    title="Open in full screen"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-6 w-6 p-0"
+                        title="Export presentation"
+                        disabled={isDownloading}
+                      >
+                        {isDownloading ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Download className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-32">
+                      <DropdownMenuItem 
+                        onClick={() => handleDownload(setIsDownloading, DownloadFormat.PDF)}
+                        className="cursor-pointer"
+                        disabled={isDownloading}
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleDownload(setIsDownloading, DownloadFormat.PPTX)}
+                        className="cursor-pointer"
+                        disabled={isDownloading}
+                      >
+                        <Presentation className="h-4 w-4 mr-2" />
+                        PPTX
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleDownload(setIsDownloading, DownloadFormat.GOOGLE_SLIDES)}
+                        className="cursor-pointer"
+                        disabled={isDownloading}
+                      >
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Google Slides
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider truncate max-w-[200px]">
+            {metadata?.title || metadata?.presentation_name || toolTitle}
           </div>
         </div>
-      </CardHeader>}
+      )}
 
 
 
-      <CardContent className="p-0 h-full flex-1 overflow-hidden relative">
+      <div className="p-0 h-full flex-1 overflow-hidden relative">
         {(isStreaming || isLoadingMetadata || (!metadata && !toolExecutionError)) ? (
           <LoadingState
             icon={Presentation}
@@ -681,7 +674,7 @@ export function PresentationViewer({
             </div>
           </ScrollArea>
         )}
-      </CardContent>
+      </div>
 
       <div className="px-4 py-2 h-9 bg-muted/20 border-t border-border/40 flex justify-between items-center">
         <div className="text-xs text-muted-foreground">
@@ -704,6 +697,6 @@ export function PresentationViewer({
         sandboxUrl={viewerState.sandboxUrl}
         initialSlide={viewerState.initialSlide}
       />
-    </Card>
+    </div>
   );
 }

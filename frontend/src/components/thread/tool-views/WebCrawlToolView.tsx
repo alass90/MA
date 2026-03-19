@@ -128,42 +128,8 @@ export function WebCrawlToolView({
   const contentStats = webpageContent?.text ? getContentStats(webpageContent.text) : null;
 
   return (
-    <Card className="gap-0 flex border shadow-none border-t border-b-0 border-x-0 p-0 rounded-none flex-col h-full overflow-hidden bg-card">
-      <CardHeader className="h-14 bg-zinc-50/80 dark:bg-zinc-900/80 backdrop-blur-sm border-b p-2 px-4 space-y-2">
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20">
-              <Globe className="w-5 h-5 text-primary" />
-            </div>
-
-            <div>
-              <CardTitle className="text-base font-medium text-zinc-900 dark:text-zinc-100">
-                {toolTitle}
-              </CardTitle>
-            </div>
-          </div>
-
-          {!isStreaming && (
-            <Badge
-              variant="secondary"
-              className={
-                isSuccess
-                  ? "bg-gradient-to-b from-emerald-200 to-emerald-100 text-emerald-700 dark:from-emerald-800/50 dark:to-emerald-900/60 dark:text-emerald-300"
-                  : "bg-gradient-to-b from-rose-200 to-rose-100 text-rose-700 dark:from-rose-800/50 dark:to-rose-900/60 dark:text-rose-300"
-              }
-            >
-              {isSuccess ? (
-                <CheckCircle className="h-3.5 w-3.5" />
-              ) : (
-                <AlertTriangle className="h-3.5 w-3.5" />
-              )}
-              {isSuccess ? 'Crawling completed' : 'Crawling failed'}
-            </Badge>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-0 h-full flex-1 overflow-hidden relative">
+    <div className="flex flex-col h-full overflow-hidden bg-transparent">
+      <div className="p-0 h-full flex-1 overflow-hidden relative">
         {isStreaming ? (
           <div className="flex flex-col items-center justify-center h-full py-12 px-6 bg-gradient-to-b from-white to-zinc-50 dark:from-zinc-950 dark:to-zinc-900">
             <div className="text-center w-full max-w-xs">
@@ -323,27 +289,7 @@ export function WebCrawlToolView({
             </p>
           </div>
         )}
-      </CardContent>
-
-      {/* Footer */}
-      <div className="px-4 py-2 h-10 bg-gradient-to-r from-zinc-50/90 to-zinc-100/90 dark:from-zinc-900/90 dark:to-zinc-800/90 backdrop-blur-sm border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center gap-4">
-        <div className="h-full flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
-          {!isStreaming && webpageContent?.text && (
-            <Badge className="h-6 py-0.5">
-              <div className="w-2 h-2 rounded-full bg-green-500 mr-1.5" />
-              Content extracted
-            </Badge>
-          )}
-        </div>
-
-        <div className="text-xs text-zinc-500 dark:text-zinc-400">
-          {toolTimestamp && !isStreaming
-            ? formatTimestamp(toolTimestamp)
-            : assistantTimestamp
-              ? formatTimestamp(assistantTimestamp)
-              : ''}
-        </div>
       </div>
-    </Card>
+    </div>
   );
 }

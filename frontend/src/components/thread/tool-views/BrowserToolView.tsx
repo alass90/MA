@@ -5,7 +5,6 @@ import {
   ExternalLink,
   CheckCircle,
   AlertTriangle,
-  CircleDashed,
   RefreshCw,
   Code2,
   ImageIcon,
@@ -17,11 +16,10 @@ import {
   getToolTitle,
 } from './utils';
 import { safeJsonParse } from '@/components/thread/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ImageLoader } from './shared/ImageLoader';
-import { ParsedContent } from '../types';
 import { JsonViewer } from './shared/JsonViewer';
 
 interface BrowserHeaderProps {
@@ -32,35 +30,43 @@ interface BrowserHeaderProps {
 
 export const BrowserHeader: React.FC<BrowserHeaderProps> = ({ isConnected, onRefresh, viewToggle }) => {
   return (
-    <div className={`flex items-center justify-between px-3 md:px-4 py-2 border border-border ${!isConnected ? 'bg-muted/30 border-b' : ''}`}>
-      <div className="flex items-center gap-2 justify-between min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <div className="relative p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/20">
-            <Globe className="w-5 h-5 text-purple-500 dark:text-purple-400" />
-          </div>
-          <div>
-            <CardTitle className="text-base font-medium text-zinc-900 dark:text-zinc-100">
-              Browser
-            </CardTitle>
-          </div>
+    <div className={`flex items-center justify-between px-3 md:px-4 h-14 border-b border-black/[0.08] dark:border-white/[0.08] bg-[#f8f8f7]/80 dark:bg-[#1a1a1b]/80 backdrop-blur-md sticky top-0 z-10`}>
+      <div className="flex items-center gap-3 flex-1">
+        <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-xl bg-white dark:bg-[#272728] border border-black/[0.05] dark:border-white/[0.05] shadow-sm max-w-[400px] flex-1">
+          <Globe className={`w-3.5 h-3.5 ${isConnected ? 'text-blue-500' : 'text-zinc-400'}`} />
+          <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 truncate">
+            {isConnected ? 'browser.talos.ai' : 'No connection'}
+          </span>
         </div>
-        <div className='flex items-center gap-1'>
-        <Badge variant="outline" className="gap-1.5 p-2 rounded-3xl mr-2">
-          <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500/80 animate-pulse' : 'bg-gray-400'}`}></div>
-          <span className="sm:inline">Live Preview</span>
-        </Badge>
-        {viewToggle}
-        {isConnected && onRefresh && (
-          <Button
-          variant="ghost"
-          size="sm"
-          onClick={onRefresh}
-          className="h-7 w-7 p-0 hover:bg-muted rounded-xl"
-          title="Refresh browser view"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-          </Button>
-        )}
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white dark:bg-[#272728] border border-black/[0.05] dark:border-white/[0.05] shadow-sm">
+          <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-red-400'}`}></div>
+          <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
+            {isConnected ? 'LIVE' : 'OFFLINE'}
+          </span>
+        </div>
+
+        <div className="h-4 w-[1px] bg-black/[0.08] dark:border-white/[0.08]"></div>
+
+        <div className="flex items-center gap-2">
+          {isConnected && onRefresh && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onRefresh}
+              className="h-8 w-8 p-0 hover:bg-black/[0.03] dark:hover:bg-white/[0.03] rounded-full"
+              title="Refresh browser view"
+            >
+              <RefreshCw className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" />
+            </Button>
+          )}
+          {viewToggle && (
+            <div className="scale-90">
+              {viewToggle}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -74,16 +80,11 @@ export function BrowserToolView({
   toolTimestamp,
   isSuccess = true,
   isStreaming = false,
-  project,
   agentStatus = 'idle',
   messages = [],
-  currentIndex = 0,
-  totalCalls = 1,
   viewToggle,
 }: ToolViewProps) {
-  // All hooks must be called unconditionally at the top
   const [showContext, setShowContext] = React.useState(false);
-  // Add loading states for images
   const [imageLoading, setImageLoading] = React.useState(true);
   const [imageError, setImageError] = React.useState(false);
   const isRunning = isStreaming || agentStatus === 'running';
@@ -108,7 +109,6 @@ export function BrowserToolView({
     }
   }, [isRunning]);
 
-  // Reset loading state when screenshot changes (use optional chaining for safety)
   const screenshotUrl = toolResult?.output?.image_url || null;
   const screenshotBase64 = toolResult?.output?.screenshot_base64 || null;
   React.useEffect(() => {
@@ -118,7 +118,6 @@ export function BrowserToolView({
     }
   }, [screenshotUrl, screenshotBase64]);
 
-  // Defensive check - handle cases where toolCall might be undefined
   if (!toolCall) {
     console.warn('BrowserToolView: toolCall is undefined. Tool views should use structured props.');
     return null;
@@ -128,11 +127,9 @@ export function BrowserToolView({
   const operation = extractBrowserOperation(name);
   const toolTitle = getToolTitle(name);
 
-  // Extract data directly from structured props
   const url = toolCall.arguments?.url || toolCall.arguments?.target_url || null;
   const parameters = toolCall.arguments || null;
 
-  // Extract result data from toolResult
   let browserStateMessageId: string | undefined;
   let screenshotUrlFinal: string | null = screenshotUrl;
   let screenshotBase64Final: string | null = screenshotBase64;
@@ -142,15 +139,12 @@ export function BrowserToolView({
     const output = toolResult.output;
     
     if (typeof output === 'object' && output !== null) {
-      // Extract screenshot URL and message ID from output
       if (output.image_url) {
         screenshotUrlFinal = output.image_url;
       }
       if (output.message_id) {
         browserStateMessageId = output.message_id;
       }
-      
-      // Set result, excluding message_id
       result = Object.fromEntries(
         Object.entries(output).filter(([k]) => k !== 'message_id')
       ) as Record<string, any>;
@@ -159,7 +153,6 @@ export function BrowserToolView({
     }
   }
 
-  // Try to find browser state message if we have a message_id
   if (!screenshotUrlFinal && !screenshotBase64Final && browserStateMessageId && messages.length > 0) {
     const browserStateMessage = messages.find(
       (msg) =>
@@ -191,7 +184,6 @@ export function BrowserToolView({
   };
 
   const renderScreenshot = () => {
-
     if (screenshotUrlFinal) {
       return (
         <div className="flex items-center justify-center w-full h-full min-h-[600px] relative p-4" style={{ minHeight: '600px' }}>
@@ -247,58 +239,9 @@ export function BrowserToolView({
   };
 
   return (
-    <Card className="gap-0 flex border shadow-none border-t border-b-0 border-x-0 p-0 rounded-none flex-col h-full overflow-scroll bg-card">
-      <CardHeader className="h-14 bg-zinc-50/80 dark:bg-zinc-900/80 backdrop-blur-sm border-b p-2 px-4 space-y-2">
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/20">
-              <MonitorPlay className="w-5 h-5 text-purple-500 dark:text-purple-400" />
-            </div>
-            <div className='flex items-center gap-2'>
-              <CardTitle className="text-base font-medium text-zinc-900 dark:text-zinc-100">
-                {toolTitle}
-              </CardTitle>
-            </div>
-          </div>
-
-          <div className='flex items-center gap-2'>
-            {!isRunning && (
-              <Badge
-              variant="secondary"
-              className={
-                isSuccess
-                ? "bg-gradient-to-b from-emerald-200 to-emerald-100 text-emerald-700 dark:from-emerald-800/50 dark:to-emerald-900/60 dark:text-emerald-300"
-                : "bg-gradient-to-b from-rose-200 to-rose-100 text-rose-700 dark:from-rose-800/50 dark:to-rose-900/60 dark:text-rose-300"
-              }
-              >
-                {isSuccess ? (
-                  <CheckCircle className="h-3.5 w-3.5 mr-1" />
-                ) : (
-                  <AlertTriangle className="h-3.5 w-3.5 mr-1" />
-                )}
-                {isSuccess ? 'Browser action completed' : 'Browser action failed'}
-              </Badge>
-            )}
-            {viewToggle}
-            {(result || parameters) && <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowContext(!showContext)}
-              className="h-7 w-7 hover:bg-muted rounded-xl"
-              title={showContext ? "Show screenshot" : "Show INPUT/OUTPUT context"}
-            >
-              {showContext ? (
-                <ImageIcon className="h-3.5 w-3.5" />
-              ) : (
-                <Code2 className="h-3.5 w-3.5" />
-              )}
-            </Button>}
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-0 flex-1 overflow-hidden relative" style={{ height: 'calc(100vh - 150px)'}}>
-        <div className="flex-1 flex h-full items-center overflow-scroll bg-white dark:bg-black">
+    <div className="flex-1 flex flex-col h-full overflow-hidden bg-transparent">
+      <div className="flex-1 overflow-hidden relative">
+        <div className="flex-1 flex h-full items-center overflow-scroll bg-white dark:bg-zinc-950">
           {showContext && (result || parameters) ? (
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {parameters && <JsonViewer
@@ -346,31 +289,7 @@ export function BrowserToolView({
             </div>
           )}
         </div>
-      </CardContent>
-
-      <div className="px-4 py-2 h-10 bg-gradient-to-r from-zinc-50/90 to-zinc-100/90 dark:from-zinc-900/90 dark:to-zinc-800/90 backdrop-blur-sm border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center gap-4">
-        <div className="h-full flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
-          {!isRunning && (
-            <Badge className="h-6 py-0.5">
-              <Globe className="h-3 w-3" />
-              {operation}
-            </Badge>
-          )}
-          {url && (
-            <span className="text-xs truncate max-w-[200px] hidden sm:inline-block">
-              {url}
-            </span>
-          )}
-        </div>
-
-        <div className="text-xs text-zinc-500 dark:text-zinc-400">
-          {toolTimestamp && !isRunning
-            ? formatTimestamp(toolTimestamp)
-            : assistantTimestamp
-              ? formatTimestamp(assistantTimestamp)
-              : ''}
-        </div>
       </div>
-    </Card>
+    </div>
   );
 }

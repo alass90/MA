@@ -402,157 +402,103 @@ export function DesignerToolView({
   };
 
   return (
-    <Card className="gap-0 flex border shadow-none border-t border-b-0 border-x-0 p-0 rounded-none flex-col h-full overflow-hidden bg-card">
-      <CardHeader className="h-16 border-b p-3 px-4">
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="relative p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/20">
-              <Palette className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            </div>
-            <div>
-              <CardTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                Designer Canvas
-              </CardTitle>
-              <div className="flex items-center gap-2 mt-1">
-                {platformPreset && platformPreset !== 'custom' && (
-                  <Badge variant="secondary" className="text-xs">
-                    {platformPreset.replace(/_/g, ' ')}
-                  </Badge>
-                )}
-                {designStyle && (
-                  <Badge variant="outline" className="text-xs capitalize">
-                    {designStyle}
-                  </Badge>
-                )}
-                {width && height && (
-                  <Badge variant="outline" className="text-xs">
-                    {width}×{height}px
-                  </Badge>
-                )}
-              </div>
-            </div>
+    <div className="flex flex-col h-full overflow-hidden bg-transparent relative">
+      <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+        {isStreaming && (
+          <Badge className="bg-purple-500 text-white shadow-lg animate-pulse border-none">
+            <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+            Creating Design
+          </Badge>
+        )}
+        {!isStreaming && actualIsSuccess && (
+          <Badge className="bg-emerald-500 text-white shadow-lg border-none">
+            <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
+            Design Ready
+          </Badge>
+        )}
+      </div>
+
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <TooltipProvider>
+          <div className="flex items-center gap-1 p-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md rounded-xl border shadow-sm">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleZoomOut}
+                  className="h-8 w-8 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                >
+                  <ZoomOut className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Zoom Out</TooltipContent>
+            </Tooltip>
+
+            <span className="text-[10px] font-bold px-1 min-w-[40px] text-center text-zinc-500">
+              {Math.round(canvasScale * 100)}%
+            </span>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleZoomIn}
+                  className="h-8 w-8 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                >
+                  <ZoomIn className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Zoom In</TooltipContent>
+            </Tooltip>
+
+            <div className="w-[1px] h-4 bg-zinc-200 dark:bg-zinc-800 mx-1" />
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleResetView}
+                  className="h-8 w-8 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                >
+                  <Maximize2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Reset View</TooltipContent>
+            </Tooltip>
           </div>
 
-          <div className="flex items-center gap-2">
-            <TooltipProvider>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 p-1 bg-background/80 rounded-lg border">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleZoomOut}
-                        className="h-8 w-8"
-                      >
-                        <ZoomOut className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Zoom Out</TooltipContent>
-                  </Tooltip>
+          <div className="flex items-center gap-1 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md rounded-xl p-1 border shadow-sm">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Toggle
+                  pressed={showGrid}
+                  onPressedChange={setShowGrid}
+                  className="h-8 w-8 rounded-lg data-[state=on]:bg-purple-500/10 data-[state=on]:text-purple-600 dark:data-[state=on]:bg-purple-500/20 dark:data-[state=on]:text-purple-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                >
+                  <Grid className="h-4 w-4" />
+                </Toggle>
+              </TooltipTrigger>
+              <TooltipContent>Toggle Grid</TooltipContent>
+            </Tooltip>
 
-                  <span className="text-xs px-2 min-w-[50px] text-center">
-                    {Math.round(canvasScale * 100)}%
-                  </span>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleZoomIn}
-                        className="h-8 w-8"
-                      >
-                        <ZoomIn className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Zoom In</TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleResetView}
-                        className="h-8 w-8"
-                      >
-                        <Maximize2 className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Reset View</TooltipContent>
-                  </Tooltip>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1 bg-background/80 rounded-lg p-1 border">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Toggle
-                      pressed={showGrid}
-                      onPressedChange={setShowGrid}
-                      className="h-8 w-8 data-[state=on]:bg-purple-100 dark:data-[state=on]:bg-purple-900/50"
-                    >
-                      <Grid className="h-4 w-4" />
-                    </Toggle>
-                  </TooltipTrigger>
-                  <TooltipContent>Toggle Grid</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Toggle
-                      pressed={snapToGrid}
-                      onPressedChange={setSnapToGrid}
-                      className="h-8 w-8 data-[state=on]:bg-purple-100 dark:data-[state=on]:bg-purple-900/50"
-                    >
-                      <svg
-                        className="h-4 w-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <rect x="4" y="4" width="4" height="4" />
-                        <rect x="10" y="10" width="4" height="4" />
-                        <rect x="16" y="4" width="4" height="4" />
-                        <rect x="4" y="16" width="4" height="4" />
-                        <rect x="16" y="16" width="4" height="4" />
-                      </svg>
-                    </Toggle>
-                  </TooltipTrigger>
-                  <TooltipContent>Snap to Grid</TooltipContent>
-                </Tooltip>
-              </div>
-            </TooltipProvider>
-
-            {!isStreaming && (
-              <Badge
-                className={cn(
-                  "px-3",
-                  actualIsSuccess
-                    ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white"
-                    : "bg-gradient-to-r from-rose-500 to-rose-600 text-white"
-                )}
-              >
-                {actualIsSuccess ? (
-                  <CheckCircle className="h-3.5 w-3.5 mr-1" />
-                ) : (
-                  <AlertTriangle className="h-3.5 w-3.5 mr-1" />
-                )}
-                {actualIsSuccess ? 'Ready' : 'Failed'}
-              </Badge>
-            )}
-
-            {isStreaming && (
-              <Badge className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
-                Creating Design
-              </Badge>
-            )}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Toggle
+                  pressed={snapToGrid}
+                  onPressedChange={setSnapToGrid}
+                  className="h-8 w-8 rounded-lg data-[state=on]:bg-purple-500/10 data-[state=on]:text-purple-600 dark:data-[state=on]:bg-purple-500/20 dark:data-[state=on]:text-purple-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                >
+                  <Wand2 className="h-4 w-4" />
+                </Toggle>
+              </TooltipTrigger>
+              <TooltipContent>Snap to Grid</TooltipContent>
+            </Tooltip>
           </div>
-        </div>
-      </CardHeader>
+        </TooltipProvider>
+      </div>
 
       <CardContent className="p-0 flex-1 flex">
         <div className="flex flex-1">
@@ -824,6 +770,6 @@ export function DesignerToolView({
           {actualAssistantTimestamp ? formatTimestamp(actualAssistantTimestamp) : ''}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

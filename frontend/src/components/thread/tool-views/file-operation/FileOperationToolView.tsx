@@ -403,72 +403,57 @@ export function FileOperationToolView({
   };
 
   return (
-    <Card className="gap-0 flex border shadow-none border-t border-b-0 border-x-0 p-0 rounded-none flex-col h-full overflow-hidden bg-card">
-      <Tabs defaultValue="preview" className="w-full h-full">
-        <CardHeader className="h-14 bg-zinc-50/80 dark:bg-zinc-900/80 backdrop-blur-sm border-b p-2 px-4 space-y-2 mb-0">
-          <div className="flex flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <div className={cn("relative p-2 rounded-lg border flex-shrink-0", config.gradientBg, config.borderColor)}>
-                <Icon className={cn("h-5 w-5", config.color)} />
-              </div>
-              <CardTitle className="text-base font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                {toolTitle}
-              </CardTitle>
-              <TabsList className="h-8 bg-muted/50 border border-border/50 p-0.5 gap-0.5 flex-shrink-0">
-                <TabsTrigger
-                  value="code"
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all [&[data-state=active]]:bg-white [&[data-state=active]]:dark:bg-primary/10 [&[data-state=active]]:text-foreground hover:bg-background/50 text-muted-foreground shadow-none"
-                >
-                  <Code className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Source</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="preview"
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all [&[data-state=active]]:bg-white [&[data-state=active]]:dark:bg-primary/10 [&[data-state=active]]:text-foreground hover:bg-background/50 text-muted-foreground shadow-none"
-                >
-                  <Eye className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Preview</span>
-                </TabsTrigger>
-              </TabsList>
-            </div>
-            <div className='flex items-center gap-1.5 flex-shrink-0'>
-              {fileContent && !isStreaming && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCopyContent}
-                  disabled={isCopyingContent}
-                  className="h-8 w-8 p-0"
-                  title="Copy file content"
-                >
-                  {isCopyingContent ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </Button>
-              )}
-              {isHtml && htmlPreviewUrl && !isStreaming && (
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="Open in browser" asChild>
-                  <a href={htmlPreviewUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
-              )}
-              {processedFilePath && onFileClick && !isStreaming && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onFileClick(processedFilePath)}
-                  className="h-8 w-8 p-0"
-                  title="Open in workspace manager"
-                >
-                  <Maximize2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
+    <div className="flex flex-col h-full overflow-hidden bg-transparent">
+      <Tabs defaultValue="preview" className="w-full h-full flex flex-col">
+        <div className="flex items-center justify-between px-4 py-2 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
+          <TabsList className="h-8 bg-muted/50 border border-border/50 p-0.5 gap-0.5">
+            <TabsTrigger
+              value="code"
+              className="px-3 py-1 text-xs"
+            >
+              <Code className="h-3 w-3 mr-1.5" />
+              Source
+            </TabsTrigger>
+            <TabsTrigger
+              value="preview"
+              className="px-3 py-1 text-xs"
+            >
+              <Eye className="h-3 w-3 mr-1.5" />
+              Preview
+            </TabsTrigger>
+          </TabsList>
+          
+          <div className="flex items-center gap-1">
+            {fileContent && !isStreaming && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleCopyContent}
+                disabled={isCopyingContent}
+                className="h-8 w-8"
+              >
+                {isCopyingContent ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            )}
+            {isHtml && htmlPreviewUrl && !isStreaming && (
+              <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                <a href={htmlPreviewUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
+            )}
+            {processedFilePath && onFileClick && !isStreaming && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onFileClick(processedFilePath)}
+                className="h-8 w-8"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </Button>
+            )}
           </div>
-        </CardHeader>
+        </div>
 
         <CardContent className="p-0 -my-2 h-full flex-1 overflow-hidden relative">
           <TabsContent value="code" className="flex-1 h-full mt-0 p-0 overflow-hidden">
@@ -563,6 +548,6 @@ export function FileOperationToolView({
           </div>
         </div>
       </Tabs>
-    </Card>
+    </div>
   );
 }

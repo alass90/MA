@@ -6,7 +6,7 @@ import React, { memo, useMemo, useCallback, useState, useEffect, useRef } from '
 import { Slider } from '@/components/ui/slider';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApiMessageType } from '@/components/thread/types';
-import { CircleDashed, X, ChevronLeft, ChevronRight, Computer, Minimize2, Globe, Wrench } from 'lucide-react';
+import { CircleDashed, X, ChevronLeft, ChevronRight, Computer, Minimize2, Globe, Wrench, CheckCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -148,6 +148,7 @@ interface PanelHeaderProps {
   variant?: 'drawer' | 'desktop' | 'motion';
   showMinimize?: boolean;
   layoutId?: string;
+  statusText?: string;
 }
 
 const PanelHeader = memo(function PanelHeader({
@@ -157,8 +158,9 @@ const PanelHeader = memo(function PanelHeader({
   variant = 'desktop',
   showMinimize = false,
   layoutId,
+  statusText,
 }: PanelHeaderProps) {
-  const title = agentName ? `${agentName}'s Computer` : "Talos's Computer";
+  const title = "Talos's Computer";
 
   if (variant === 'drawer') {
     return (
@@ -218,25 +220,27 @@ const PanelHeader = memo(function PanelHeader({
   return (
     <div className="pt-4 pl-4 pr-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="ml-2">
-            <h2 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
-              {title}
-            </h2>
-          </div>
+        <div className="flex flex-col gap-0.5">
+          <h2 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
+            {title}
+          </h2>
+          {statusText && (
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+              {statusText}
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {isStreaming && (
-            <Badge variant="outline" className="gap-1.5 p-2 rounded-3xl">
-              <CircleDashed className="h-3 w-3 animate-spin" />
-              <span>Running</span>
+            <Badge variant="outline" className="gap-1.5 p-2 rounded-3xl border-none bg-transparent">
+              <CircleDashed className="h-3 w-3 animate-spin text-blue-500" />
             </Badge>
           )}
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-8 w-8"
+            className="h-8 w-8 text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
             title={showMinimize ? "Minimize to floating preview" : "Close"}
           >
             {showMinimize ? <Minimize2 className="h-4 w-4" /> : <X className="h-4 w-4" />}
@@ -261,9 +265,9 @@ interface NavigationControlsProps {
   onPrevious: () => void;
   onNext: () => void;
   onSliderChange: (value: number[]) => void;
-  onJumpToLive: () => void;
   onJumpToLatest: () => void;
-  isMobile?: boolean;
+  footerLabel?: string;
+  isStreaming?: boolean;
 }
 
 const NavigationControls = memo(function NavigationControls({
@@ -276,132 +280,114 @@ const NavigationControls = memo(function NavigationControls({
   onPrevious,
   onNext,
   onSliderChange,
-  onJumpToLive,
   onJumpToLatest,
   isMobile = false,
-}: NavigationControlsProps) {
-  const renderStatusButton = useCallback(() => {
-    const baseClasses = "flex items-center justify-center gap-1.5 px-2 py-0.5 rounded-full w-[116px]";
-    const dotClasses = "w-1.5 h-1.5 rounded-full";
-    const textClasses = "text-xs font-medium";
-
+}: NavigationControlsProps & { isMobile?: boolean }) {
+  const renderStatusButton = () => {
     if (isLiveMode) {
-      if (agentStatus === 'running') {
-        return (
-          <div
-            className={`${baseClasses} bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors cursor-pointer`}
-            onClick={onJumpToLive}
-          >
-            <div className={`${dotClasses} bg-green-500 animate-pulse`} />
-            <span className={`${textClasses} text-green-700 dark:text-green-400`}>Live Updates</span>
-          </div>
-        );
-      } else {
-        return (
-          <div className={`${baseClasses} bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-neutral-800`}>
-            <div className={`${dotClasses} bg-neutral-500`} />
-            <span className={`${textClasses} text-neutral-700 dark:text-neutral-400`}>Latest Tool</span>
-          </div>
-        );
-      }
-    } else {
-      if (agentStatus === 'running') {
-        return (
-          <div
-            className={`${baseClasses} bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors cursor-pointer`}
-            onClick={onJumpToLive}
-          >
-            <div className={`${dotClasses} bg-green-500 animate-pulse`} />
-            <span className={`${textClasses} text-green-700 dark:text-green-400`}>Jump to Live</span>
-          </div>
-        );
-      } else {
-        return (
-          <div
-            className={`${baseClasses} bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors cursor-pointer`}
-            onClick={onJumpToLatest}
-          >
-            <div className={`${dotClasses} bg-blue-500`} />
-            <span className={`${textClasses} text-blue-700 dark:text-blue-400`}>Jump to Latest</span>
-          </div>
-        );
-      }
+      const isIdle = agentStatus === 'idle';
+      return (
+        <Badge
+          variant="secondary"
+          className={`h-7 px-2.5 gap-1.5 border-none shadow-none font-medium text-xs whitespace-nowrap
+            ${isIdle
+              ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+              : "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+            }`}
+        >
+          <div className={`w-1.5 h-1.5 rounded-full ${isIdle ? "bg-zinc-400 dark:bg-zinc-500" : "bg-blue-500 animate-pulse"}`} />
+          <span>{isIdle ? 'Live' : 'Running'}</span>
+        </Badge>
+      );
     }
-  }, [isLiveMode, agentStatus, onJumpToLive, onJumpToLatest]);
+
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onJumpToLatest}
+        className="h-7 px-2.5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 gap-1.5 border-zinc-200 dark:border-zinc-800"
+      >
+        <span className="text-xs font-medium">To Latest</span>
+      </Button>
+    );
+  };
 
   if (isMobile) {
     return (
-      <div className="border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 p-3">
-        <div className="flex items-center justify-between">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onPrevious}
-            disabled={displayIndex <= 0}
-            className="h-8 px-2.5 text-xs"
-          >
-            <ChevronLeft className="h-3.5 w-3.5 mr-1" />
-            <span>Prev</span>
-          </Button>
-
+      <div className="px-4 py-3 bg-card border-t flex flex-col gap-4">
+        <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-zinc-600 dark:text-zinc-400 font-medium tabular-nums min-w-[44px]">
-              {safeInternalIndex + 1}/{displayTotalCalls}
-            </span>
-            {renderStatusButton()}
-          </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onPrevious}
+              disabled={displayIndex <= 0}
+              className="h-8 px-2.5 text-xs"
+            >
+              <ChevronLeft className="h-3.5 w-3.5 mr-1" />
+              <span>Prev</span>
+            </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onNext}
-            disabled={displayIndex >= displayTotalCalls - 1}
-            className="h-8 px-2.5 text-xs"
-          >
-            <span>Next</span>
-            <ChevronRight className="h-3.5 w-3.5 ml-1" />
-          </Button>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-zinc-600 dark:text-zinc-400 font-medium tabular-nums min-w-[44px]">
+                {safeInternalIndex + 1}/{displayTotalCalls}
+              </span>
+              {renderStatusButton()}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onNext}
+              disabled={displayIndex >= displayTotalCalls - 1}
+              className="h-8 px-2.5 text-xs"
+            >
+              <span>Next</span>
+              <ChevronRight className="h-3.5 w-3.5 ml-1" />
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-4 py-2.5">
-      <div className="flex items-center gap-3">
+    <div className="px-4 py-2 mt-auto border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50 backdrop-blur-sm">
+      <div className="flex items-center gap-4 max-w-2xl mx-auto h-10">
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
             onClick={onPrevious}
             disabled={displayIndex <= 0}
-            className="h-7 w-7 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+            className="h-8 w-8 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-xs text-zinc-600 dark:text-zinc-400 font-medium tabular-nums px-1 min-w-[44px] text-center">
-            {displayIndex + 1}/{displayTotalCalls}
-          </span>
           <Button
             variant="ghost"
             size="icon"
             onClick={onNext}
             disabled={safeInternalIndex >= latestIndex}
-            className="h-7 w-7 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+            className="h-8 w-8 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
 
-        <div className="flex-1 relative">
+        <div className="flex-1 relative flex items-center gap-4">
           <Slider
             min={0}
             max={Math.max(0, displayTotalCalls - 1)}
             step={1}
             value={[safeInternalIndex]}
             onValueChange={onSliderChange}
-            className="w-full [&>span:first-child]:h-1.5 [&>span:first-child]:bg-zinc-200 dark:[&>span:first-child]:bg-zinc-800 [&>span:first-child>span]:bg-zinc-500 dark:[&>span:first-child>span]:bg-zinc-400 [&>span:first-child>span]:h-1.5"
+            className="flex-1 [&>span:first-child]:h-1.5 [&>span:first-child]:bg-zinc-200 dark:[&>span:first-child]:bg-zinc-800 [&>span:first-child>span]:bg-zinc-500 dark:[&>span:first-child>span]:bg-zinc-400 [&>span:first-child>span]:h-1.5"
           />
+          <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium tabular-nums min-w-[32px]">
+            {safeInternalIndex + 1}/{displayTotalCalls}
+          </span>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -422,23 +408,25 @@ interface EmptyStateProps {
 
 const EmptyState = memo(function EmptyState({ t }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center flex-1 p-8">
-      <div className="flex flex-col items-center space-y-4 max-w-sm text-center">
-        <div className="relative">
-          <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
-            <Computer className="h-8 w-8 text-zinc-400 dark:text-zinc-500" />
+    <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4 bg-[#f8f8f7] dark:bg-[#1a1a1b]">
+      <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] border border-black/[0.08] dark:border-white/[0.08] shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col items-center justify-center p-8">
+        <div className="flex flex-col items-center space-y-6 max-w-sm text-center">
+          <div className="relative">
+            <div className="w-20 h-20 bg-[#f8f8f7] dark:bg-[#1a1a1b] rounded-full flex items-center justify-center border border-black/[0.05] dark:border-white/[0.05]">
+              <Computer className="h-10 w-10 text-zinc-300 dark:text-zinc-600" />
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-white dark:bg-[#272728] rounded-full flex items-center justify-center border border-black/[0.08] dark:border-white/[0.08] shadow-sm">
+              <div className="w-2.5 h-2.5 bg-zinc-300 dark:bg-zinc-600 rounded-full animate-pulse"></div>
+            </div>
           </div>
-          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center">
-            <div className="w-2 h-2 bg-zinc-400 dark:text-zinc-500 rounded-full"></div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+              {t('noActionsYet')}
+            </h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+              {t('workerActionsDescription')}
+            </p>
           </div>
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
-            {t('noActionsYet')}
-          </h3>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-            {t('workerActionsDescription')}
-          </p>
         </div>
       </div>
     </div>
@@ -456,23 +444,50 @@ interface LoadingStateProps {
 }
 
 const LoadingState = memo(function LoadingState({ agentName, onClose, isMobile }: LoadingStateProps) {
+  const content = (
+    <div className="flex-1 flex flex-col overflow-hidden bg-[#f8f8f7] dark:bg-[#1a1a1b]">
+      <PanelHeader
+        agentName={agentName}
+        onClose={onClose}
+        variant={isMobile ? 'drawer' : 'desktop'}
+        statusText="Initializing session..."
+      />
+
+      <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4">
+        <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] border border-black/[0.08] dark:border-white/[0.08] shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] overflow-hidden p-6 space-y-6">
+          <div className="h-9 w-full bg-[#f8f8f7] dark:bg-[#1a1a1b] rounded-t-[22px] -mt-6 -mx-6 border-b border-black/[0.08] dark:border-white/[0.08] flex items-center px-6">
+            <Skeleton className="h-3 w-32" />
+          </div>
+          
+          <div className="space-y-4 pt-4">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+            <Skeleton className="h-48 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
+          </div>
+        </div>
+      </div>
+
+      <div className="h-12 px-4 bg-transparent border-t border-black/[0.04] dark:border-white/[0.04] flex justify-between items-center gap-4">
+        <div className="flex items-center gap-2 flex-1">
+          <Skeleton className="h-4 w-4 rounded-full" />
+          <Skeleton className="h-3 w-24" />
+        </div>
+        <div className="flex items-center gap-2">
+           <Skeleton className="h-3 w-12" />
+           <div className="flex gap-1">
+             <Skeleton className="h-7 w-7 rounded-lg" />
+             <Skeleton className="h-7 w-7 rounded-lg" />
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+
   if (isMobile) {
     return (
       <DrawerContent className="h-[85vh]">
-        <PanelHeader
-          agentName={agentName}
-          onClose={onClose}
-          variant="drawer"
-        />
-
-        <div className="flex-1 p-4 overflow-auto">
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-32" />
-            <Skeleton className="h-20 w-full rounded-md" />
-            <Skeleton className="h-40 w-full rounded-md" />
-            <Skeleton className="h-20 w-full rounded-md" />
-          </div>
-        </div>
+        {content}
       </DrawerContent>
     );
   }
@@ -480,24 +495,8 @@ const LoadingState = memo(function LoadingState({ agentName, onClose, isMobile }
   return (
     <div className="fixed inset-0 z-30 pointer-events-none">
       <div className="p-4 h-full flex items-stretch justify-end pointer-events-auto">
-        <div className="border rounded-2xl flex flex-col shadow-2xl bg-background w-[90%] sm:w-[450px] md:w-[500px] lg:w-[550px] xl:w-[650px]">
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex flex-col h-full">
-              <PanelHeader
-                agentName={agentName}
-                onClose={onClose}
-                showMinimize={true}
-              />
-              <div className="flex-1 p-4 overflow-auto">
-                <div className="space-y-4">
-                  <Skeleton className="h-8 w-32" />
-                  <Skeleton className="h-20 w-full rounded-md" />
-                  <Skeleton className="h-40 w-full rounded-md" />
-                  <Skeleton className="h-20 w-full rounded-md" />
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="border border-black/[0.08] dark:border-white/[0.08] rounded-3xl flex flex-col shadow-2xl bg-white dark:bg-[#1a1a1b] w-[90%] sm:w-[450px] md:w-[500px] lg:w-[550px] xl:w-[650px] overflow-hidden">
+          {content}
         </div>
       </div>
     </div>
@@ -944,44 +943,61 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
       const firstStreamingTool = toolCallSnapshots.find(s => s.toolCall.toolResult === undefined);
       if (firstStreamingTool && totalCompletedCalls === 0) {
         const toolName = firstStreamingTool.toolCall.toolCall?.function_name?.replace(/_/g, '-') || 'Tool';
+        const userFriendlyName = getUserFriendlyToolName(toolName);
+        
         return (
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full bg-[#f8f8f7] dark:bg-[#1a1a1b]">
             {!isMobile && (
               <PanelHeader
                 agentName={agentName}
                 onClose={handleClose}
                 isStreaming={true}
+                statusText={`Talos is starting ${userFriendlyName}...`}
               />
             )}
-            {isMobile && (
-              <div className="px-4 pb-2">
-                <div className="flex items-center justify-center">
-                  <div className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 flex items-center gap-1.5">
-                    <CircleDashed className="h-3 w-3 animate-spin" />
-                    <span>Running</span>
-                  </div>
+            
+            <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4">
+              <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] border border-black/[0.08] dark:border-white/[0.08] shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col">
+                <div className="h-9 flex items-center justify-center px-4 bg-[#f8f8f7] dark:bg-[#1a1a1b] border-b border-black/[0.08] dark:border-white/[0.08] rounded-t-[22px] shadow-[inset_0px_1px_0px_0px_#FFFFFF] dark:shadow-[inset_0px_1px_0px_0px_#FFFFFF10]">
+                  <span className="text-[13px] font-medium text-zinc-400 dark:text-zinc-500 truncate max-w-[300px]">
+                    {userFriendlyName}
+                  </span>
                 </div>
-              </div>
-            )}
-            <div className="flex flex-col items-center justify-center flex-1 p-8">
-              <div className="flex flex-col items-center space-y-4 max-w-sm text-center">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
-                    <CircleDashed className="h-8 w-8 text-blue-500 dark:text-blue-400 animate-spin" />
+                <div className="flex-1 flex flex-col items-center justify-center p-8">
+                <div className="flex flex-col items-center space-y-6 max-w-sm text-center">
+                  <div className="relative">
+                    <div className="w-20 h-20 bg-blue-50/50 dark:bg-blue-900/10 rounded-full flex items-center justify-center border border-blue-100 dark:border-blue-900/20">
+                      <CircleDashed className="h-10 w-10 text-blue-500 dark:text-blue-400 animate-spin" />
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
-                    Tool is running
-                  </h3>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                    {getUserFriendlyToolName(toolName)} is currently executing. Results will appear here when complete.
-                  </p>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+                      Task in progress
+                    </h3>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                      {userFriendlyName} is currently executing. Results will appear here shortly.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
+
+            <NavigationControls
+              displayIndex={displayIndex}
+              displayTotalCalls={displayTotalCalls}
+              safeInternalIndex={safeInternalIndex}
+              latestIndex={latestIndex}
+              isLiveMode={isLiveMode}
+              agentStatus={agentStatus}
+              onPrevious={navigateToPrevious}
+              onNext={navigateToNext}
+              onSliderChange={handleSliderChange}
+              onJumpToLatest={jumpToLatest}
+              isMobile={isMobile}
+            />
           </div>
-        );
+        </div>
+      );
       }
 
       return (
@@ -1042,51 +1058,87 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
       />
     );
 
+    const toolName = displayToolCall.toolCall?.function_name?.replace(/_/g, '-') || 'tool';
+    const userFriendlyName = getUserFriendlyToolName(toolName);
+    const args = displayToolCall.toolCall?.arguments || {};
+    const contextText = args.url || args.target_url || args.path || args.filepath || args.filename || userFriendlyName;
+
+    const statusText = isStreaming 
+      ? `Talos is using ${userFriendlyName} | Executing...`
+      : `Talos is using ${userFriendlyName} | Ready`;
+    const capsuleHeader = (
+      <div className="h-9 flex items-center justify-center px-4 bg-[#f8f8f7] dark:bg-[#1a1a1b] border-b border-black/[0.08] dark:border-white/[0.08] rounded-t-[22px] shadow-[inset_0px_1px_0px_0px_#FFFFFF] dark:shadow-[inset_0px_1px_0px_0px_#FFFFFF10]">
+        <span className="text-[13px] font-medium text-zinc-400 dark:text-zinc-500 truncate max-w-[300px]">
+          {contextText}
+        </span>
+      </div>
+    );
+
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full bg-[#f8f8f7] dark:bg-[#1a1a1b]">
         {!isMobile && (
           <PanelHeader
             agentName={agentName}
             onClose={handleClose}
             isStreaming={isStreaming}
-            variant="motion"
+            variant="desktop"
+            statusText={statusText}
           />
         )}
 
-        <div className={`flex-1 ${currentView === 'browser' ? 'overflow-hidden' : 'overflow-hidden'} scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-700 scrollbar-track-transparent`}>
-          {persistentVncIframe && (
-            <div className={`${currentView === 'browser' ? 'h-full flex flex-col' : 'hidden'}`}>
-              <BrowserHeader isConnected={true} onRefresh={handleVncRefresh} viewToggle={<ViewToggle currentView={currentView} onViewChange={setCurrentView} />} />
-              <div className="flex-1 overflow-hidden grid items-center">
-                {persistentVncIframe}
+        <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4">
+          <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] border border-black/[0.08] dark:border-white/[0.08] shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col">
+            {capsuleHeader}
+            <div className="flex-1 overflow-hidden flex flex-col">
+            {persistentVncIframe && (
+              <div className={`${currentView === 'browser' ? 'h-full flex flex-col' : 'hidden'}`}>
+                <BrowserHeader isConnected={true} onRefresh={handleVncRefresh} viewToggle={<ViewToggle currentView={currentView} onViewChange={setCurrentView} />} />
+                <div className="flex-1 overflow-hidden grid items-center">
+                  {persistentVncIframe}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {!persistentVncIframe && currentView === 'browser' && (
-            <div className="h-full flex flex-col">
-              <BrowserHeader isConnected={false} viewToggle={<ViewToggle currentView={currentView} onViewChange={setCurrentView} />} />
+            {!persistentVncIframe && currentView === 'browser' && (
+              <div className="h-full flex flex-col">
+                <BrowserHeader isConnected={false} viewToggle={<ViewToggle currentView={currentView} onViewChange={setCurrentView} />} />
 
-              <div className="flex-1 flex flex-col items-center justify-center p-8 bg-zinc-50 dark:bg-zinc-900/50">
-                <div className="flex flex-col items-center space-y-4 max-w-sm text-center">
-                  <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center border-2 border-zinc-200 dark:border-zinc-700">
-                    <Globe className="h-8 w-8 text-zinc-400 dark:text-zinc-500" />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                      Browser not available
-                    </h3>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                      No active browser session available. The browser will appear here when a sandbox is created and Browser tools are used.
-                    </p>
+                <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#f8f8f7] dark:bg-[#272728]/50">
+                  <div className="flex flex-col items-center space-y-4 max-w-sm text-center">
+                    <div className="w-16 h-16 bg-white dark:bg-[#1a1a1b] rounded-full flex items-center justify-center border border-black/[0.08] dark:border-white/[0.08]">
+                      <Globe className="h-8 w-8 text-zinc-400 dark:text-zinc-500" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                        Browser not available
+                      </h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        No active browser session available. The browser will appear here when a sandbox is created and Browser tools are used.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {currentView === 'tools' && toolView}
+            {currentView === 'tools' && toolView}
+            </div>
+          </div>
         </div>
+
+        <NavigationControls
+          displayIndex={displayIndex}
+          displayTotalCalls={displayTotalCalls}
+          safeInternalIndex={safeInternalIndex}
+          latestIndex={latestIndex}
+          isLiveMode={isLiveMode}
+          agentStatus={agentStatus}
+          onPrevious={navigateToPrevious}
+          onNext={navigateToNext}
+          onSliderChange={handleSliderChange}
+          onJumpToLatest={jumpToLatest}
+          isMobile={isMobile}
+        />
       </div>
     );
   };
@@ -1105,23 +1157,6 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
           <div className="flex-1 flex flex-col overflow-hidden">
             {renderContent()}
           </div>
-
-          {(displayTotalCalls > 1 || (isCurrentToolStreaming && totalCompletedCalls > 0)) && (
-            <NavigationControls
-              displayIndex={displayIndex}
-              displayTotalCalls={displayTotalCalls}
-              safeInternalIndex={safeInternalIndex}
-              latestIndex={latestIndex}
-              isLiveMode={isLiveMode}
-              agentStatus={agentStatus}
-              onPrevious={navigateToPrevious}
-              onNext={navigateToNext}
-              onSliderChange={handleSliderChange}
-              onJumpToLive={jumpToLive}
-              onJumpToLatest={jumpToLatest}
-              isMobile={true}
-            />
-          )}
         </DrawerContent>
       </Drawer>
     );
@@ -1153,25 +1188,9 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
               overflow: 'hidden',
             }}
           >
-            <div className="flex-1 flex flex-col overflow-hidden bg-card">
+            <div className="flex-1 flex flex-col overflow-hidden bg-[#f8f8f7] dark:bg-[#1a1a1b]">
               {renderContent()}
             </div>
-            {(displayTotalCalls > 1 || (isCurrentToolStreaming && totalCompletedCalls > 0)) && (
-              <NavigationControls
-                displayIndex={displayIndex}
-                displayTotalCalls={displayTotalCalls}
-                safeInternalIndex={safeInternalIndex}
-                latestIndex={latestIndex}
-                isLiveMode={isLiveMode}
-                agentStatus={agentStatus}
-                onPrevious={navigateToPrevious}
-                onNext={navigateToNext}
-                onSliderChange={handleSliderChange}
-                onJumpToLive={jumpToLive}
-                onJumpToLatest={jumpToLatest}
-                isMobile={false}
-              />
-            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -1194,27 +1213,11 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
           ease: [0.4, 0, 0.2, 1]
         }
       }}
-      className="h-full w-full flex flex-col border rounded-3xl bg-card overflow-hidden"
+      className="h-full w-full flex flex-col bg-card overflow-hidden"
     >
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden bg-[#f8f8f7] dark:bg-[#1a1a1b]">
         {renderContent()}
       </div>
-      {(displayTotalCalls > 1 || (isCurrentToolStreaming && totalCompletedCalls > 0)) && (
-        <NavigationControls
-          displayIndex={displayIndex}
-          displayTotalCalls={displayTotalCalls}
-          safeInternalIndex={safeInternalIndex}
-          latestIndex={latestIndex}
-          isLiveMode={isLiveMode}
-          agentStatus={agentStatus}
-          onPrevious={navigateToPrevious}
-          onNext={navigateToNext}
-          onSliderChange={handleSliderChange}
-          onJumpToLive={jumpToLive}
-          onJumpToLatest={jumpToLatest}
-          isMobile={false}
-        />
-      )}
     </motion.div>
   );
 });

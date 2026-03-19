@@ -165,49 +165,42 @@ export function SheetsToolView({
   );
 
   return (
-    <Card className="gap-0 flex border shadow-none border-t border-b-0 border-x-0 p-0 rounded-none flex-col h-full overflow-hidden bg-card">
-      <CardHeader className="h-14 bg-zinc-50/80 dark:bg-zinc-900/80 backdrop-blur-sm border-b p-2 px-4 space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className={cn("relative p-2 rounded-lg", sheetIconBgColor)}>
-              <Table2 className={cn("w-5 h-5", getSheetIconColor())} />
-            </div>
-            <CardTitle className="text-base font-medium text-zinc-900 dark:text-zinc-100">
-              {sheetTitle}
-            </CardTitle>
-          </div>
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="sm" variant="outline">
-                  <Download className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem disabled={!primaryXlsx} onClick={() => handleDownload(primaryXlsx, 'sheet.xlsx')}>
-                  <FileSpreadsheet className="h-4 w-4" /> Download XLSX
-                </DropdownMenuItem>
-                <DropdownMenuItem disabled={!primaryCsv} onClick={() => handleDownload(primaryCsv, 'sheet.csv')}>
-                  <Download className="h-4 w-4" /> Download CSV
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {!isStreaming && (
-              <Badge
-                variant="secondary"
-                className={cn(
-                  isSuccess
-                    ? 'bg-gradient-to-b from-emerald-200 to-emerald-100 text-emerald-700 dark:from-emerald-800/50 dark:to-emerald-900/60 dark:text-emerald-300'
-                    : 'bg-gradient-to-b from-rose-200 to-rose-100 text-rose-700 dark:from-rose-800/50 dark:to-rose-900/60 dark:text-rose-300'
-                )}
-              >
-                {isSuccess ? <CheckCircle className="h-3.5 w-3.5 mr-1" /> : <AlertTriangle className="h-3.5 w-3.5 mr-1" />}
-                {isSuccess ? 'Success' : 'Failed'}
-              </Badge>
-            )}
-          </div>
+    <div className="flex flex-col h-full overflow-hidden bg-transparent">
+      <div className="flex items-center justify-between px-4 py-2 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
+        <div className="flex items-center gap-2">
+          {!isStreaming && (
+            <Badge
+              variant="secondary"
+              className={cn(
+                "text-[10px] h-4 px-1 leading-none border-none",
+                isSuccess
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+              )}
+            >
+              {isSuccess ? 'Success' : 'Failed'}
+            </Badge>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                <Download className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem disabled={!primaryXlsx} onClick={() => handleDownload(primaryXlsx, 'sheet.xlsx')}>
+                <FileSpreadsheet className="h-4 w-4 mr-2" /> Download XLSX
+              </DropdownMenuItem>
+              <DropdownMenuItem disabled={!primaryCsv} onClick={() => handleDownload(primaryCsv, 'sheet.csv')}>
+                <Download className="h-4 w-4 mr-2" /> Download CSV
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </CardHeader>
+        <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+          {sheetTitle}
+        </div>
+      </div>
 
       <CardContent className="p-0 flex-1 overflow-hidden">
         <div className="flex flex-col h-full">
@@ -278,6 +271,6 @@ export function SheetsToolView({
           </div>
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 } 

@@ -82,41 +82,30 @@ export function DocumentParserToolView({
   const hasContent = result.text_content.length > 0 || result.structure.length > 0 || result.tables.length > 0;
 
   return (
-    <Card className="gap-0 flex border shadow-none border-t border-b-0 border-x-0 p-0 rounded-none flex-col h-full overflow-hidden bg-card">
-      <CardHeader className="h-14 bg-zinc-50/80 dark:bg-zinc-900/80 backdrop-blur-sm border-b p-2 px-4 space-y-2">
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative p-2 rounded-xl bg-indigo-500/20 border border-indigo-500/20">
-              <FileText className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
-            </div>
-            <div>
-              <CardTitle className="text-base font-medium text-zinc-900 dark:text-zinc-100">
-                {toolTitle}
-              </CardTitle>
-            </div>
+    <div className="flex flex-col h-full overflow-hidden bg-transparent">
+      {!isStreaming && (
+        <div className="flex items-center justify-between px-4 py-2 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
+          <Badge
+            variant="secondary"
+            className={cn(
+              "text-[10px] h-4 px-1 leading-none border-none",
+              actualIsSuccess
+                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+            )}
+          >
+            {actualIsSuccess ? (
+              <CheckCircle className="h-3 w-3 mr-1" />
+            ) : (
+              <AlertTriangle className="h-3 w-3 mr-1" />
+            )}
+            {actualIsSuccess ? 'Parse completed' : 'Parse failed'}
+          </Badge>
+          <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+            {toolTitle}
           </div>
-
-          {!isStreaming && (
-            <div className="flex items-center gap-2">
-              <Badge
-                variant="secondary"
-                className={
-                  actualIsSuccess
-                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
-                    : "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300"
-                }
-              >
-                {actualIsSuccess ? (
-                  <CheckCircle className="h-3.5 w-3.5" />
-                ) : (
-                  <AlertTriangle className="h-3.5 w-3.5" />
-                )}
-                {actualIsSuccess ? 'Parse completed' : 'Parse failed'}
-              </Badge>
-            </div>
-          )}
         </div>
-      </CardHeader>
+      )}
 
       <CardContent className="p-0 h-full flex-1 overflow-hidden relative">
         {isStreaming && !hasContent ? (
@@ -319,6 +308,6 @@ export function DocumentParserToolView({
               : ''}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

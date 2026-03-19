@@ -212,46 +212,39 @@ export function ExportToolView({
   };
 
   return (
-    <Card className="gap-0 flex border shadow-none border-t border-b-0 border-x-0 p-0 rounded-none flex-col h-full overflow-hidden bg-card">
-      <CardHeader className="h-14 bg-zinc-50/80 dark:bg-zinc-900/80 backdrop-blur-sm border-b p-2 px-4 space-y-2">
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative p-2 rounded-xl border bg-gradient-to-br from-blue-500/20 to-blue-600/10 border-blue-500/20">
-              <IconComponent className={`w-5 h-5 ${config.iconColor}`} />
-            </div>
-            <div>
-              <CardTitle className="text-base font-medium text-zinc-900 dark:text-zinc-100">
-                {getToolTitle(name)}
-              </CardTitle>
-            </div>
-          </div>
-
-          {!isStreaming && (
+    <div className="flex flex-col h-full overflow-hidden bg-transparent">
+      <div className="flex items-center justify-between px-4 py-2 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
+        <div className="flex items-center gap-2">
+          {(!isStreaming || isSuccess) && (
             <Badge
               variant="secondary"
-              className={
+              className={cn(
+                "text-[10px] h-4 px-1 leading-none border-none",
                 isSuccess
                   ? config.badgeColor
-                  : "bg-gradient-to-b from-rose-200 to-rose-100 text-rose-700 dark:from-rose-800/50 dark:to-rose-900/60 dark:text-rose-300"
-              }
+                  : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+              )}
             >
               {isSuccess ? (
-                <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                <CheckCircle className="h-3 w-3 mr-1" />
               ) : (
-                <AlertTriangle className="h-3.5 w-3.5 mr-1" />
+                <AlertTriangle className="h-3 w-3 mr-1" />
               )}
               {isSuccess ? 'Completed' : 'Failed'}
             </Badge>
           )}
 
           {isStreaming && (
-            <Badge className={config.badgeColor}>
-              <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
-              Exporting
-            </Badge>
+            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+              <Loader2 className="h-3 w-3 animate-spin text-blue-600 dark:text-blue-400" />
+              <span className="text-[10px] font-medium text-blue-700 dark:text-blue-300">Exporting</span>
+            </div>
           )}
         </div>
-      </CardHeader>
+        <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+          {getToolTitle(name)}
+        </div>
+      </div>
 
       <CardContent className="p-0 flex-1 overflow-hidden relative">
         <ScrollArea className="h-full w-full">
@@ -360,7 +353,7 @@ export function ExportToolView({
           </div>
         </ScrollArea>
       </CardContent>
-    </Card>
+    </div>
   );
 }
 
