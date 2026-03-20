@@ -55,6 +55,7 @@ import { ToolViewProps } from '../types';
 import { GenericToolView } from '../GenericToolView';
 import { LoadingState } from '../shared/LoadingState';
 import { toast } from 'sonner';
+import { parseStreamingFileContent } from '@/lib/utils/streaming-content-parser';
 
 export function FileOperationToolView({
   toolCall,
@@ -92,87 +93,22 @@ export function FileOperationToolView({
 
   // STREAMING: Extract content from live streaming JSON arguments
   if (isStreaming && streamingText) {
-    try {
-      // Try parsing as complete JSON first
-      const parsed = JSON.parse(streamingText);
-
-      // Extract based on operation type
-      if (operation === 'create' || operation === 'rewrite') {
-        if (parsed.file_contents) {
-          fileContent = parsed.file_contents;
-        }
-      } else if (operation === 'edit') {
-        if (parsed.code_edit) {
-          fileContent = parsed.code_edit;
-        }
-      }
-
-      // Extract file_path if not already set
-      if (!filePath && parsed.file_path) {
-        filePath = parsed.file_path;
-      }
-    } catch (e) {
-      // JSON incomplete - extract partial content
-      if (operation === 'create' || operation === 'rewrite') {
-        // Find the start of file_contents value
-        const startMatch = streamingText.match(/"file_contents"\s*:\s*"/);
-        if (startMatch) {
-          const startIndex = startMatch.index! + startMatch[0].length;
-          // Extract everything after "file_contents": " until we hit the end or a closing quote
-          let rawContent = streamingText.substring(startIndex);
-
-          // Try to find the end quote (but it might not exist yet during streaming)
-          const endQuoteMatch = rawContent.match(/(?<!\\)"/);
-          if (endQuoteMatch) {
-            rawContent = rawContent.substring(0, endQuoteMatch.index);
-          }
-
-          // Unescape JSON sequences like \n, \t, \\, \"
-          try {
-            fileContent = JSON.parse('"' + rawContent + '"');
-          } catch {
-            // If unescaping fails, replace common escapes manually
-            fileContent = rawContent
-              .replace(/\\n/g, '\n')
-              .replace(/\\t/g, '\t')
-              .replace(/\\r/g, '\r')
-              .replace(/\\"/g, '"')
-              .replace(/\\\\/g, '\\');
-          }
-        }
-      } else if (operation === 'edit') {
-        const startMatch = streamingText.match(/"code_edit"\s*:\s*"/);
-        if (startMatch) {
-          const startIndex = startMatch.index! + startMatch[0].length;
-          let rawContent = streamingText.substring(startIndex);
-
-          const endQuoteMatch = rawContent.match(/(?<!\\)"/);
-          if (endQuoteMatch) {
-            rawContent = rawContent.substring(0, endQuoteMatch.index);
-          }
-
-          try {
-            fileContent = JSON.parse('"' + rawContent + '"');
-          } catch {
-            fileContent = rawContent
-              .replace(/\\n/g, '\n')
-              .replace(/\\t/g, '\t')
-              .replace(/\\r/g, '\r')
-              .replace(/\\"/g, '"')
-              .replace(/\\\\/g, '\\');
-          }
-        }
-      }
-
-      // Extract file_path from partial JSON
-      if (!filePath) {
-        const pathMatch = streamingText.match(/"file_path"\s*:\s*"([^"]+)"/);
-        if (pathMatch) {
-          filePath = pathMatch[1];
-        }
-      }
+    const streamingData = parseStreamingFileContent(streamingText);
+    
+    if (streamingData.fileContent !== null) {
+      fileContent = streamingData.fileContent;
     }
-  }  // Fallback: Extract content from args (for completed operations)
+    
+    if (streamingData.filePath && !filePath) {
+      filePath = streamingData.filePath;
+    }
+    
+    // Check if operation matches
+    if (streamingData.operation) {
+      // already have operation from tool name, but could use this for extra safety
+    }
+  }
+  // Fallback: Extract content from args (for completed operations)
   if (!fileContent) {
     fileContent = args.file_contents || args.code_edit || args.updated_content || null;
   }

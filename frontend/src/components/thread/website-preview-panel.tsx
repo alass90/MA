@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   Eye,
   Code2,
@@ -31,9 +31,11 @@ import {
   Layout,
   Terminal,
 } from 'lucide-react';
-import { TalosCodePanel } from '@/components/artifacts/TalosCodePanel';
 import { TalosTerminal } from '@/components/artifacts/TalosTerminal';
 import { usePreviewPanelStore } from '@/stores/use-preview-panel-store';
+import { constructHtmlPreviewUrl } from '@/lib/utils/url';
+import { parseStreamingFileContent } from '@/lib/utils/streaming-content-parser';
+import { useDirectoryQuery, useFileContentQuery } from '@/hooks/files/use-file-queries';
 
 // —————————————————————————————————————————————————————————————————————————————————————
 // TYPES
@@ -50,6 +52,7 @@ interface FileItem {
   type: 'file' | 'folder';
   size?: string;
   active?: boolean;
+  path?: string;
   children?: FileItem[];
 }
 
@@ -102,6 +105,9 @@ interface WebsitePreviewPanelProps {
   databaseProvider?: string;
   framework?: string;
   projectName?: string;
+  projectPath?: string;
+  agentStatus?: 'idle' | 'running' | 'connecting' | 'error';
+  streamingText?: string;
 }
 
 // —————————————————————————————————————————————————————————————————————————————————————
@@ -256,9 +262,10 @@ interface FileTreeProps {
   items: FileItem[];
   depth?: number;
   theme: Theme;
+  onFileSelect?: (path: string) => void;
 }
 
-const FileTree: React.FC<FileTreeProps> = ({ items, depth = 0, theme }) => {
+const FileTree: React.FC<FileTreeProps> = ({ items, depth = 0, theme, onFileSelect }) => {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   return (
@@ -266,17 +273,20 @@ const FileTree: React.FC<FileTreeProps> = ({ items, depth = 0, theme }) => {
       {items.map((item) => (
         <div key={item.name}>
           <div
-            onClick={() =>
-              item.type === 'folder' &&
-              setExpanded((p) => ({ ...p, [item.name]: !p[item.name] }))
-            }
+            onClick={() => {
+              if (item.type === 'folder') {
+                setExpanded((p) => ({ ...p, [item.name]: !p[item.name] }));
+              } else if (onFileSelect) {
+                onFileSelect(item.path || item.name);
+              }
+            }}
             style={{
               padding: '6px 12px',
               paddingLeft: `${16 + depth * 16}px`,
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              cursor: item.type === 'folder' ? 'pointer' : 'default',
+              cursor: 'pointer',
               fontSize: '13px',
               color: item.active ? theme.text : theme.textSecondary,
               background: item.active ? theme.fileActive : 'transparent',
@@ -317,7 +327,7 @@ const FileTree: React.FC<FileTreeProps> = ({ items, depth = 0, theme }) => {
             )}
           </div>
           {item.type === 'folder' && expanded[item.name] && item.children && (
-            <FileTree items={item.children} depth={depth + 1} theme={theme} />
+            <FileTree items={item.children} depth={depth + 1} theme={theme} onFileSelect={onFileSelect} />
           )}
         </div>
       ))}
@@ -329,9 +339,10 @@ interface CodeViewerProps {
   code: string;
   filename: string;
   theme: Theme;
+  isStreaming?: boolean;
 }
 
-const CodeViewer: React.FC<CodeViewerProps> = ({ code, filename, theme }) => {
+const CodeViewer: React.FC<CodeViewerProps> = ({ code, filename, theme, isStreaming }) => {
   const lines = code.split('\n');
 
   return (
@@ -352,13 +363,25 @@ const CodeViewer: React.FC<CodeViewerProps> = ({ code, filename, theme }) => {
         <span
           style={{
             marginLeft: 'auto',
-            background: theme.toggleBg,
+            background: isStreaming ? '#10b98122' : theme.toggleBg,
+            color: isStreaming ? '#10b981' : theme.textSecondary,
             padding: '2px 8px',
             borderRadius: '4px',
             fontSize: '10px',
+            fontWeight: isStreaming ? 700 : 400,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
           }}
         >
-          TSX
+          {isStreaming && (
+            <motion.div 
+              animate={{ opacity: [1, 0.4, 1] }} 
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }}
+            />
+          )}
+          {isStreaming ? 'LIVE' : 'TSX'}
         </span>
       </div>
       <pre
@@ -650,6 +673,87 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ theme, onClose }) => (
 // MAIN COMPONENT
 // —————————————————————————————————————————————————————————————————————————————————————
 
+import { motion } from 'framer-motion';
+
+// —————————————————————————————————————————————————————————————————————————————————————
+// GENERATION VIEW (PREMIUM LOADER)
+// —————————————————————————————————————————————————————————————————————————————————————
+
+const GenerationView = ({ theme }: { theme: Theme }) => (
+  <div
+    style={{
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#ffffff',
+      gap: '24px',
+    }}
+  >
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      style={{
+        width: '64px',
+        height: '64px',
+        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+        borderRadius: '20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 10px 30px rgba(37, 99, 235, 0.2)',
+      }}
+    >
+      <motion.div
+        animate={{ 
+          rotate: 360,
+          scale: [1, 1.2, 1]
+        }}
+        transition={{ 
+          rotate: { duration: 4, repeat: Infinity, ease: "linear" },
+          scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+        }}
+      >
+        <Globe className="w-8 h-8 text-white" />
+      </motion.div>
+    </motion.div>
+    
+    <div style={{ textAlign: 'center' }}>
+      <motion.div
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        style={{ fontSize: '18px', fontWeight: 600, color: '#111827', marginBottom: '8px' }}
+      >
+        Talos is building your vision
+      </motion.div>
+      <motion.div
+        initial={{ y: 10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        style={{ fontSize: '14px', color: '#6b7280' }}
+      >
+        Generating code and provisioning Daytona sandbox...
+      </motion.div>
+    </div>
+
+    <div style={{ width: '200px', height: '4px', background: '#f3f4f6', borderRadius: '2px', overflow: 'hidden' }}>
+      <motion.div
+        animate={{ x: [-200, 200] }}
+        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        style={{ width: '40%', height: '100%', background: '#3b82f6', borderRadius: '2px' }}
+      />
+    </div>
+  </div>
+);
+
+// —————————————————————————————————————————————————————————————————————————————————————
+// MAIN COMPONENT
+// —————————————————————————————————————————————————————————————————————————————————————
+
 export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
   threadId,
   projectId,
@@ -663,6 +767,8 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
   framework,
   projectName,
   initialFiles,
+  agentStatus = 'idle',
+  streamingText = ''
 }) => {
   const { deployment } = usePreviewPanelStore();
   const sandboxId = propsSandboxId || deployment?.sandboxId;
@@ -670,15 +776,83 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
 
   const [activeTab, setActiveTab] = useState<
     'preview' | 'code' | 'files' | 'db' | 'settings' | 'workspace' | 'terminal'
-  >(isProject ? 'workspace' : 'preview');
+  >('preview');
+
+  // Parse streaming content
+  const streamingData = useMemo(() => parseStreamingFileContent(streamingText), [streamingText]);
+
+  // Automatic transition: Switch back to 'preview' when agent finishes
+  useEffect(() => {
+    if (agentStatus === 'idle') {
+      setActiveTab('preview');
+    }
+  }, [agentStatus]);
+
+  const [activeFile, setActiveFile] = useState<string>('src/app/page.tsx');
+
+  // React Query: Fetch real files and content
+  const { data: sandboxFiles = [] } = useDirectoryQuery(sandboxId, '/workspace', {
+    enabled: !!sandboxId,
+  });
+
+  const { data: liveFileContent } = useFileContentQuery(sandboxId, activeFile, {
+    enabled: !!sandboxId && !!activeFile,
+  });
+
+  // Map real files to FileItem structure
+  const realFiles = useMemo(() => {
+    if (!sandboxFiles.length) return MOCK_FILES;
+
+    // Simple one-level mapping for now, grouped by workspace root
+    return sandboxFiles.map(f => ({
+      name: f.name,
+      type: f.is_dir ? 'folder' : 'file' as 'folder' | 'file',
+      size: f.size ? `${(f.size / 1024).toFixed(1)} KB` : undefined,
+      active: f.path === activeFile || f.name === activeFile,
+      path: f.path
+    }));
+  }, [sandboxFiles, activeFile]);
+
+  // Handle file selection from tree
+  const handleFileSelect = useCallback((fileName: string) => {
+    // Try to find the actual path from the sandbox files
+    const file = sandboxFiles.find(f => f.name === fileName || f.path === fileName);
+    if (file && !file.is_dir) {
+      setActiveFile(file.path);
+    }
+  }, [sandboxFiles]);
+
+  // Auto-switch to 'code' tab when agent starts writing
+  useEffect(() => {
+    if (agentStatus === 'running' && streamingData.fileContent && streamingData.filePath) {
+      setActiveTab('code');
+      setActiveFile(streamingData.filePath);
+    }
+  }, [agentStatus, streamingData.fileContent, streamingData.filePath]);
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop');
-  const [mode, setMode] = useState<'dark' | 'light'>('light');
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
   const [moreOpen, setMoreOpen] = useState(false);
   const [showVersions, setShowVersions] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
+
+  // Derive the final preview URL from either props or the sandbox metadata
+  const finalPreviewUrl = useMemo(() => {
+    if (previewUrl) return previewUrl;
+    
+    // If we have a sandboxId and no explicit previewUrl, construct one for index.html
+    // Note: In a real app, we might want to track the current active file
+    if (sandboxId) {
+      // Mocking the sandbox base URL if not provided in deployment
+      // In production, deployment.url would be the base sandbox URL
+      const baseUrl = deployment?.url || `http://8080-${sandboxId}.daytonaproxy01.net`;
+      return constructHtmlPreviewUrl(baseUrl, 'index.html');
+    }
+    
+    return undefined;
+  }, [previewUrl, sandboxId, deployment?.url]);
 
   const theme = themes[mode];
 
@@ -744,13 +918,13 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
         >
           {(isProject
             ? [
-                { id: 'workspace', icon: <Eye className="w-4 h-4" />, label: 'Preview' },
-                { id: 'code_view', icon: <Code2 className="w-4 h-4" />, label: 'Code' },
+                { id: 'preview', icon: <Eye className="w-4 h-4" />, label: 'Preview' },
+                { id: 'code', icon: <Code2 className="w-4 h-4" />, label: 'Code' },
                 { id: 'terminal', icon: <Terminal className="w-4 h-4" />, label: 'Terminal' },
                 { id: 'settings', icon: <Settings className="w-4 h-4" />, label: 'Settings' },
               ]
             : TABS
-          ).map((tab: Tab) => (
+          ).map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
@@ -776,11 +950,52 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
         </div>
 
         {/* Center: Address Bar */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px', alignItems: 'center' }}>
+          {/* Nav Controls */}
+          <div style={{ display: 'flex', gap: '2px' }}>
+            <button
+              onClick={() => console.log('Back')}
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#6b7280',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                opacity: 0.5,
+              }}
+              title="Back (Shift+B)"
+            >
+              <ChevronRight className="w-4 h-4 rotate-180" />
+            </button>
+            <button
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#6b7280',
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+                opacity: 0.5,
+              }}
+              title="Forward (Shift+F)"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
           <div
             style={{
               width: '100%',
-              maxWidth: '640px',
+              maxWidth: '540px',
               height: '32px',
               background: '#f3f4f6',
               border: '1px solid #e5e7eb',
@@ -790,9 +1005,14 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
               padding: '0 12px',
               fontSize: '13px',
               color: '#4b5563',
+              gap: '6px',
             }}
           >
+            <Globe className="w-3 h-3 text-gray-400" />
             <div style={{ opacity: 0.7 }}>/</div>
+            <div style={{ fontWeight: 500 }}>
+              {activeTab === 'code' ? activeFile.split('/').pop() : 'index.html'}
+            </div>
           </div>
         </div>
 
@@ -817,7 +1037,7 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
           </button>
 
           <button
-            onClick={() => previewUrl && window.open(previewUrl, '_blank')}
+            onClick={() => finalPreviewUrl && window.open(finalPreviewUrl, '_blank')}
             style={{
               width: '32px',
               height: '32px',
@@ -969,95 +1189,91 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
               background: '#ffffff',
             }}
           >
-            <div
-              style={{
-                width: viewport === 'mobile' ? '375px' : '100%',
-                height: viewport === 'mobile' ? 'calc(100% - 48px)' : '100%',
-                borderRadius: viewport === 'mobile' ? '24px' : '0',
-                overflow: 'hidden',
-                border: viewport === 'mobile' ? `3px solid ${theme.border}` : 'none',
-                boxShadow: viewport === 'mobile' ? '0 20px 60px rgba(0,0,0,0.1)' : 'none',
-                background: '#ffffff',
-                position: 'relative',
-              }}
-            >
-              {previewUrl ? (
-                <iframe
-                  key={iframeKey}
-                  src={previewUrl}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    border: 'none',
-                  }}
-                  title="Website Preview"
-                />
-              ) : (
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '12px',
-                    color: '#374151',
-                    textAlign: 'center',
-                    background: '#ffffff',
-                  }}
-                >
-                  <div style={{ fontSize: '15px', fontWeight: 500 }}>
-                    Start prompting (or editing) to see magic happen :)
-                  </div>
-                </div>
-              )}
-
-              {/* MADE IN BOLT BADGE (CLONE) */}
+            {agentStatus === 'running' ? (
+              <GenerationView theme={theme} />
+            ) : (
               <div
                 style={{
-                  position: 'absolute',
-                  bottom: '16px',
-                  right: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
+                  width: viewport === 'mobile' ? '375px' : '100%',
+                  height: viewport === 'mobile' ? 'calc(100% - 48px)' : '100%',
+                  borderRadius: viewport === 'mobile' ? '24px' : '0',
+                  overflow: 'hidden',
+                  border: viewport === 'mobile' ? `3px solid ${theme.border}` : 'none',
+                  boxShadow: viewport === 'mobile' ? '0 20px 60px rgba(0,0,0,0.1)' : 'none',
                   background: '#ffffff',
-                  padding: '6px 14px',
-                  borderRadius: '12px',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
-                  fontSize: '12px',
-                  color: '#111827',
-                  fontWeight: 700,
-                  border: '1px solid #e5e7eb',
+                  position: 'relative',
                 }}
               >
+                {finalPreviewUrl ? (
+                  <iframe
+                    key={iframeKey}
+                    src={finalPreviewUrl}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      border: 'none',
+                    }}
+                    onLoad={() => console.log('Iframe loaded:', finalPreviewUrl)}
+                    title="Website Preview"
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px',
+                      color: '#374151',
+                      textAlign: 'center',
+                      background: '#ffffff',
+                    }}
+                  >
+                    <div style={{ fontSize: '15px', fontWeight: 500 }}>
+                      Start prompting (or editing) to see magic happen :)
+                    </div>
+                  </div>
+                )}
+
+                {/* MADE IN BOLT BADGE (CLONE) */}
                 <div
                   style={{
-                    width: '16px',
-                    height: '16px',
+                    position: 'absolute',
+                    bottom: '16px',
+                    right: '16px',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    gap: '6px',
+                    background: '#ffffff',
+                    padding: '6px 14px',
+                    borderRadius: '12px',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+                    fontSize: '12px',
+                    color: '#111827',
+                    fontWeight: 700,
+                    border: '1px solid #e5e7eb',
                   }}
                 >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                  </svg>
+                  <div
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                  </div>
+                  Made in Bolt
                 </div>
-                Made in Bolt
               </div>
-            </div>
+            )}
           </div>
-        )}
-
-        {activeTab === 'workspace' && isProject && (
-          <TalosCodePanel
-            sandboxId={sandboxId || 'mock-sandbox'}
-            theme={mode}
-            previewUrl={previewUrl}
-            initialFiles={initialFiles}
-          />
         )}
 
         {activeTab === 'terminal' && sandboxId && (
@@ -1068,12 +1284,23 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
         )}
 
         {(activeTab === 'code' || (activeTab === 'workspace' && !sandboxId)) && (
-          <CodeViewer code={MOCK_CODE} filename="src/app/page.tsx" theme={theme} />
+          <CodeViewer 
+            code={(agentStatus === 'running' && streamingData.filePath === activeFile && streamingData.fileContent !== null) 
+              ? streamingData.fileContent 
+              : (liveFileContent || initialFiles?.[activeFile] || MOCK_CODE)} 
+            filename={activeFile} 
+            theme={theme} 
+            isStreaming={agentStatus === 'running' && streamingData.filePath === activeFile && streamingData.fileContent !== null}
+          />
         )}
 
         {(activeTab === 'files' || (activeTab === 'workspace' && !sandboxId)) && (
           <div style={{ height: '100%', overflow: 'auto', background: theme.surface, paddingTop: '8px' }}>
-            <FileTree items={MOCK_FILES} theme={theme} />
+            <FileTree 
+              items={realFiles} 
+              theme={theme} 
+              onFileSelect={handleFileSelect}
+            />
           </div>
         )}
 

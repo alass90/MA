@@ -178,6 +178,7 @@ export const ThreadLayout = memo(function ThreadLayout({
                 projectId={projectId}
                 sandboxId={sandboxId || undefined}
                 onPublish={async () => {}}
+                agentStatus={agentStatus}
               />
             </div>
           ) : isSidePanelOpen && initialLoadCompleted && (
@@ -295,6 +296,8 @@ export const ThreadLayout = memo(function ThreadLayout({
               projectId={projectId}
               sandboxId={sandboxId || undefined}
               onPublish={async () => { }}
+              agentStatus={agentStatus}
+              streamingText={streamingToolArgsJson}
             />
           </div>
         )}
@@ -373,6 +376,8 @@ export const ThreadLayout = memo(function ThreadLayout({
               projectId={projectId}
               sandboxId={sandboxId || undefined}
               onPublish={async () => { }}
+              agentStatus={agentStatus}
+              streamingText={streamingToolArgsJson}
             />
           ) : (
             <ToolCallSidePanel
