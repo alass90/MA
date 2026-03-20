@@ -385,7 +385,7 @@ export function DesignerToolView({
     const element = elements.find(el => el.id === selectedElement);
     if (element?.directUrl || element?.filePath) {
       const link = document.createElement('a');
-      link.href = element.directUrl || `/api/sandboxes/${element.sandboxId}/files?path=${encodeURIComponent(element.filePath)}`;
+      link.href = element.directUrl || `/api/sandbox/${element.sandboxId}/file?path=${encodeURIComponent(element.filePath)}`;
       link.download = element.name;
       document.body.appendChild(link);
       link.click();
@@ -396,7 +396,7 @@ export function DesignerToolView({
   const handleOpenInNewTab = () => {
     const element = elements.find(el => el.id === selectedElement);
     if (element?.directUrl || element?.filePath) {
-      const url = element.directUrl || `/api/sandboxes/${element.sandboxId}/files?path=${encodeURIComponent(element.filePath)}`;
+      const url = element.directUrl || `/api/sandbox/${element.sandboxId}/file?path=${encodeURIComponent(element.filePath)}`;
       window.open(url, '_blank');
     }
   };

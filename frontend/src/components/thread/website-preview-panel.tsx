@@ -28,14 +28,19 @@ import {
   Maximize2,
   Minimize2,
   Globe,
+  Layout,
+  Terminal,
 } from 'lucide-react';
+import { TalosCodePanel } from '@/components/artifacts/TalosCodePanel';
+import { TalosTerminal } from '@/components/artifacts/TalosTerminal';
+import { usePreviewPanelStore } from '@/stores/use-preview-panel-store';
 
 // —————————————————————————————————————————————————————————————————————————————————————
 // TYPES
 // —————————————————————————————————————————————————————————————————————————————————————
 
 interface Tab {
-  id: 'preview' | 'code' | 'files' | 'db' | 'settings';
+  id: 'preview' | 'code' | 'files' | 'db' | 'settings' | 'workspace' | 'terminal';
   label: string;
   icon: React.ReactNode;
 }
@@ -85,18 +90,18 @@ interface Theme {
 }
 
 interface WebsitePreviewPanelProps {
-  isOpen: boolean;
-  onClose: () => void;
-  previewUrl?: string;
-  projectPath?: string;
-  framework?: string;
-  deploymentId?: string;
-  projectName?: string;
-  databaseUrl?: string;
-  databaseProvider?: string;
   threadId?: string;
   projectId?: string;
+  sandboxId?: string;
+  initialFiles?: Record<string, any>;
   onPublish?: () => Promise<void>;
+  isOpen?: boolean;
+  onClose?: () => void;
+  previewUrl?: string;
+  databaseUrl?: string;
+  databaseProvider?: string;
+  framework?: string;
+  projectName?: string;
 }
 
 // —————————————————————————————————————————————————————————————————————————————————————
@@ -105,58 +110,58 @@ interface WebsitePreviewPanelProps {
 
 const themes: Record<'dark' | 'light', Theme> = {
   dark: {
-    bg: '#010101',
-    surface: '#0a0a0a',
-    surfaceHover: 'rgba(255,255,255,0.03)',
-    surfaceActive: 'rgba(255,255,255,0.06)',
-    border: '#1a1a1a',
-    borderHover: '#333',
-    text: '#fff',
-    textSecondary: '#9ca3af',
-    textMuted: '#4b5563',
-    textDim: '#616160',
-    accent: '#fff',
-    accentBg: '#fff',
-    accentText: '#010101',
+    bg: '#0a0a0a',
+    surface: '#111111',
+    surfaceHover: 'rgba(255,255,255,0.05)',
+    surfaceActive: 'rgba(255,255,255,0.1)',
+    border: '#1f1f1f',
+    borderHover: '#2a2a2a',
+    text: '#ffffff',
+    textSecondary: '#a1a1aa',
+    textMuted: '#52525b',
+    textDim: '#3f3f46',
+    accent: '#ffffff',
+    accentBg: '#ffffff',
+    accentText: '#000000',
     success: '#10b981',
-    badge: 'rgba(0,0,0,0.8)',
-    codeGutter: '#333',
+    badge: 'rgba(255,255,255,0.1)',
+    codeGutter: '#1f1f1f',
     codeBg: '#0a0a0a',
-    urlBar: '#111',
-    toggleBg: '#111',
-    toggleActive: '#2a2a2a',
+    urlBar: '#18181b',
+    toggleBg: '#18181b',
+    toggleActive: '#27272a',
     folderColor: '#fbbf24',
     fileActive: 'rgba(255,255,255,0.06)',
     fileActiveBorder: '#fff',
-    menuBg: '#111',
-    menuBorder: '#222',
-    menuHover: '#1a1a1a',
+    menuBg: '#111111',
+    menuBorder: '#1f1f1f',
+    menuHover: '#1f1f1f',
   },
   light: {
-    bg: '#ffffff',
-    surface: '#f9fafb',
+    bg: '#f9fafb',
+    surface: '#ffffff',
     surfaceHover: 'rgba(0,0,0,0.02)',
     surfaceActive: 'rgba(0,0,0,0.04)',
     border: '#e5e7eb',
     borderHover: '#d1d5db',
     text: '#111827',
-    textSecondary: '#6b7280',
+    textSecondary: '#4b5563',
     textMuted: '#9ca3af',
-    textDim: '#9ca3af',
-    accent: '#111827',
-    accentBg: '#111827',
-    accentText: '#fff',
-    success: '#059669',
-    badge: 'rgba(255,255,255,0.9)',
-    codeGutter: '#d1d5db',
-    codeBg: '#f9fafb',
+    textDim: '#d1d5db',
+    accent: '#000000',
+    accentBg: '#000000',
+    accentText: '#ffffff',
+    success: '#10b981',
+    badge: 'rgba(0,0,0,0.05)',
+    codeGutter: '#e5e7eb',
+    codeBg: '#ffffff',
     urlBar: '#f3f4f6',
     toggleBg: '#f3f4f6',
-    toggleActive: '#e5e7eb',
-    folderColor: '#d97706',
-    fileActive: 'rgba(0,0,0,0.04)',
-    fileActiveBorder: '#111827',
-    menuBg: '#fff',
+    toggleActive: '#ffffff',
+    folderColor: '#fbbf24',
+    fileActive: 'rgba(0,0,0,0.05)',
+    fileActiveBorder: '#000000',
+    menuBg: '#ffffff',
     menuBorder: '#e5e7eb',
     menuHover: '#f3f4f6',
   },
@@ -646,24 +651,28 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ theme, onClose }) => (
 // —————————————————————————————————————————————————————————————————————————————————————
 
 export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
-  isOpen,
-  onClose,
-  previewUrl,
-  projectPath,
-  framework,
-  deploymentId,
-  projectName,
-  databaseUrl,
-  databaseProvider,
   threadId,
   projectId,
+  sandboxId: propsSandboxId,
   onPublish,
+  isOpen = true,
+  onClose,
+  previewUrl,
+  databaseUrl,
+  databaseProvider,
+  framework,
+  projectName,
+  initialFiles,
 }) => {
+  const { deployment } = usePreviewPanelStore();
+  const sandboxId = propsSandboxId || deployment?.sandboxId;
+  const isProject = !!(sandboxId || initialFiles);
+
   const [activeTab, setActiveTab] = useState<
-    'preview' | 'code' | 'files' | 'db' | 'settings'
-  >('preview');
+    'preview' | 'code' | 'files' | 'db' | 'settings' | 'workspace' | 'terminal'
+  >(isProject ? 'workspace' : 'preview');
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop');
-  const [mode, setMode] = useState<'dark' | 'light'>('dark');
+  const [mode, setMode] = useState<'dark' | 'light'>('light');
   const [moreOpen, setMoreOpen] = useState(false);
   const [showVersions, setShowVersions] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -675,20 +684,14 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
 
   const handlePublish = async () => {
     setIsPublishing(true);
-
     try {
-      if (onPublish) {
-        // Call the provided publish callback
-        await onPublish();
-      }
-
+      if (onPublish) await onPublish();
       setIsPublishing(false);
       setIsPublished(true);
       setTimeout(() => setIsPublished(false), 3000);
     } catch (error) {
       console.error('Error publishing:', error);
       setIsPublishing(false);
-      // Could show an error toast here
     }
   };
 
@@ -700,492 +703,260 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
     <div
       onClick={() => moreOpen && closeMore()}
       style={{
-        width: '100%',
-        height: '100vh',
+        width: isFullscreen ? '100vw' : '100%',
+        height: isFullscreen ? '100vh' : '100%',
+        position: isFullscreen ? 'fixed' : 'relative',
+        top: 0,
+        left: 0,
+        zIndex: isFullscreen ? 1000 : 'auto',
         display: 'flex',
         flexDirection: 'column',
-        background: theme.bg,
-        color: theme.text,
-        fontFamily: "'Inter', -apple-system, system-ui, sans-serif",
-        overflow: 'hidden',
-        transition: 'background 0.3s, color 0.3s',
-        position: 'relative',
+        background: isFullscreen ? theme.bg : '#f8f8f7',
+        padding: isFullscreen ? '0' : '0 12px 12px 12px',
+        transition: 'all 0.3s ease',
       }}
     >
-      {/* —— TOP BAR ———————————————————————————————————————— */}
-      {!isFullscreen && (
+      {/* —— TOP BAR (BOLT CLONE) —————————————————————————————————— */}
+      <div
+        style={{
+          height: '56px',
+          minHeight: '56px',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0 8px',
+          gap: '8px',
+          zIndex: 100,
+          background: isFullscreen ? '#ffffff' : 'transparent',
+          borderBottom: isFullscreen ? '1px solid #e5e7eb' : 'none',
+          marginBottom: isFullscreen ? '0' : '0',
+        }}
+      >
+        {/* Left: View Toggles (Gray Pill) */}
         <div
           style={{
-            height: '48px',
-            minHeight: '48px',
-            borderBottom: `1px solid ${theme.border}`,
             display: 'flex',
-            alignItems: 'center',
-            padding: '0 6px',
             gap: '2px',
-            transition: 'border-color 0.3s',
+            background: '#f3f4f6',
+            padding: '3px',
+            borderRadius: '8px',
+            border: '1px solid #e1e4e8',
           }}
         >
-          {/* Tabs */}
-          <div style={{ display: 'flex', gap: '1px', flex: 1 }}>
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '7px 12px',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '12.5px',
-                  fontWeight: activeTab === tab.id ? 600 : 400,
-                  color: activeTab === tab.id ? theme.text : theme.textDim,
-                  background: activeTab === tab.id ? theme.surfaceActive : 'transparent',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {tab.icon}
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
-
-          <div
-            style={{ width: '1px', height: '20px', background: theme.border, margin: '0 4px' }}
-          />
-
-          {/* Right actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', position: 'relative' }}>
-            {/* Theme toggle */}
+          {(isProject
+            ? [
+                { id: 'workspace', icon: <Eye className="w-4 h-4" />, label: 'Preview' },
+                { id: 'code_view', icon: <Code2 className="w-4 h-4" />, label: 'Code' },
+                { id: 'terminal', icon: <Terminal className="w-4 h-4" />, label: 'Terminal' },
+                { id: 'settings', icon: <Settings className="w-4 h-4" />, label: 'Settings' },
+              ]
+            : TABS
+          ).map((tab: Tab) => (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setMode(mode === 'dark' ? 'light' : 'dark');
-              }}
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
               style={{
-                padding: '6px',
-                border: 'none',
-                borderRadius: '6px',
-                background: 'transparent',
-                color: theme.textSecondary,
-                cursor: 'pointer',
-                display: 'flex',
-                transition: 'color 0.15s',
-              }}
-              title={mode === 'dark' ? 'Light mode' : 'Dark mode'}
-            >
-              {mode === 'dark' ? (
-                <Sun className="w-[15px] h-[15px]" />
-              ) : (
-                <Moon className="w-[15px] h-[15px]" />
-              )}
-            </button>
-
-            {/* More menu button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setMoreOpen(!moreOpen);
-              }}
-              style={{
-                padding: '6px',
-                border: 'none',
-                borderRadius: '6px',
-                background: moreOpen ? theme.surfaceActive : 'transparent',
-                color: theme.textSecondary,
-                cursor: 'pointer',
-                display: 'flex',
-                transition: 'all 0.15s',
-              }}
-            >
-              <MoreVertical className="w-4 h-4" />
-            </button>
-
-            {/* More dropdown */}
-            {moreOpen && (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                style={{
-                  position: 'absolute',
-                  top: '40px',
-                  right: '0px',
-                  width: '220px',
-                  background: theme.menuBg,
-                  border: `1px solid ${theme.menuBorder}`,
-                  borderRadius: '10px',
-                  padding: '6px',
-                  zIndex: 100,
-                  boxShadow: '0 12px 40px rgba(0,0,0,0.3)',
-                }}
-              >
-                {[
-                  {
-                    icon: <Download className="w-[15px] h-[15px]" />,
-                    label: 'Download as ZIP',
-                    action: () => {
-                      closeMore();
-                    },
-                  },
-                  {
-                    icon: <History className="w-[15px] h-[15px]" />,
-                    label: 'Version history',
-                    action: () => {
-                      closeMore();
-                      setShowVersions(true);
-                    },
-                  },
-                ].map((item, i) => (
-                  <button
-                    key={i}
-                    onClick={item.action}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      width: '100%',
-                      padding: '10px 12px',
-                      border: 'none',
-                      borderRadius: '7px',
-                      background: 'transparent',
-                      color: theme.text,
-                      cursor: 'pointer',
-                      fontSize: '13px',
-                      textAlign: 'left',
-                      transition: 'background 0.1s',
-                    }}
-                    onMouseEnter={(e) =>
-                      ((e.currentTarget as HTMLButtonElement).style.background = theme.menuHover)
-                    }
-                    onMouseLeave={(e) =>
-                      ((e.currentTarget as HTMLButtonElement).style.background = 'transparent')
-                    }
-                  >
-                    <span style={{ color: theme.textSecondary, display: 'flex' }}>
-                      {item.icon}
-                    </span>
-                    {item.label}
-                  </button>
-                ))}
-                <div style={{ height: '1px', background: theme.menuBorder, margin: '4px 8px' }} />
-                {[
-                  {
-                    icon: <ExternalLink className="w-[15px] h-[15px]" />,
-                    label: 'Open in new tab',
-                    action: () => {
-                      closeMore();
-                      if (previewUrl) window.open(previewUrl, '_blank');
-                    },
-                  },
-                  {
-                    icon: <Settings className="w-[15px] h-[15px]" />,
-                    label: 'Project settings',
-                    action: () => {
-                      closeMore();
-                      setActiveTab('settings');
-                    },
-                  },
-                ].map((item, i) => (
-                  <button
-                    key={i}
-                    onClick={item.action}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      width: '100%',
-                      padding: '10px 12px',
-                      border: 'none',
-                      borderRadius: '7px',
-                      background: 'transparent',
-                      color: theme.text,
-                      cursor: 'pointer',
-                      fontSize: '13px',
-                      textAlign: 'left',
-                      transition: 'background 0.1s',
-                    }}
-                    onMouseEnter={(e) =>
-                      ((e.currentTarget as HTMLButtonElement).style.background = theme.menuHover)
-                    }
-                    onMouseLeave={(e) =>
-                      ((e.currentTarget as HTMLButtonElement).style.background = 'transparent')
-                    }
-                  >
-                    <span style={{ color: theme.textSecondary, display: 'flex' }}>
-                      {item.icon}
-                    </span>
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <div
-              style={{ width: '1px', height: '20px', background: theme.border, margin: '0 2px' }}
-            />
-
-            {/* GitHub */}
-            <button
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '5px 10px',
-                border: `1px solid ${theme.border}`,
-                borderRadius: '6px',
-                background: 'transparent',
-                color: theme.textSecondary,
-                cursor: 'pointer',
-                fontSize: '12px',
-                transition: 'all 0.15s',
-              }}
-            >
-              <Github className="w-[15px] h-[15px]" />
-              <span>GitHub</span>
-            </button>
-
-            {/* Share */}
-            <button
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '5px 10px',
-                border: `1px solid ${theme.border}`,
-                borderRadius: '6px',
-                background: 'transparent',
-                color: theme.textSecondary,
-                cursor: 'pointer',
-                fontSize: '12px',
-                transition: 'all 0.15s',
-              }}
-            >
-              <Share2 className="w-[15px] h-[15px]" />
-              <span>Share</span>
-            </button>
-
-            {/* Publish */}
-            <button
-              onClick={handlePublish}
-              disabled={isPublishing}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '5px 14px',
-                border: 'none',
-                borderRadius: '6px',
-                background: isPublished
-                  ? theme.success
-                  : isPublishing
-                    ? theme.surface
-                    : theme.accentBg,
-                color: isPublished ? '#fff' : isPublishing ? theme.textMuted : theme.accentText,
-                cursor: isPublishing ? 'wait' : 'pointer',
-                fontSize: '12px',
-                fontWeight: 700,
-                letterSpacing: '0.02em',
-                transition: 'all 0.3s ease',
-              }}
-            >
-              {isPublished ? (
-                <Check className="w-[15px] h-[15px]" />
-              ) : (
-                <Upload className="w-[15px] h-[15px]" />
-              )}
-              <span>
-                {isPublished ? 'Published!' : isPublishing ? 'Publishing...' : 'Publish'}
-              </span>
-            </button>
-
-            {/* Close panel */}
-            <button
-              onClick={onClose}
-              style={{
-                padding: '5px',
-                border: 'none',
-                borderRadius: '6px',
-                marginLeft: '2px',
-                background: 'transparent',
-                color: theme.textMuted,
-                cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'all 0.15s',
+                width: '28px',
+                height: '28px',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                color: activeTab === tab.id ? '#3b82f6' : '#6b7280',
+                background: activeTab === tab.id ? '#ffffff' : 'transparent',
+                boxShadow: activeTab === tab.id ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                transition: 'all 0.1s ease',
               }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = theme.surfaceActive;
-                (e.currentTarget as HTMLButtonElement).style.color = theme.text;
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-                (e.currentTarget as HTMLButtonElement).style.color = theme.textMuted;
-              }}
-              title="Close preview"
+              title={tab.label}
             >
-              <X className="w-4 h-4" />
+              {tab.icon}
             </button>
-          </div>
+          ))}
         </div>
-      )}
 
-      {/* —— BROWSER BAR ————————————————————————————————————— */}
-      {activeTab === 'preview' && (
-        <div
-          style={{
-            height: '40px',
-            minHeight: '40px',
-            borderBottom: `1px solid ${theme.border}`,
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 12px',
-            gap: '8px',
-            transition: 'border-color 0.3s',
-          }}
-        >
+        {/* Center: Address Bar */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
           <div
             style={{
-              display: 'flex',
-              gap: '2px',
-              background: theme.toggleBg,
-              borderRadius: '6px',
-              padding: '2px',
-            }}
-          >
-            {[
-              { id: 'desktop' as const, icon: <Monitor className="w-[15px] h-[15px]" /> },
-              { id: 'mobile' as const, icon: <Smartphone className="w-[15px] h-[15px]" /> },
-            ].map(({ id, icon }) => (
-              <button
-                key={id}
-                onClick={() => setViewport(id)}
-                style={{
-                  padding: '4px 8px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  background: viewport === id ? theme.toggleActive : 'transparent',
-                  color: viewport === id ? theme.text : theme.textMuted,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  transition: 'all 0.15s',
-                }}
-              >
-                {icon}
-              </button>
-            ))}
-          </div>
-
-          <div
-            style={{
-              flex: 1,
+              width: '100%',
+              maxWidth: '640px',
+              height: '32px',
+              background: '#f3f4f6',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              background: theme.urlBar,
-              borderRadius: '6px',
-              padding: '4px 12px',
-              fontSize: '12px',
+              padding: '0 12px',
+              fontSize: '13px',
+              color: '#4b5563',
             }}
           >
-            <Globe className="w-3 h-3" style={{ color: theme.textMuted }} />
-            <span style={{ color: theme.textMuted, fontFamily: 'monospace' }}>
-              {previewUrl || '/'}
-            </span>
+            <div style={{ opacity: 0.7 }}>/</div>
           </div>
+        </div>
 
+        {/* Right Action Strip */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <button
             onClick={() => setIframeKey((k) => k + 1)}
             style={{
-              padding: '4px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#6b7280',
               border: 'none',
               background: 'transparent',
-              color: theme.textMuted,
               cursor: 'pointer',
-              display: 'flex',
             }}
           >
-            <RefreshCw className="w-[14px] h-[14px]" />
+            <RefreshCw className="w-4 h-4" />
           </button>
 
           <button
             onClick={() => previewUrl && window.open(previewUrl, '_blank')}
             style={{
-              padding: '4px',
-              border: 'none',
-              background: 'transparent',
-              color: theme.textMuted,
-              cursor: 'pointer',
-              display: 'flex',
-            }}
-          >
-            <ExternalLink className="w-[14px] h-[14px]" />
-          </button>
-
-          <div
-            style={{ width: '1px', height: '18px', background: theme.border, margin: '0 4px' }}
-          />
-
-          {/* Edit button */}
-          <button
-            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '6px',
               display: 'flex',
               alignItems: 'center',
-              gap: '5px',
-              padding: '4px 10px',
-              border: `1px solid ${theme.border}`,
-              borderRadius: '6px',
+              justifyContent: 'center',
+              color: '#6b7280',
+              border: 'none',
               background: 'transparent',
-              color: theme.textSecondary,
               cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: 500,
-              transition: 'all 0.15s',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = theme.borderHover;
-              (e.currentTarget as HTMLButtonElement).style.color = theme.text;
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = theme.border;
-              (e.currentTarget as HTMLButtonElement).style.color = theme.textSecondary;
             }}
           >
-            <Edit3 className="w-[14px] h-[14px]" />
-            <span>Edit</span>
+            <ExternalLink className="w-4 h-4" />
           </button>
 
-          {/* Fullscreen */}
+          <button
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#6b7280',
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+            }}
+            onClick={() => setViewport(v => v === 'desktop' ? 'mobile' : 'desktop')}
+          >
+            <Smartphone className="w-4 h-4" />
+          </button>
+
           <button
             onClick={() => setIsFullscreen(!isFullscreen)}
             style={{
-              padding: '4px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#6b7280',
               border: 'none',
               background: 'transparent',
-              color: theme.textMuted,
+              cursor: 'pointer',
+            }}
+          >
+            <Maximize2 className="w-4 h-4" />
+          </button>
+
+          <div style={{ width: '1px', height: '16px', background: '#e5e7eb', margin: '0 2px' }} />
+
+          <button
+            style={{
+              width: '32px',
+              height: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'transparent',
+              border: 'none',
+              color: '#111827',
+              cursor: 'pointer',
+            }}
+          >
+            <Github className="w-5 h-5" />
+          </button>
+
+          <button
+            style={{
+              padding: '0 12px',
+              height: '32px',
+              borderRadius: '8px',
+              background: '#f3f4f6',
+              border: 'none',
+              color: '#374151',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: 600,
+            }}
+          >
+            Share
+          </button>
+
+          <button
+            onClick={handlePublish}
+            disabled={isPublishing}
+            style={{
+              padding: '0 16px',
+              height: '32px',
+              borderRadius: '8px',
+              background: '#000000',
+              color: '#ffffff',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: 700,
+            }}
+          >
+            {isPublishing ? '...' : 'Publish'}
+          </button>
+
+          
+          <button
+            onClick={onClose}
+            style={{
+              marginLeft: '8px',
+              color: '#9ca3af',
+              background: 'none',
+              border: 'none',
               cursor: 'pointer',
               display: 'flex',
-              transition: 'color 0.15s',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.color = theme.text)}
-            onMouseLeave={(e) =>
-              ((e.currentTarget as HTMLButtonElement).style.color = theme.textMuted)
-            }
-            title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
           >
-            {isFullscreen ? (
-              <Minimize2 className="w-[15px] h-[15px]" />
-            ) : (
-              <Maximize2 className="w-[15px] h-[15px]" />
-            )}
+            <X className="w-4 h-4" />
           </button>
         </div>
-      )}
+      </div>
 
-      {/* —— CONTENT —————————————————————————————————————————— */}
-      <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+      {/* —— CONTENT AREA (FLOATING CARD) ——————————————————————————— */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          background: theme.bg,
+          color: theme.text,
+          overflow: 'hidden',
+          borderRadius: isFullscreen ? '0' : '22px',
+          border: isFullscreen ? 'none' : '1px solid rgba(0,0,0,0.08)',
+          boxShadow: isFullscreen ? 'none' : '0px 0px 8px 0px rgba(0,0,0,0.02), 0 10px 40px rgba(0,0,0,0.06)',
+          position: 'relative',
+          marginTop: isFullscreen ? '0' : '8px',
+        }}
+      >
         {activeTab === 'preview' && (
           <div
             style={{
@@ -1194,9 +965,8 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'flex-start',
-              background: theme.surface,
               padding: viewport === 'mobile' ? '24px' : '0',
-              transition: 'all 0.3s ease',
+              background: '#ffffff',
             }}
           >
             <div
@@ -1206,10 +976,8 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
                 borderRadius: viewport === 'mobile' ? '24px' : '0',
                 overflow: 'hidden',
                 border: viewport === 'mobile' ? `3px solid ${theme.border}` : 'none',
-                boxShadow:
-                  viewport === 'mobile' ? '0 20px 60px rgba(0,0,0,0.25)' : 'none',
-                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                background: '#010101',
+                boxShadow: viewport === 'mobile' ? '0 20px 60px rgba(0,0,0,0.1)' : 'none',
+                background: '#ffffff',
                 position: 'relative',
               }}
             >
@@ -1233,65 +1001,19 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '16px',
-                    background:
-                      'linear-gradient(160deg, #010101 0%, #0a0a1a 50%, #010101 100%)',
-                    color: '#fff',
+                    gap: '12px',
+                    color: '#374151',
                     textAlign: 'center',
-                    padding: '40px',
+                    background: '#ffffff',
                   }}
                 >
-                  <div
-                    style={{
-                      fontSize: '10px',
-                      letterSpacing: '4px',
-                      color: '#616160',
-                      textTransform: 'uppercase',
-                      fontWeight: 600,
-                    }}
-                  >
-                    Talos AI
-                  </div>
-                  <div
-                    style={{
-                      fontSize: viewport === 'mobile' ? '28px' : '52px',
-                      fontWeight: 900,
-                      letterSpacing: '-0.04em',
-                      lineHeight: 1.05,
-                    }}
-                  >
-                    FROM INTENT
-                    <br />
-                    TO ACTION
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '14px',
-                      color: '#616160',
-                      maxWidth: '420px',
-                      lineHeight: 1.6,
-                      marginTop: '4px',
-                    }}
-                  >
-                    The autonomous AI agent that turns your intent into real-world results
-                  </div>
-                  <div
-                    style={{
-                      marginTop: '24px',
-                      padding: '11px 32px',
-                      background: '#fff',
-                      color: '#010101',
-                      borderRadius: '8px',
-                      fontWeight: 700,
-                      fontSize: '13px',
-                      letterSpacing: '0.02em',
-                    }}
-                  >
-                    Get Started
+                  <div style={{ fontSize: '15px', fontWeight: 500 }}>
+                    Start prompting (or editing) to see magic happen :)
                   </div>
                 </div>
               )}
 
+              {/* MADE IN BOLT BADGE (CLONE) */}
               <div
                 style={{
                   position: 'absolute',
@@ -1299,40 +1021,57 @@ export const WebsitePreviewPanel: React.FC<WebsitePreviewPanelProps> = ({
                   right: '16px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  background: 'rgba(0,0,0,0.75)',
-                  backdropFilter: 'blur(12px)',
+                  gap: '6px',
+                  background: '#ffffff',
                   padding: '6px 14px',
-                  borderRadius: '20px',
-                  fontSize: '11px',
-                  color: '#9ca3af',
-                  fontWeight: 500,
+                  borderRadius: '12px',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+                  fontSize: '12px',
+                  color: '#111827',
+                  fontWeight: 700,
+                  border: '1px solid #e5e7eb',
                 }}
               >
                 <div
                   style={{
                     width: '16px',
                     height: '16px',
-                    borderRadius: '50%',
-                    background: '#fff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <span style={{ fontSize: '8px', fontWeight: 900, color: '#010101' }}>T</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                  </svg>
                 </div>
-                Made with Talos
+                Made in Bolt
               </div>
             </div>
           </div>
         )}
 
-        {activeTab === 'code' && (
+        {activeTab === 'workspace' && isProject && (
+          <TalosCodePanel
+            sandboxId={sandboxId || 'mock-sandbox'}
+            theme={mode}
+            previewUrl={previewUrl}
+            initialFiles={initialFiles}
+          />
+        )}
+
+        {activeTab === 'terminal' && sandboxId && (
+          <TalosTerminal
+            sandboxId={sandboxId}
+            theme={mode}
+          />
+        )}
+
+        {(activeTab === 'code' || (activeTab === 'workspace' && !sandboxId)) && (
           <CodeViewer code={MOCK_CODE} filename="src/app/page.tsx" theme={theme} />
         )}
 
-        {activeTab === 'files' && (
+        {(activeTab === 'files' || (activeTab === 'workspace' && !sandboxId)) && (
           <div style={{ height: '100%', overflow: 'auto', background: theme.surface, paddingTop: '8px' }}>
             <FileTree items={MOCK_FILES} theme={theme} />
           </div>

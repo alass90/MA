@@ -50,8 +50,8 @@ export function useDeploymentDetector(messages: UnifiedMessage[] | undefined, pr
 
               // Check if this is a successful deployment
               if (output.success && output.url) {
-                // Extract sandbox ID from project metadata if available
-                const sandboxId = projectId; // We'll use projectId as a fallback
+                // Extract sandbox ID from project output if available
+                const sandboxId = output.sandbox_id || projectId;
 
                 openPanel({
                   url: output.url,

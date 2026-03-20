@@ -66,6 +66,7 @@ interface ToolCallSidePanelProps {
   disableInitialAnimation?: boolean;
   compact?: boolean;
   streamingText?: string; // Live streaming content from assistant message
+  sandboxId?: string | null;
 }
 
 interface ToolCallSnapshot {
@@ -525,6 +526,7 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
   disableInitialAnimation,
   compact = false,
   streamingText,
+  sandboxId,
 }: ToolCallSidePanelProps) {
   const t = useTranslations('thread');
   const [dots, setDots] = useState('');
@@ -1055,6 +1057,7 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
         onFileClick={onFileClick}
         viewToggle={<ViewToggle currentView={currentView} onViewChange={setCurrentView} />}
         streamingText={isStreaming ? streamingText : undefined}
+        sandboxId={sandboxId}
       />
     );
 
@@ -1213,7 +1216,7 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
           ease: [0.4, 0, 0.2, 1]
         }
       }}
-      className="h-full w-full flex flex-col bg-card overflow-hidden"
+      className="h-full w-full flex flex-col bg-card overflow-hidden rounded-3xl border border-black/[0.08] dark:border-white/[0.08]"
     >
       <div className="flex-1 flex flex-col overflow-hidden bg-[#f8f8f7] dark:bg-[#1a1a1b]">
         {renderContent()}

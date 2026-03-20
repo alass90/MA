@@ -29,7 +29,7 @@ export function MarkdownRenderer({
     let derivedBasePath = basePath;
     try {
         if (!derivedBasePath && previewUrl) {
-            if (previewUrl.includes('/api/sandboxes/')) {
+            if (previewUrl.includes('/api/sandbox/')) {
                 const u = new URL(previewUrl);
                 const p = u.searchParams.get('path');
                 if (p) derivedBasePath = p;

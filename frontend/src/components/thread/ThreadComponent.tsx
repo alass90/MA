@@ -56,6 +56,9 @@ import { useTranslations } from 'next-intl';
 import { backendApi } from '@/lib/api-client';
 import { WebsitePreviewPanel } from '@/components/thread/website-preview-panel';
 import { usePreviewPanelStore } from '@/stores/use-preview-panel-store';
+import { usePresentationPanelStore } from '@/stores/use-presentation-panel-store';
+import { usePresentationDetector } from '@/hooks/use-presentation-detector';
+import { TalosSlidesPanel } from '@/components/artifacts/TalosSlidesPanel';
 import { useDeploymentDetector } from '@/hooks/use-deployment-detector';
 import { useWebFileDetector } from '@/hooks/use-web-file-detector';
 
@@ -220,8 +223,18 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
     userClosedPanelRef,
   });
 
-  // Deployment detector - detects deploy_app tool calls and opens preview panel
+  // Deployment detector  // Detect deployments to open preview panel
   useDeploymentDetector(messages, projectId);
+
+  // Detect presentations to open slides panel
+  const {
+    isOpen: isPresentationOpen,
+    presentationPath,
+    sandboxId: presentationSandboxId,
+    closePanel: closePresentation
+  } = usePresentationPanelStore();
+
+  usePresentationDetector(messages, sandboxId);
 
   // Preview panel state
   const { isOpen: isPreviewPanelOpen, deployment, closePanel } = usePreviewPanelStore();
@@ -1130,6 +1143,24 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
             projectId={projectId}
           />
         )}
+
+        {/* Full-page Presentation Overlay */}
+        {isPresentationOpen && presentationSandboxId && presentationPath && (
+          <TalosSlidesPanel
+            sandboxId={presentationSandboxId}
+            presentationPath={presentationPath}
+            onClose={closePresentation}
+          />
+        )}
+
+        {/* Full-page Presentation Overlay */}
+        {isPresentationOpen && presentationSandboxId && presentationPath && (
+          <TalosSlidesPanel
+            sandboxId={presentationSandboxId}
+            presentationPath={presentationPath}
+            onClose={closePresentation}
+          />
+        )}
       </>
     );
   }
@@ -1211,6 +1242,12 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         leftSidebarState={leftSidebarState}
         streamingTextContent={isShared ? '' : streamingTextContent}
         streamingToolCall={isShared ? undefined : streamingToolCall}
+        isPreviewPanelOpen={isPreviewPanelOpen}
+        previewUrl={deployment?.url}
+        previewProjectPath={deployment?.projectPath}
+        previewFramework={deployment?.framework}
+        previewProjectName={deployment?.projectName}
+        onClosePreview={closePanel}
       >
         <ThreadContent
           messages={isShared ? playback.playbackState.visibleMessages : messages}

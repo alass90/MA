@@ -104,7 +104,7 @@ export const ThreadLayout = memo(function ThreadLayout({
   const isActuallyMobile = useIsMobile();
 
   // Track when panel should be visible
-  const shouldShowPanel = isSidePanelOpen && initialLoadCompleted;
+  const shouldShowPanel = (isSidePanelOpen || isPreviewPanelOpen) && initialLoadCompleted;
 
   // Extract streaming tool arguments as JSON string (what FileOperationToolView expects)
   const streamingToolArgsJson = React.useMemo(() => {
@@ -136,10 +136,13 @@ export const ThreadLayout = memo(function ThreadLayout({
   // Update sizes when panel visibility changes with smooth animation
   useEffect(() => {
     if (shouldShowPanel) {
-      // Open panel smoothly
+      // Open panel smoothly - use larger size for Preview Panel
+      const targetSize = isPreviewPanelOpen ? 65 : 40;
+      const mainSize = 100 - targetSize;
+      
       requestAnimationFrame(() => {
-        sidePanelRef.current?.resize(40);
-        mainPanelRef.current?.resize(60);
+        sidePanelRef.current?.resize(targetSize);
+        mainPanelRef.current?.resize(mainSize);
       });
     } else {
       // Close panel - resize smoothly, content disappears immediately
@@ -149,7 +152,7 @@ export const ThreadLayout = memo(function ThreadLayout({
       }, 0);
       return () => clearTimeout(timeout);
     }
-  }, [shouldShowPanel]);
+  }, [shouldShowPanel, isPreviewPanelOpen]);
 
   // Compact mode for embedded use
   if (compact) {
@@ -162,7 +165,7 @@ export const ThreadLayout = memo(function ThreadLayout({
           </div>
 
           {/* Preview Panel OR Tool Call Side Panel - Full replacement overlay for compact */}
-          {isPreviewPanelOpen && previewUrl && onClosePreview ? (
+          {isPreviewPanelOpen && onClosePreview ? (
             <div className="absolute inset-0 bg-background z-40">
               <WebsitePreviewPanel
                 isOpen={true}
@@ -173,6 +176,7 @@ export const ThreadLayout = memo(function ThreadLayout({
                 projectName={previewProjectName}
                 threadId={threadId}
                 projectId={projectId}
+                sandboxId={sandboxId || undefined}
                 onPublish={async () => {}}
               />
             </div>
@@ -196,6 +200,7 @@ export const ThreadLayout = memo(function ThreadLayout({
                 disableInitialAnimation={disableInitialAnimation}
                 compact={true}
                 streamingText={streamingToolArgsJson}
+                sandboxId={sandboxId}
               />
             </div>
           )}
@@ -262,6 +267,7 @@ export const ThreadLayout = memo(function ThreadLayout({
           agentName={agentName}
           disableInitialAnimation={disableInitialAnimation}
           streamingText={streamingToolArgsJson}
+          sandboxId={sandboxId}
         />
 
         {sandboxId && (
@@ -273,6 +279,24 @@ export const ThreadLayout = memo(function ThreadLayout({
             projectId={projectId}
             filePathList={filePathList}
           />
+        )}
+
+        {/* Preview Panel Overlay for Mobile Layout */}
+        {isPreviewPanelOpen && onClosePreview && (
+          <div className="absolute inset-0 bg-background z-[100]">
+            <WebsitePreviewPanel
+              isOpen={true}
+              onClose={onClosePreview}
+              previewUrl={previewUrl}
+              projectPath={previewProjectPath}
+              framework={previewFramework}
+              projectName={previewProjectName}
+              threadId={threadId}
+              projectId={projectId}
+              sandboxId={sandboxId || undefined}
+              onPublish={async () => { }}
+            />
+          </div>
         )}
       </div>
     );
@@ -326,35 +350,51 @@ export const ThreadLayout = memo(function ThreadLayout({
         {/* Side panel - always render but control size */}
         <ResizablePanel
           ref={sidePanelRef}
-          defaultSize={shouldShowPanel ? 40 : 0}
+          defaultSize={shouldShowPanel ? (isPreviewPanelOpen ? 65 : 40) : 0}
           minSize={shouldShowPanel ? 20 : 0}
-          maxSize={shouldShowPanel ? 70 : 0}
+          maxSize={shouldShowPanel ? 85 : 0}
           collapsible={true}
           className={cn(
             "relative bg-transparent",
             // Match ChatInput horizontal spacing: px-4
-            shouldShowPanel ? "pr-4 pb-5 pt-4" : "px-0",
+            shouldShowPanel ? (isPreviewPanelOpen ? "pr-4 pb-5 pt-0" : "pr-4 pb-5 pt-4") : "px-0",
             !shouldShowPanel ? "hidden" : ""
           )}
         >
-          <ToolCallSidePanel
-            isOpen={isSidePanelOpen && initialLoadCompleted}
-            onClose={onSidePanelClose}
-            toolCalls={toolCalls}
-            messages={messages}
-            externalNavigateToIndex={externalNavIndex}
-            agentStatus={agentStatus}
-            currentIndex={currentToolIndex}
-            onNavigate={onSidePanelNavigate}
-            project={project || undefined}
-            renderAssistantMessage={renderAssistantMessage}
-            renderToolResult={renderToolResult}
-            isLoading={!initialLoadCompleted || isLoading}
-            onFileClick={onViewFiles}
-            agentName={agentName}
-            disableInitialAnimation={disableInitialAnimation}
-            streamingText={streamingToolArgsJson}
-          />
+          {isPreviewPanelOpen && onClosePreview ? (
+            <WebsitePreviewPanel
+              isOpen={true}
+              onClose={onClosePreview}
+              previewUrl={previewUrl}
+              projectPath={previewProjectPath}
+              framework={previewFramework}
+              projectName={previewProjectName}
+              threadId={threadId}
+              projectId={projectId}
+              sandboxId={sandboxId || undefined}
+              onPublish={async () => { }}
+            />
+          ) : (
+            <ToolCallSidePanel
+              isOpen={isSidePanelOpen && initialLoadCompleted}
+              onClose={onSidePanelClose}
+              toolCalls={toolCalls}
+              messages={messages}
+              externalNavigateToIndex={externalNavIndex}
+              agentStatus={agentStatus}
+              currentIndex={currentToolIndex}
+              onNavigate={onSidePanelNavigate}
+              project={project || undefined}
+              renderAssistantMessage={renderAssistantMessage}
+              renderToolResult={renderToolResult}
+              isLoading={!initialLoadCompleted || isLoading}
+              onFileClick={onViewFiles}
+              agentName={agentName}
+              disableInitialAnimation={disableInitialAnimation}
+              streamingText={streamingToolArgsJson}
+              sandboxId={sandboxId}
+            />
+          )}
         </ResizablePanel>
       </ResizablePanelGroup>
 
@@ -366,6 +406,7 @@ export const ThreadLayout = memo(function ThreadLayout({
         projectId={projectId}
         filePathList={filePathList}
       />
+
     </div>
   );
 });

@@ -37,6 +37,7 @@ export interface ToolViewProps {
   onFileClick?: (filePath: string) => void;
   viewToggle?: React.ReactNode;
   streamingText?: string; // Live streaming content from assistant message
+  sandboxId?: string | null;
 }
 
 export interface BrowserToolViewProps extends ToolViewProps {

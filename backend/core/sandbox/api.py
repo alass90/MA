@@ -194,44 +194,94 @@ async def update_file(
 @router.get("/sandboxes/{sandbox_id}/files")
 async def list_files(
     sandbox_id: str, 
-    path: str,
+    path: str = "/workspace",
     request: Request = None,
     user_id: Optional[str] = Depends(get_optional_user_id)
 ):
+    """List files in a directory within the sandbox"""
     path = normalize_path(path)
-    
-    logger.debug(f"Received list files request for sandbox {sandbox_id}, path: {path}, user_id: {user_id}")
+    logger.debug(f"Received file list request for sandbox {sandbox_id}, path: {path}, user_id: {user_id}")
     client = await db.client
-    
-    # Verify the user has access to this sandbox
     await verify_sandbox_access_optional(client, sandbox_id, user_id)
     
     try:
-        # Get sandbox using the safer method
         sandbox = await get_sandbox_by_id_safely(client, sandbox_id)
-        
-        # List files
         files = await sandbox.fs.list_files(path)
+        
         result = []
-        
-        for file in files:
-            # Convert file information to our model
-            # Ensure forward slashes are used for paths, regardless of OS
-            full_path = f"{path.rstrip('/')}/{file.name}" if path != '/' else f"/{file.name}"
-            file_info = FileInfo(
-                name=file.name,
-                path=full_path, # Use the constructed path
-                is_dir=file.is_dir,
-                size=file.size,
-                mod_time=str(file.mod_time),
-                permissions=getattr(file, 'permissions', None)
-            )
-            result.append(file_info)
-        
+        for f in files:
+            result.append(FileInfo(
+                name=f.name,
+                path=f.path,
+                is_dir=f.is_dir,
+                size=f.size,
+                mod_time=f.mod_time,
+                permissions=f.permissions
+            ))
+            
         logger.debug(f"Successfully listed {len(result)} files in sandbox {sandbox_id}")
         return {"files": [file.dict() for file in result]}
     except Exception as e:
         logger.error(f"Error listing files in sandbox {sandbox_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/sandboxes/{sandbox_id}/workspace-files")
+async def get_all_workspace_files(
+    sandbox_id: str,
+    user_id: Optional[str] = Depends(get_optional_user_id)
+):
+    """
+    Recursively get all files in the /workspace directory and their contents.
+    Optimized to skip large/binary directories.
+    """
+    logger.debug(f"Received recursive workspace files request for sandbox {sandbox_id}")
+    client = await db.client
+    await verify_sandbox_access_optional(client, sandbox_id, user_id)
+
+    try:
+        sandbox = await get_sandbox_by_id_safely(client, sandbox_id)
+        workspace_path = "/workspace"
+        
+        all_files = {}
+        
+        # Helper for recursion
+        async def traverse(current_path):
+            try:
+                files = await sandbox.fs.list_files(current_path)
+                for f in files:
+                    rel_path = f"{current_path.rstrip('/')}/{f.name}"
+                    
+                    # Skip common junk directories
+                    if f.name in ['.git', 'node_modules', '.venv', '__pycache__', '.next', '.pytest_cache', 'dist', 'build', '.gemini']:
+                        continue
+                        
+                    if f.is_dir:
+                        await traverse(rel_path)
+                    else:
+                        # Skip binary-looking files (heuristic)
+                        ext = os.path.splitext(f.name)[1].lower()
+                        if ext in ['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.zip', '.tar', '.gz', '.db', '.sqlite', '.exe', '.dll', '.so']:
+                            continue
+                            
+                        try:
+                            content = (await sandbox.fs.download_file(rel_path)).decode('utf-8')
+                            # Sandpack expects relative paths from the root of its 'files' object
+                            sandpack_path = rel_path.replace("/workspace/", "")
+                            if sandpack_path.startswith("/"):
+                                sandpack_path = sandpack_path[1:]
+                            all_files[sandpack_path] = content
+                        except UnicodeDecodeError:
+                            logger.debug(f"Skipping binary file in recursive fetch: {rel_path}")
+                        except Exception as e:
+                            logger.error(f"Error reading {rel_path}: {e}")
+            except Exception as e:
+                logger.error(f"Error traversing {current_path}: {e}")
+
+        await traverse(workspace_path)
+        return all_files
+
+    except Exception as e:
+        logger.error(f"Error in get_all_workspace_files: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/sandboxes/{sandbox_id}/files/content")
@@ -484,9 +534,86 @@ async def create_file_in_project(
             "sandbox_id": sandbox_id,
             "sandbox_created": sandbox_created
         }
-        
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error uploading file to project {project_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/sandboxes/{sandbox_id}/terminal/execute")
+async def execute_terminal_command(
+    sandbox_id: str,
+    payload: dict,
+    user_id: str = Depends(verify_and_get_user_id_from_jwt)
+):
+    """Execute a command in the sandbox and return the output."""
+    command = payload.get("command")
+    if not command:
+        raise HTTPException(status_code=400, detail="Command is required")
+        
+    logger.debug(f"Received terminal command for sandbox {sandbox_id}: {command}")
+    client = await db.client
+    await verify_sandbox_access(client, sandbox_id, user_id)
+    
+    try:
+        sandbox = await get_sandbox_by_id_safely(client, sandbox_id)
+        # We use a dedicated session for the terminal to keep it separate from other tools
+        session_id = "terminal-main"
+        
+        try:
+            await sandbox.process.create_session(session_id)
+        except Exception:
+            # Session might already exist
+            pass
+            
+        from daytona_sdk import SessionExecuteRequest
+        result = await sandbox.process.execute_session_command(
+            session_id, 
+            SessionExecuteRequest(command=command)
+        )
+        
+        return {
+            "status": "success",
+            "output": result.output,
+            "exit_code": result.exit_code
+        }
+    except Exception as e:
+        logger.error(f"Error executing terminal command: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/sandboxes/{sandbox_id}/file")
+async def write_single_file(
+    sandbox_id: str, 
+    body: dict,
+    user_id: Optional[str] = Depends(get_optional_user_id)
+):
+    """Write a single file to the sandbox workspace"""
+    path = body.get("path")
+    content = body.get("content")
+    
+    if not path:
+        raise HTTPException(status_code=400, detail="Path is required")
+        
+    logger.debug(f"Received write_single_file request for sandbox {sandbox_id}, path: {path}")
+    client = await db.client
+    await verify_sandbox_access(client, sandbox_id, user_id)
+    
+    try:
+        sandbox = await get_sandbox_by_id_safely(client, sandbox_id)
+        
+        # Ensure path is normalized and starts with /workspace if not already
+        normalized_path = normalize_path(path)
+        if not normalized_path.startswith("/workspace"):
+            if normalized_path.startswith("/"):
+                full_path = f"/workspace{normalized_path}"
+            else:
+                full_path = f"/workspace/{normalized_path}"
+        else:
+            full_path = normalized_path
+            
+        await sandbox.fs.upload_file(content.encode("utf-8"), full_path)
+        logger.info(f"File written successfully to {full_path} in sandbox {sandbox_id}")
+        return {"ok": True, "path": full_path}
+    except Exception as e:
+        logger.error(f"Error writing file in sandbox {sandbox_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

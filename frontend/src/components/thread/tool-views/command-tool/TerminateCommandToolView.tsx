@@ -9,7 +9,9 @@ import {
   ArrowRight,
   TerminalIcon,
   Power,
-  StopCircle
+  StopCircle,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { ToolViewProps } from '../types';
 import { formatTimestamp, getToolTitle } from '../utils';
@@ -33,6 +35,7 @@ export function TerminateCommandToolView({
   const isDarkTheme = resolvedTheme === 'dark';
   const [progress, setProgress] = useState(0);
   const [showFullOutput, setShowFullOutput] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   const {
     sessionName,
@@ -115,6 +118,13 @@ export function TerminateCommandToolView({
     // Add empty lines for natural scrolling
     const emptyLines = Array.from({ length: 30 }, () => '');
 
+  const handleCopy = () => {
+    const fullText = `terminating session: ${finalSessionName}\n${output || ''}`;
+    navigator.clipboard.writeText(fullText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="flex flex-col h-full overflow-hidden bg-transparent">
       <div className="flex items-center justify-between px-4 py-2 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
@@ -152,112 +162,79 @@ export function TerminateCommandToolView({
 
       <div className="p-0 h-full flex-1 overflow-hidden relative">
         {isStreaming ? (
-          <div className="flex flex-col items-center justify-center h-full py-12 px-6 bg-gradient-to-b from-white to-zinc-50 dark:from-zinc-950 dark:to-zinc-900">
-            <div className="text-center w-full max-w-xs">
-              <div className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center bg-gradient-to-b from-red-100 to-red-50 shadow-inner dark:from-red-800/40 dark:to-red-900/60 dark:shadow-red-950/20">
-                <Loader2 className="h-8 w-8 animate-spin text-red-500 dark:text-red-400" />
+          <div className="h-full flex flex-col overflow-hidden p-4">
+            <div className="flex-1 bg-[#1a1a1b] rounded-xl border border-black/10 dark:border-white/5 overflow-hidden flex flex-col relative">
+              <div className="flex-1 overflow-hidden">
+                <ScrollArea className="h-full">
+                  <div className="p-4 font-mono text-[13px] leading-relaxed">
+                    <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500 italic">
+                      <Loader2 className="h-3 w-3 animate-spin text-red-500" />
+                      <span>Terminating session: {finalSessionName || '...'}</span>
+                    </div>
+                  </div>
+                </ScrollArea>
               </div>
-              <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100 mb-2">
-                Terminating session
-              </h3>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">
-                <span className="font-mono text-xs break-all">{finalSessionName || 'Processing termination...'}</span>
-              </p>
-              <Progress value={progress} className="w-full h-1" />
-              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-2">{progress}%</p>
             </div>
           </div>
         ) : finalSessionName ? (
-          <div className="h-full flex flex-col overflow-hidden">
-            <div className="flex-shrink-0 p-4 pb-2">
-              {/* Session info */}
-              <div className="mb-4 bg-card border border-border rounded-lg p-3.5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 font-normal">
-                    <Power className="h-2.5 w-2.5 mr-1 opacity-70" />
-                    Session
-                  </Badge>
-                </div>
-                <div className="font-mono text-xs text-foreground flex gap-2">
-                  <span className="text-red-500 dark:text-red-400 select-none">●</span>
-                  <code className="flex-1 break-all">{finalSessionName}</code>
-                </div>
+          <div className="h-full flex flex-col overflow-hidden p-4">
+            <div className="flex-1 bg-white dark:bg-[#1a1a1b] rounded-xl border border-black/10 dark:border-white/10 shadow-sm dark:shadow-lg overflow-hidden flex flex-col relative group">
+              {/* Terminal Header/Controls */}
+              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                <button
+                  onClick={handleCopy}
+                  className="p-1.5 rounded-md bg-zinc-100/80 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors border border-black/5 dark:border-white/5"
+                  title="Copy to clipboard"
+                >
+                  {copied ? <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                </button>
               </div>
 
-              {/* Result badge */}
-              {output && (
-                <div className="mb-4 bg-card border border-border rounded-lg p-3.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 font-normal">
-                        <ArrowRight className="h-2.5 w-2.5 mr-1 opacity-70" />
-                        Result
-                      </Badge>
+              <div className="flex-1 overflow-hidden">
+                <ScrollArea className="h-full">
+                  <div className="p-4 font-mono text-[13px] leading-relaxed">
+                    {/* Termination Line as terminal prompt/comment */}
+                    <div className="mb-3 text-zinc-100">
+                      <span className="text-purple-600 dark:text-[#d38aea] font-semibold">root@talos:~ $ </span>
+                      <span className="text-zinc-500 dark:text-zinc-400 italic"># terminating session: </span>
+                      <span className="text-zinc-900 dark:text-zinc-100">{finalSessionName}</span>
                     </div>
-                    <Badge
-                      className={cn(
-                        "text-xs h-4 px-1.5",
-                        terminationSuccess
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                          : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                      )}
-                    >
-                      {terminationSuccess ? 'Success' : 'Failed'}
-                    </Badge>
-                  </div>
-                </div>
-              )}
-            </div>
 
-            {/* Output section - fills remaining height and scrolls */}
-            {output ? (
-              <div className="flex-1 min-h-0 px-4 pb-4">
-                <div className="h-full bg-card border border-border rounded-lg flex flex-col overflow-hidden">
-                  <div className="flex-shrink-0 p-3.5 pb-2 border-b border-border">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 font-normal">
-                        <TerminalIcon className="h-2.5 w-2.5 mr-1 opacity-70" />
-                        Output
-                      </Badge>
-                      {!terminationSuccess && (
-                        <Badge variant="outline" className="text-xs h-4 px-1.5 border-red-700/30 text-red-400">
-                          <AlertTriangle className="h-2.5 w-2.5 mr-1" />
-                          Error
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <ScrollArea className="flex-1 min-h-0">
-                    <div className="p-3.5 pt-2">
-                      <pre className="text-xs text-foreground font-mono whitespace-pre-wrap break-all overflow-visible">
-                        {linesToShow.map((line, index) => (
-                          <span key={index}>
-                            {line || ' '}
-                            {'\n'}
-                          </span>
-                        ))}
-                        {/* Add empty lines for natural scrolling */}
-                        {showFullOutput && emptyLines.map((_, idx) => (
-                          <span key={`empty-${idx}`}>{'\n'}</span>
-                        ))}
-                      </pre>
-                      {!showFullOutput && hasMoreLines && (
-                        <div className="text-muted-foreground mt-2 border-t border-border pt-2 text-xs font-mono">
-                          + {formattedOutput.length - 10} more lines
+                    {/* Result Content */}
+                    <div className="text-zinc-700 dark:text-zinc-300">
+                      {output ? (
+                        <div className="space-y-1">
+                          {formattedOutput.map((line, index) => (
+                            <div key={index} className="min-h-[1.5em] whitespace-pre-wrap break-all overflow-visible">
+                              {line || ' '}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-zinc-400 dark:text-zinc-500 italic opacity-60">
+                          # No output received
                         </div>
                       )}
+
+                      <div className={cn(
+                        "mt-6 py-2 px-3 rounded border text-[12px]",
+                        terminationSuccess 
+                          ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/20" 
+                          : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-500/20"
+                      )}>
+                        <span className="font-semibold mr-2">{terminationSuccess ? "SUCCESS:" : "FAILED:"}</span>
+                        {terminationSuccess ? "Session has been terminated." : "Failed to terminate session."}
+                      </div>
+
+                      {/* Empty lines for scrolling */}
+                      {emptyLines.map((_, idx) => (
+                        <div key={`empty-${idx}`} className="h-[1.5em]" />
+                      ))}
                     </div>
-                  </ScrollArea>
-                </div>
+                  </div>
+                </ScrollArea>
               </div>
-            ) : !isStreaming ? (
-              <div className="flex-1 flex items-center justify-center px-4 pb-4">
-                <div className="bg-card border border-border rounded-lg p-4 text-center">
-                  <CircleDashed className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No output received</p>
-                </div>
-              </div>
-            ) : null}
+            </div>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full py-12 px-6 bg-gradient-to-b from-white to-zinc-50 dark:from-zinc-950 dark:to-zinc-900">

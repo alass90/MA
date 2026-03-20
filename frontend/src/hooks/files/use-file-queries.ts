@@ -109,7 +109,8 @@ export async function fetchFileContent(
 ): Promise<string | Blob | any> {
   const normalizedPath = normalizePath(filePath);
   
-  const url = new URL(`${process.env.NEXT_PUBLIC_BACKEND_URL}/sandboxes/${sandboxId}/files/content`);
+  // Use the Next.js proxy route instead of calling backend directly
+  const url = new URL(`/api/sandbox/${sandboxId}/file`, window.location.origin);
   url.searchParams.append('path', normalizedPath);
   
   const headers: Record<string, string> = {};

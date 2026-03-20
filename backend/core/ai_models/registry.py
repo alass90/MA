@@ -8,9 +8,9 @@ from core.utils.logger import logger
 SHOULD_USE_ANTHROPIC = config.ENV_MODE == EnvMode.LOCAL and bool(config.ANTHROPIC_API_KEY)
 
 # Actual model IDs for LiteLLM
-# MODIFICATION: Use Qwen as default instead of Bedrock when no Anthropic key
-_BASIC_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "dashscope/qwen-plus"
-_POWER_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "dashscope/qwen-plus"
+# MODIFICATION: Use Moonshot (Kimi) K2 Preview as default instead of Qwen when no Anthropic key
+_BASIC_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "moonshot/kimi-k2-0905-preview"
+_POWER_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "moonshot/kimi-k2-0905-preview"
 
 # Default model IDs (these are aliases that resolve to actual IDs)
 FREE_MODEL_ID = "kortix/basic"
@@ -285,30 +285,28 @@ class ModelRegistry:
         # ))
         
         
-        # self.register(Model(
-        #     id="openrouter/moonshotai/kimi-k2",
-        #     name="Kimi K2",
-        #     provider=ModelProvider.MOONSHOTAI,
-        #     aliases=["kimi-k2", "Kimi K2", "moonshotai/kimi-k2"],
-        #     context_window=200_000,
-        #     capabilities=[
-        #         ModelCapability.CHAT,
-        #         ModelCapability.FUNCTION_CALLING,
-        #     ],
-        #     pricing=ModelPricing(
-        #         input_cost_per_million_tokens=1.00,
-        #         output_cost_per_million_tokens=3.00
-        #     ),
-        #     tier_availability=["free", "paid"],
-        #     priority=94,
-        #     enabled=True,
-        #     config=ModelConfig(
-        #         extra_headers={
-        #             "HTTP-Referer": config.OR_SITE_URL if hasattr(config, 'OR_SITE_URL') and config.OR_SITE_URL else "",
-        #             "X-Title": config.OR_APP_NAME if hasattr(config, 'OR_APP_NAME') and config.OR_APP_NAME else ""
-        #         }
-        #     )
-        # ))
+        self.register(Model(
+            id="moonshot/kimi-k2-0905-preview",
+            name="Kimi K2 Preview",
+            provider=ModelProvider.MOONSHOTAI,
+            aliases=["kimi-k2", "Kimi K2", "moonshotai/kimi-k2", "moonshot/kimi-k2-0905-preview"],
+            context_window=200_000,
+            capabilities=[
+                ModelCapability.CHAT,
+                ModelCapability.FUNCTION_CALLING,
+            ],
+            pricing=ModelPricing(
+                input_cost_per_million_tokens=1.00,
+                output_cost_per_million_tokens=3.00
+            ),
+            tier_availability=["free", "paid"],
+            priority=94,
+            enabled=True,
+            config=ModelConfig(
+                api_base="https://api.moonshot.ai/v1",
+                num_retries=3
+            )
+        ))
         
         # # DeepSeek Models
         # self.register(Model(

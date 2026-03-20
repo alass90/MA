@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button"
-import { FolderOpen, Upload, Monitor, Copy, Check } from "lucide-react"
+import { FolderOpen, Upload, Monitor, Copy, Check, Layout } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { toast } from "sonner"
 import {
@@ -20,6 +20,7 @@ import { ShareModal } from "@/components/sidebar/share-modal"
 import { useQueryClient } from "@tanstack/react-query";
 import { projectKeys } from "@/hooks/threads/keys";
 import { threadKeys } from "@/hooks/threads/keys";
+import { usePreviewPanelStore } from "@/stores/use-preview-panel-store";
 
 interface ThreadSiteHeaderProps {
   threadId?: string;
@@ -51,6 +52,7 @@ export function SiteHeader({
   const [showKnowledgeBase, setShowKnowledgeBase] = useState(false);
   const [copied, setCopied] = useState(false);
   const queryClient = useQueryClient();
+  const { togglePanel, deployment } = usePreviewPanelStore();
 
   const isMobile = useIsMobile() || isMobileView
   const updateProjectMutation = useUpdateProject()
@@ -221,6 +223,22 @@ export function SiteHeader({
             </Tooltip>
 
 
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={togglePanel}
+                  className="h-9 w-9 cursor-pointer"
+                >
+                  <Layout className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side={isMobile ? "bottom" : "bottom"}>
+                <p>Open Preview Workspace</p>
+              </TooltipContent>
+            </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>

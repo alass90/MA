@@ -17,11 +17,15 @@ interface PreviewPanelState {
   deployment: DeploymentInfo | null;
   openPanel: (deployment: DeploymentInfo) => void;
   closePanel: () => void;
+  togglePanel: () => void;
+  setOpen: (open: boolean) => void;
 }
 
 export const usePreviewPanelStore = create<PreviewPanelState>((set) => ({
   isOpen: false,
   deployment: null,
   openPanel: (deployment) => set({ isOpen: true, deployment }),
-  closePanel: () => set({ isOpen: false, deployment: null }),
+  closePanel: () => set({ isOpen: false }),
+  togglePanel: () => set((state) => ({ isOpen: !state.isOpen })),
+  setOpen: (open) => set({ isOpen: open }),
 }));

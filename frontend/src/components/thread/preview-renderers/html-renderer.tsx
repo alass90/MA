@@ -39,7 +39,7 @@ export function HtmlRenderer({
     const filePath = useMemo(() => {
         try {
             // If it's an API URL, extract the full path from the path parameter
-            if (previewUrl.includes('/api/sandboxes/')) {
+            if (previewUrl.includes('/api/sandbox/')) {
                 const url = new URL(previewUrl);
                 const path = url.searchParams.get('path');
                 if (path) {

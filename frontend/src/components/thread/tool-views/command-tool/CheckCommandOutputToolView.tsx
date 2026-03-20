@@ -8,6 +8,9 @@ import {
     TerminalIcon,
     Play,
     Square,
+    Loader2,
+    Copy,
+    Check,
 } from 'lucide-react';
 import { ToolViewProps } from '../types';
 import { formatTimestamp, getToolTitle } from '../utils';
@@ -220,6 +223,7 @@ export function CheckCommandOutputToolView({
     const { resolvedTheme } = useTheme();
     const isDarkTheme = resolvedTheme === 'dark';
     const [showFullOutput, setShowFullOutput] = useState(true);
+    const [copied, setCopied] = useState(false);
 
     const {
         sessionName,
@@ -294,6 +298,13 @@ export function CheckCommandOutputToolView({
     // Add empty lines for natural scrolling
     const emptyLines = Array.from({ length: 30 }, () => '');
 
+    const handleCopy = () => {
+        const fullText = `session: ${sessionName}\n${output || ''}`;
+        navigator.clipboard.writeText(fullText);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     const isSessionRunning = status?.includes('still running') || status?.includes('running');
 
     return (
@@ -333,74 +344,75 @@ export function CheckCommandOutputToolView({
 
             <div className="p-0 h-full flex-1 overflow-hidden relative">
                 {isStreaming ? (
-                    <LoadingState
-                        icon={Terminal}
-                        iconColor="text-blue-500 dark:text-blue-400"
-                        bgColor="bg-gradient-to-b from-blue-100 to-blue-50 shadow-inner dark:from-blue-800/40 dark:to-blue-900/60 dark:shadow-blue-950/20"
-                        title="Checking command output"
-                        filePath={sessionName || 'Processing session...'}
-                        showProgress={true}
-                    />
-                ) : sessionName ? (
-                    <div className="h-full flex flex-col overflow-hidden">
-                        <div className="flex-shrink-0 p-4 pb-2">
-                            {/* Session info */}
-                            <div className="bg-card border border-border rounded-lg p-3.5">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 font-normal">
-                                        <TerminalIcon className="h-2.5 w-2.5 mr-1 opacity-70" />
-                                        Session
-                                    </Badge>
-                                </div>
-                                <div className="text-xs text-foreground font-mono">
-                                    {sessionName}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Output section - fills remaining height and scrolls */}
-                        {formattedOutput.length > 0 ? (
-                            <div className="flex-1 min-h-0 px-4 pb-4">
-                                <div className="h-full bg-card border border-border rounded-lg flex flex-col overflow-hidden">
-                                    <div className="flex-shrink-0 p-3.5 pb-2 border-b border-border">
-                                        <div className="flex items-center gap-2">
-                                            <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 font-normal">
-                                                <TerminalIcon className="h-2.5 w-2.5 mr-1 opacity-70" />
-                                                Output
-                                            </Badge>
+                    <div className="h-full flex flex-col overflow-hidden p-4">
+                        <div className="flex-1 bg-zinc-50 dark:bg-[#1a1a1b] rounded-xl border border-black/10 dark:border-white/5 overflow-hidden flex flex-col relative">
+                            <div className="flex-1 overflow-hidden">
+                                <ScrollArea className="h-full">
+                                    <div className="p-4 font-mono text-[13px] leading-relaxed">
+                                        <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500 italic">
+                                            <Loader2 className="h-3 w-3 animate-spin" />
+                                            <span>Retrieving output for session: {sessionName}...</span>
                                         </div>
                                     </div>
-                                    <ScrollArea className="flex-1 min-h-0">
-                                        <div className="p-3.5 pt-2">
-                                            <pre className="text-xs text-foreground font-mono whitespace-pre-wrap break-all overflow-visible">
-                                                {linesToShow.map((line, index) => (
-                                                    <span key={index}>
-                                                        {line}
-                                                        {'\n'}
-                                                    </span>
-                                                ))}
-                                                {/* Add empty lines for natural scrolling */}
-                                                {showFullOutput && emptyLines.map((_, idx) => (
-                                                    <span key={`empty-${idx}`}>{'\n'}</span>
-                                                ))}
-                                            </pre>
-                                            {!showFullOutput && hasMoreLines && (
-                                                <div className="text-muted-foreground mt-2 border-t border-border pt-2 text-xs font-mono">
-                                                    + {formattedOutput.length - 10} more lines
-                                                </div>
-                                            )}
+                                </ScrollArea>
+                            </div>
+                        </div>
+                    </div>
+                ) : sessionName ? (
+                    <div className="h-full flex flex-col overflow-hidden p-4">
+                        <div className="flex-1 bg-white dark:bg-[#1a1a1b] rounded-xl border border-black/10 dark:border-white/10 shadow-sm dark:shadow-lg overflow-hidden flex flex-col relative group">
+                            {/* Terminal Header/Controls */}
+                            <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                <button
+                                    onClick={handleCopy}
+                                    className="p-1.5 rounded-md bg-zinc-100/80 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors border border-black/5 dark:border-white/5"
+                                    title="Copy to clipboard"
+                                >
+                                    {copied ? <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                                </button>
+                            </div>
+
+                            <div className="flex-1 overflow-hidden">
+                                <ScrollArea className="h-full">
+                                    <div className="p-4 font-mono text-[13px] leading-relaxed">
+                                        {/* Session Info as terminal prompt/comment */}
+                                        <div className="mb-3">
+                                            <span className="text-purple-600 dark:text-[#d38aea] font-semibold">root@talos:~ $ </span>
+                                            <span className="text-zinc-500 dark:text-zinc-400 italic"># checking output for session: </span>
+                                            <span className="text-zinc-900 dark:text-zinc-100">{sessionName}</span>
                                         </div>
-                                    </ScrollArea>
-                                </div>
+
+                                        {/* Output Content */}
+                                        {formattedOutput.length > 0 ? (
+                                            <div className="text-zinc-700 dark:text-zinc-300">
+                                                {formattedOutput.map((line, index) => (
+                                                    <div key={index} className="min-h-[1.5em] whitespace-pre-wrap break-all overflow-visible">
+                                                        {line}
+                                                    </div>
+                                                ))}
+                                                
+                                                {/* Status message */}
+                                                {status && (
+                                                    <div className="mt-4 py-2 px-3 bg-zinc-100 dark:bg-zinc-800 rounded border border-black/5 dark:border-white/5 text-zinc-600 dark:text-zinc-400 text-[12px]">
+                                                        <span className="text-blue-600 dark:text-blue-400 font-semibold mr-2">STATUS:</span>
+                                                        {status}
+                                                    </div>
+                                                )}
+
+                                                {/* Empty lines for scrolling */}
+                                                {emptyLines.map((_, idx) => (
+                                                    <div key={`empty-${idx}`} className="h-[1.5em]" />
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="text-zinc-400 dark:text-zinc-500 italic opacity-60">
+                                                # No output received
+                                            </div>
+                                        )}
+                                    </div>
+                                </ScrollArea>
                             </div>
-                        ) : (
-                            <div className="flex-1 flex items-center justify-center px-4 pb-4">
-                                <div className="bg-card border border-border rounded-lg p-4 text-center">
-                                    <CircleDashed className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                                    <p className="text-sm text-muted-foreground">No output received</p>
-                                </div>
-                            </div>
-                        )}
+                        </div>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center h-full py-12 px-6 bg-gradient-to-b from-white to-zinc-50 dark:from-zinc-950 dark:to-zinc-900">

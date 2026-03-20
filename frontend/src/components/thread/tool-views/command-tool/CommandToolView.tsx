@@ -9,6 +9,8 @@ import {
   ArrowRight,
   TerminalIcon,
   Loader2,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { ToolViewProps } from '../types';
 import { formatTimestamp, getToolTitle } from '../utils';
@@ -31,6 +33,7 @@ export function CommandToolView({
   const { resolvedTheme } = useTheme();
   const isDarkTheme = resolvedTheme === 'dark';
   const [showFullOutput, setShowFullOutput] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   const {
     command,
@@ -150,6 +153,13 @@ export function CommandToolView({
   // Add empty lines for natural scrolling
   const emptyLines = Array.from({ length: 30 }, () => '');
 
+  const handleCopy = () => {
+    const fullText = `${displayPrefix} ${command}\n${output || ''}`;
+    navigator.clipboard.writeText(fullText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="flex flex-col h-full overflow-hidden bg-transparent">
       <div className="flex items-center justify-between px-4 py-2 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
@@ -190,143 +200,88 @@ export function CommandToolView({
       <div className="p-0 h-full flex-1 overflow-hidden relative">
         {isStreaming ? (
           <div className="h-full flex flex-col overflow-hidden">
-            <div className="flex-shrink-0 p-4 pb-2">
-              {/* Show partial command data if available during streaming */}
-              {command && (
-                <div className="mb-4 bg-card border border-border rounded-lg p-3.5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 font-normal">
-                      <TerminalIcon className="h-2.5 w-2.5 mr-1 opacity-70" />
-                      Command
-                    </Badge>
-                    {!isStreaming ? (
-                      <Badge
-                        variant="secondary"
-                        className={cn(
-                          "text-[10px] h-4 px-1 leading-none border-none",
-                          actualIsSuccess
-                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                            : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
-                        )}
-                      >
-                        {actualIsSuccess ? "Success" : "Failed"}
-                      </Badge>
-                    ) : (
-                      <Badge className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-none text-[10px] h-4 px-1 leading-none">
-                        <Loader2 className="h-2.5 w-2.5 animate-spin mr-1" />
-                        Running
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="font-mono text-xs text-foreground">
-                    <span className="text-green-500 dark:text-green-400 font-semibold">{displayPrefix} </span>
-                    <span className="text-foreground">{command}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-            {!command && (
-          <LoadingState
-            icon={Terminal}
-            iconColor="text-blue-500 dark:text-blue-400"
-            bgColor="bg-gradient-to-b from-blue-100 to-blue-50 shadow-inner dark:from-blue-800/40 dark:to-blue-900/60 dark:shadow-blue-950/20"
-            title={name === 'check-command-output' ? 'Checking command output' : 'Executing command'}
-            filePath={displayText || 'Processing command...'}
-            showProgress={true}
-          />
-            )}
-          </div>
-        ) : displayText ? (
-          <div className="h-full flex flex-col overflow-hidden">
-            <div className="flex-shrink-0 p-4 pb-2">
-              {/* Command section */}
-              {command && (
-                <div className="mb-4 bg-card border border-border rounded-lg p-3.5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 font-normal">
-                      <TerminalIcon className="h-2.5 w-2.5 mr-1 opacity-70" />
-                      Command
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className={cn(
-                        "text-[10px] h-4 px-1 leading-none border-none",
-                        actualIsSuccess
-                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                          : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+            <div className="flex-1 overflow-hidden p-4">
+              <div className="h-full bg-zinc-50 dark:bg-[#1a1a1b] rounded-xl border border-black/10 dark:border-white/5 overflow-hidden flex flex-col relative group">
+                <div className="flex-1 overflow-hidden">
+                  <ScrollArea className="h-full">
+                    <div className="p-4 font-mono text-[13px] leading-relaxed">
+                      {command && (
+                        <div className="mb-2">
+                          <span className="text-purple-600 dark:text-[#d38aea] font-semibold">root@talos:~ $ </span>
+                          <span className="text-zinc-900 dark:text-zinc-100">{command}</span>
+                          {isStreaming && <span className="inline-block w-2 h-4 bg-zinc-400 dark:bg-zinc-500 animate-pulse ml-1 align-middle" />}
+                        </div>
                       )}
-                    >
-                      {actualIsSuccess ? "Success" : "Failed"}
-                    </Badge>
-                  </div>
-                  <div className="font-mono text-xs text-foreground">
-                    <span className="text-green-500 dark:text-green-400 font-semibold">{displayPrefix} </span>
-                    <span className="text-foreground">{command}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Show status message for non-blocking commands */}
-              {isNonBlockingCommand && output && (
-                <div className="mb-4 bg-muted/50 border border-border rounded-lg p-3.5">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CircleDashed className="h-4 w-4 text-blue-500" />
-                    <span className="text-sm font-medium text-foreground">Command Status</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{output}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Output section - fills remaining height and scrolls */}
-            {formattedOutput.length > 0 ? (
-              <div className="flex-1 min-h-0 px-4 pb-4">
-                <div className="h-full bg-card border border-border rounded-lg flex flex-col overflow-hidden">
-                  <div className="flex-shrink-0 p-3.5 pb-2 border-b border-border">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs px-1.5 py-0 h-4 font-normal">
-                        <TerminalIcon className="h-2.5 w-2.5 mr-1 opacity-70" />
-                        Output
-                      </Badge>
-                      {exitCode !== null && exitCode !== 0 && (
-                        <Badge variant="outline" className="text-xs h-4 px-1.5 border-red-700/30 text-red-400">
-                          <AlertTriangle className="h-2.5 w-2.5 mr-1" />
-                          Error
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <ScrollArea className="flex-1 min-h-0">
-                    <div className="p-3.5 pt-2">
-                      <pre className="text-xs text-foreground font-mono whitespace-pre-wrap break-words">
-                        {linesToShow.map((line, idx) => (
-                          <span key={idx}>
-                            {line}
-                            {'\n'}
-                          </span>
-                        ))}
-                        {/* Add empty lines for natural scrolling */}
-                        {showFullOutput && emptyLines.map((_, idx) => (
-                          <span key={`empty-${idx}`}>{'\n'}</span>
-                        ))}
-                      </pre>
-                      {!showFullOutput && hasMoreLines && (
-                        <div className="text-muted-foreground mt-2 border-t border-border pt-2 text-xs font-mono">
-                          + {formattedOutput.length - 10} more lines
+                      
+                      {!command && (
+                        <div className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500 italic">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          <span>Initializing terminal...</span>
                         </div>
                       )}
                     </div>
                   </ScrollArea>
                 </div>
               </div>
-            ) : !isNonBlockingCommand ? (
-              <div className="flex-1 flex items-center justify-center px-4 pb-4">
-                <div className="bg-card border border-border rounded-lg p-4 text-center">
-                  <CircleDashed className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No output received</p>
-                </div>
+            </div>
+          </div>
+        ) : displayText ? (
+          <div className="h-full flex flex-col overflow-hidden p-4">
+            <div className="flex-1 bg-white dark:bg-[#1a1a1b] rounded-xl border border-black/10 dark:border-white/10 shadow-sm dark:shadow-lg overflow-hidden flex flex-col relative group font-sans">
+              {/* Terminal Header/Controls */}
+              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                <button
+                  onClick={handleCopy}
+                  className="p-1.5 rounded-md bg-zinc-100/80 hover:bg-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors border border-black/5 dark:border-white/5"
+                  title="Copy to clipboard"
+                >
+                  {copied ? <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                </button>
               </div>
-            ) : null}
+
+              <div className="flex-1 overflow-hidden font-mono">
+                <ScrollArea className="h-full">
+                  <div className="p-4 text-[13px] leading-relaxed">
+                    {/* Command Line */}
+                    <div className="mb-3">
+                      <span className="text-purple-600 dark:text-[#d38aea] font-semibold">root@talos:~ $ </span>
+                      <span className="text-zinc-900 dark:text-zinc-100">{command}</span>
+                    </div>
+
+                    {/* Output Content */}
+                    {formattedOutput.length > 0 ? (
+                      <div className="text-zinc-700 dark:text-zinc-300">
+                        {formattedOutput.map((line, idx) => (
+                          <div key={idx} className="min-h-[1.5em] whitespace-pre-wrap break-words">
+                            {line}
+                          </div>
+                        ))}
+                        
+                        {/* Status Message if non-blocking */}
+                        {isNonBlockingCommand && output && formattedOutput.length === 0 && (
+                          <div className="text-blue-600 dark:text-blue-400 italic opacity-80 mt-2">
+                            # {output}
+                          </div>
+                        )}
+
+                        {/* Empty lines for scrolling */}
+                        {emptyLines.map((_, idx) => (
+                          <div key={`empty-${idx}`} className="h-[1.5em]" />
+                        ))}
+                      </div>
+                    ) : isNonBlockingCommand && output ? (
+                      <div className="text-blue-600 dark:text-blue-400 italic opacity-80">
+                        # {output}
+                      </div>
+                    ) : (
+                      <div className="text-zinc-400 dark:text-zinc-500 italic opacity-60">
+                        # No output received
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full py-12 px-6 bg-gradient-to-b from-white to-zinc-50 dark:from-zinc-950 dark:to-zinc-900">
