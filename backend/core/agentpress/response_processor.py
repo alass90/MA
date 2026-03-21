@@ -19,6 +19,7 @@ from core.utils.logger import logger
 from core.utils.config import config as global_config
 from core.agentpress.tool import ToolResult
 from core.agentpress.tool_registry import ToolRegistry
+from core.services.storage_service import upload_generated_file_to_supabase
 from core.agentpress.xml_tool_parser import (
     extract_xml_chunks,
     parse_xml_tool_calls_with_ids
@@ -105,7 +106,7 @@ class ProcessorConfig:
 class ResponseProcessor:
     """Processes LLM responses, extracting and executing tool calls."""
     
-    def __init__(self, tool_registry: ToolRegistry, add_message_callback: Callable, trace: Optional[StatefulTraceClient] = None, agent_config: Optional[dict] = None):
+    def __init__(self, tool_registry: ToolRegistry, add_message_callback: Callable, trace: Optional[StatefulTraceClient] = None, agent_config: Optional[dict] = None, project_id: Optional[str] = None):
         """Initialize the ResponseProcessor.
         
         Args:
@@ -113,6 +114,7 @@ class ResponseProcessor:
             add_message_callback: Callback function to add messages to the thread.
                 MUST return the full saved message object (dict) or None.
             agent_config: Optional agent configuration with version information
+            project_id: Optional project ID (sandbox ID) for storage operations
         """
         self.tool_registry = tool_registry
         self.add_message = add_message_callback
@@ -122,6 +124,7 @@ class ResponseProcessor:
             self.trace = langfuse.trace(name="anonymous:response_processor")
             
         self.agent_config = agent_config
+        self.project_id = project_id
 
     def _serialize_model_response(self, model_response) -> Dict[str, Any]:
         """Convert a LiteLLM ModelResponse object to a JSON-serializable dictionary.
@@ -1940,6 +1943,42 @@ class ResponseProcessor:
             if tool_call_id:
                 metadata["tool_call_id"] = tool_call_id
                 logger.debug(f"Storing tool_call_id {tool_call_id} in tool result metadata for matching")
+            # ---
+            
+            # --- SUPABASE STORAGE SNAPSHOT LOGIC ---
+            # If storage snapshots are enabled and we have a project_id (sandbox_id)
+            if global_config.TALOS_STORAGE_SNAPSHOTS_ENABLED and self.project_id and result.success:
+                try:
+                    # Check if the tool result contains a file path, indicating a file was created or modified
+                    output = result.output
+                    file_path = None
+                    
+                    if isinstance(output, dict):
+                        file_path = output.get('file_path')
+                    elif isinstance(output, str):
+                        try:
+                            parsed_output = json.loads(output)
+                            if isinstance(parsed_output, dict):
+                                file_path = parsed_output.get('file_path')
+                        except:
+                            pass
+                    
+                    if file_path:
+                        logger.info(f"📁 File operation detected for {file_path}. Triggering Supabase Storage snapshot...")
+                        # Run upload in a way that doesn't block the main flow if possible, 
+                        # but here we want the URL to be in the metadata if possible
+                        storage_url, supabase_path = await upload_generated_file_to_supabase(
+                            sandbox_id=self.project_id,
+                            file_path=file_path
+                        )
+                        
+                        if storage_url:
+                            logger.info(f"✅ File snapshot uploaded to Supabase: {storage_url}")
+                            metadata["storage_url"] = storage_url
+                            metadata["supabase_path"] = supabase_path # Store unique path for refreshment
+                            metadata["snapshot_path"] = file_path # Keep original path for reference
+                except Exception as e:
+                    logger.error(f"❌ Failed to create storage snapshot: {str(e)}")
             # ---
             
             # Determine tool call format DETERMINISTICALLY from global config

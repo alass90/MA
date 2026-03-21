@@ -38,6 +38,8 @@ interface AttachmentGroupProps {
     project?: Project; // Add project prop
     standalone?: boolean; // Add standalone prop for minimal styling
     alignRight?: boolean; // Add alignRight prop
+    storageUrls?: Record<string, string>; // Mapping of filepath to storageUrl
+    supabasePaths?: Record<string, string>; // Mapping of filepath to supabasePath
 }
 
 export function AttachmentGroup({
@@ -53,7 +55,9 @@ export function AttachmentGroup({
     collapsed = true, // By default, HTML/MD files are collapsed
     project, // Add project prop
     standalone = false, // Add standalone prop
-    alignRight = false // Add alignRight prop
+    alignRight = false, // Add alignRight prop
+    storageUrls, // Add storageUrls prop
+    supabasePaths // Add supabasePaths prop
 }: AttachmentGroupProps) {
     // State for modal
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -304,6 +308,8 @@ export function AttachmentGroup({
                                     isSingleItemGrid={true}
                                     standalone={standalone}
                                     alignRight={alignRight}
+                                    storageUrl={storageUrls?.[currentFilePath]}
+                                    supabasePath={supabasePaths?.[currentFilePath]}
                                 />
                                 {onRemove && (
                                     <div
@@ -395,6 +401,8 @@ export function AttachmentGroup({
                                 isSingleItemGrid={uniqueFiles.length === 1} // Pass single item detection
                                 standalone={standalone} // Pass standalone prop
                                 alignRight={alignRight} // Pass alignRight prop
+                                storageUrl={storageUrls?.[item.path]}
+                                supabasePath={supabasePaths?.[item.path]}
                             />
                             {onRemove && (
                                 <div
@@ -450,6 +458,8 @@ export function AttachmentGroup({
                                     localPreviewUrl={getLocalPreviewUrl(item.file)}
                                     collapsed={false} // Show previews like in CompleteToolView
                                     alignRight={alignRight} // Pass alignRight prop
+                                    storageUrl={storageUrls?.[item.path]}
+                                    supabasePath={supabasePaths?.[item.path]}
                                     className={cn(
                                         isPreviewable ? "min-h-[240px] max-h-[400px] overflow-auto" : ""
                                     )}
@@ -636,6 +646,8 @@ export function AttachmentGroup({
                                         isSingleItemGrid={uniqueFiles.length === 1} // Pass single item detection to modal too
                                         standalone={false} // Never standalone in modal
                                         alignRight={false} // Never align right in modal
+                                        storageUrl={storageUrls?.[item.path]}
+                                        supabasePath={supabasePaths?.[item.path]}
                                     />
                                     {onRemove && (
                                         <div

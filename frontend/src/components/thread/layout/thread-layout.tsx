@@ -37,6 +37,9 @@ interface ThreadLayoutProps {
   currentToolIndex: number;
   onSidePanelNavigate: (index: number) => void;
   onSidePanelClose: () => void;
+  sidePanelView?: 'tools' | 'browser' | 'preview' | 'deliverables';
+  onSidePanelViewChange?: (view: 'tools' | 'browser' | 'preview' | 'deliverables') => void;
+  onToggleDeliverables?: () => void;
   renderAssistantMessage: (assistantContent?: string, toolContent?: string) => React.ReactNode;
   renderToolResult: (toolContent?: string, isSuccess?: boolean) => React.ReactNode;
   isLoading: boolean;
@@ -100,6 +103,9 @@ export const ThreadLayout = memo(function ThreadLayout({
   previewFramework,
   previewProjectName,
   onClosePreview,
+  sidePanelView = 'tools',
+  onSidePanelViewChange,
+  onToggleDeliverables,
 }: ThreadLayoutProps) {
   const isActuallyMobile = useIsMobile();
 
@@ -202,6 +208,8 @@ export const ThreadLayout = memo(function ThreadLayout({
                 compact={true}
                 streamingText={streamingToolArgsJson}
                 sandboxId={sandboxId}
+                initialView={sidePanelView}
+                onViewChange={onSidePanelViewChange}
               />
             </div>
           )}
@@ -234,6 +242,7 @@ export const ThreadLayout = memo(function ThreadLayout({
             projectId={projectId}
             onViewFiles={onViewFiles}
             onToggleSidePanel={onToggleSidePanel}
+            onToggleDeliverables={onToggleDeliverables}
             onProjectRenamed={onProjectRenamed}
             isMobileView={isMobile}
             variant={variant}
@@ -269,6 +278,8 @@ export const ThreadLayout = memo(function ThreadLayout({
           disableInitialAnimation={disableInitialAnimation}
           streamingText={streamingToolArgsJson}
           sandboxId={sandboxId}
+          initialView={sidePanelView}
+          onViewChange={onSidePanelViewChange}
         />
 
         {sandboxId && (
@@ -327,6 +338,7 @@ export const ThreadLayout = memo(function ThreadLayout({
             projectId={projectId}
             onViewFiles={onViewFiles}
             onToggleSidePanel={onToggleSidePanel}
+            onToggleDeliverables={onToggleDeliverables}
             onProjectRenamed={onProjectRenamed}
             isMobileView={isMobile}
             variant={variant}
@@ -398,6 +410,8 @@ export const ThreadLayout = memo(function ThreadLayout({
               disableInitialAnimation={disableInitialAnimation}
               streamingText={streamingToolArgsJson}
               sandboxId={sandboxId}
+              initialView={sidePanelView}
+              onViewChange={onSidePanelViewChange}
             />
           )}
         </ResizablePanel>

@@ -94,6 +94,10 @@ class Configuration:
     DISABLE_PRESENCE: bool = False  # Disable presence tracking entirely
     # ==================================
     
+    # ===== STORAGE SNAPSHOT CONFIGURATION =====
+    TALOS_STORAGE_SNAPSHOTS_ENABLED: bool = True  # Enable automatic file snapshots to Supabase Storage
+    # ==========================================
+    
     SYSTEM_ADMIN_USER_ID: Optional[str] = None  # User ID that owns shared/fallback agents
 
     # Subscription tier IDs - Production

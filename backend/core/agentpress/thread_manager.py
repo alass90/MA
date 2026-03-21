@@ -26,7 +26,7 @@ ToolChoice = Literal["auto", "required", "none"]
 class ThreadManager:
     """Manages conversation threads with LLM models and tool execution."""
 
-    def __init__(self, trace: Optional[StatefulTraceClient] = None, agent_config: Optional[dict] = None):
+    def __init__(self, trace: Optional[StatefulTraceClient] = None, agent_config: Optional[dict] = None, project_id: Optional[str] = None):
         self.db = DBConnection()
         self.tool_registry = ToolRegistry()
         
@@ -35,11 +35,13 @@ class ThreadManager:
             self.trace = langfuse.trace(name="anonymous:thread_manager")
             
         self.agent_config = agent_config
+        self.project_id = project_id
         self.response_processor = ResponseProcessor(
             tool_registry=self.tool_registry,
             add_message_callback=self.add_message,
             trace=self.trace,
-            agent_config=self.agent_config
+            agent_config=self.agent_config,
+            project_id=self.project_id
         )
 
     def add_tool(self, tool_class: Type[Tool], function_names: Optional[List[str]] = None, **kwargs):

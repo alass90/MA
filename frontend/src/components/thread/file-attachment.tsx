@@ -23,6 +23,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { Project } from '@/lib/api/threads';
 import { PresentationSlidePreview } from '@/components/thread/tool-views/presentation-tools/PresentationSlidePreview';
 import { usePresentationViewerStore } from '@/stores/presentation-viewer-store';
+import { useFileSnapshot } from '@/hooks/use-file-snapshot';
 
 // Define basic file types
 export type FileType =
@@ -194,6 +195,8 @@ interface FileAttachmentProps {
     isSingleItemGrid?: boolean; // New prop to detect single item in grid
     standalone?: boolean; // New prop for minimal standalone styling
     alignRight?: boolean; // New prop to control right alignment
+    storageUrl?: string; // Optional direct Supabase Storage URL
+    supabasePath?: string; // Unique path in Supabase for refreshment
 }
 
 // Cache fetched content between mounts to avoid duplicate fetches
@@ -213,7 +216,9 @@ export function FileAttachment({
     project,
     isSingleItemGrid = false,
     standalone = false,
-    alignRight = false
+    alignRight = false,
+    storageUrl,
+    supabasePath
 }: FileAttachmentProps) {
     // Authentication 
     const { session } = useAuth();
@@ -228,11 +233,14 @@ export function FileAttachment({
     const [xlsxSheetIndex, setXlsxSheetIndex] = React.useState(0);
     const [xlsxSheetNames, setXlsxSheetNames] = React.useState<string[]>([]);
 
+    // Handle signed URL refreshment for snapshots
+    const { url: currentUrl, handleLoadError } = useFileSnapshot(storageUrl, supabasePath);
+
     // Basic file info
     const filename = filepath.split('/').pop() || 'file';
     const extension = filename.split('.').pop()?.toLowerCase() || '';
     const fileType = getFileType(filename);
-    const fileUrl = localPreviewUrl || (sandboxId ? getFileUrl(sandboxId, filepath) : filepath);
+    const fileUrl = currentUrl || localPreviewUrl || (sandboxId ? getFileUrl(sandboxId, filepath) : filepath);
     const typeLabel = getTypeLabel(fileType, extension);
     const fileSize = getFileSize(filepath, fileType);
     const IconComponent = getFileIcon(fileType);
@@ -251,7 +259,8 @@ export function FileAttachment({
     // Use the React Query hook to fetch file content
     // For CSV files, always try to load content for better preview experience
     // For XLSX files, we need binary data which is handled by useImageContent
-    const shouldLoadContent = (isHtmlOrMd || isCsv) && (shouldShowPreview || isCsv);
+    // If storageUrl is provided, we can skip loading content from sandbox for HTML/MD/CSV
+    const shouldLoadContent = !currentUrl && (isHtmlOrMd || isCsv) && (shouldShowPreview || isCsv);
     const {
         data: fileContent,
         isLoading: fileContentLoading,
@@ -269,8 +278,8 @@ export function FileAttachment({
         error: imageError,
         failureCount: imageRetryAttempt
     } = useImageContent(
-        isImage && showPreview && sandboxId ? sandboxId : undefined,
-        isImage && showPreview ? filepath : undefined
+        !currentUrl && isImage && showPreview && sandboxId ? sandboxId : undefined,
+        !currentUrl && isImage && showPreview ? filepath : undefined
     );
 
     // For PDFs we also fetch blob URL via the same binary hook used for images
@@ -279,8 +288,8 @@ export function FileAttachment({
         isLoading: pdfLoading,
         error: pdfError
     } = useImageContent(
-        isPdf && shouldShowPreview && sandboxId ? sandboxId : undefined,
-        isPdf && shouldShowPreview ? filepath : undefined
+        !currentUrl && isPdf && shouldShowPreview && sandboxId ? sandboxId : undefined,
+        !currentUrl && isPdf && shouldShowPreview ? filepath : undefined
     );
 
     // For XLSX files we fetch binary data and convert to base64
@@ -289,8 +298,8 @@ export function FileAttachment({
         isLoading: xlsxLoading,
         error: xlsxError
     } = useImageContent(
-        isXlsx && shouldShowPreview && sandboxId ? sandboxId : undefined,
-        isXlsx && shouldShowPreview ? filepath : undefined
+        !currentUrl && isXlsx && shouldShowPreview && sandboxId ? sandboxId : undefined,
+        !currentUrl && isXlsx && shouldShowPreview ? filepath : undefined
     );
 
     // Helper function to check if error is due to deleted sandbox
@@ -367,6 +376,12 @@ export function FileAttachment({
         e.stopPropagation(); // Prevent triggering the main click handler
 
         try {
+            if (currentUrl) {
+                // If we have a direct storage URL, use it
+                window.open(currentUrl, '_blank');
+                return;
+            }
+
             if (!sandboxId || !session?.access_token) {
                 // Fallback: open file URL in new tab
                 window.open(fileUrl, '_blank');
@@ -534,7 +549,7 @@ export function FileAttachment({
                 )}
                 
                 <img
-                    src={sandboxId && session?.access_token ? imageUrl : (fileUrl || '')}
+                    src={currentUrl || (sandboxId && session?.access_token ? imageUrl : (fileUrl || ''))}
                     alt={filename}
                     className={cn(
                         // Preserve natural aspect ratio - let image dictate dimensions
@@ -590,6 +605,10 @@ export function FileAttachment({
 
                         setHasError(true);
                         setImageLoaded(true); // Consider it "loaded" even on error
+                        
+                        // Try signed URL refresh on error
+                        handleLoadError();
+
                         // If the image failed to load and we have a localPreviewUrl that's a blob URL, try using it directly
                         if (localPreviewUrl && typeof localPreviewUrl === 'string' && localPreviewUrl.startsWith('blob:')) {
                             (e.target as HTMLImageElement).src = localPreviewUrl;
@@ -653,7 +672,7 @@ export function FileAttachment({
                     {!hasError && !isSandboxDeleted && (
                         <>
                             {isPdf && (() => {
-                                const pdfUrlForRender = localPreviewUrl || (sandboxId ? (pdfBlobUrl ?? null) : fileUrl);
+                                const pdfUrlForRender = currentUrl || localPreviewUrl || (sandboxId ? (pdfBlobUrl ?? null) : fileUrl);
                                 return pdfUrlForRender ? (
                                     <PdfPreviewRenderer
                                         url={pdfUrlForRender}
@@ -662,7 +681,7 @@ export function FileAttachment({
                                 ) : null;
                             })()}
                             {isXlsx && (() => {
-                                const xlsxUrlForRender = localPreviewUrl || (sandboxId ? (xlsxBlobUrl ?? null) : fileUrl);
+                                const xlsxUrlForRender = currentUrl || localPreviewUrl || (sandboxId ? (xlsxBlobUrl ?? null) : fileUrl);
                                 return xlsxUrlForRender ? (
                                     <XlsxRenderer
                                         content={xlsxUrlForRender}
@@ -675,7 +694,7 @@ export function FileAttachment({
                             {!isPdf && !isXlsx && fileContent && Renderer && (
                                 <Renderer
                                     content={fileContent}
-                                    previewUrl={fileUrl}
+                                    previewUrl={currentUrl || fileUrl} // Use currentUrl here
                                     className="h-full w-full"
                                     project={project}
                                 />
@@ -699,7 +718,7 @@ export function FileAttachment({
                         <div className="h-full w-full flex flex-col items-center justify-center p-4">
                             <div className="text-red-500 mb-2">Error loading content</div>
                             <div className="text-muted-foreground text-sm text-center mb-2">
-                                {fileUrl && (
+                                {filepath && ( // Changed fileUrl to filepath
                                     <div className="text-xs max-w-full overflow-hidden truncate opacity-70">
                                         Path may need /workspace prefix
                                     </div>
@@ -719,6 +738,13 @@ export function FileAttachment({
                                 >
                                     <ExternalLink size={14} />
                                     Open in viewer
+                                </button>
+                                <button
+                                    onClick={refreshUrl} // Added refresh button
+                                    className="px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-md text-sm flex items-center gap-1"
+                                >
+                                    <Loader2 size={14} />
+                                    Retry
                                 </button>
                             </div>
                         </div>
@@ -799,7 +825,7 @@ export function FileAttachment({
                         >
                             <Download size={14} />
                         </button> */}
-                        {onClick && (
+                        {onFileClick && ( // Changed onClick to onFileClick
                             <button
                                 onClick={handleClick}
                                 className="cursor-pointer p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10"
@@ -825,7 +851,7 @@ export function FileAttachment({
         <div
             className={cn(
                 "group flex items-center rounded-xl transition-all duration-200 overflow-hidden cursor-not-allowed",
-                "border border-border/50",
+                "border border-muted-foreground/50",
                 "bg-muted/30 opacity-50",
                 "text-left",
                 "h-[54px] w-fit min-w-[200px] max-w-[300px]",
@@ -908,6 +934,8 @@ interface FileAttachmentGridProps {
     project?: Project;
     standalone?: boolean;
     alignRight?: boolean;
+    storageUrls?: Record<string, string>; // Mapping of filepath to storageUrl
+    supabasePaths?: Record<string, string>; // Mapping of filepath to supabasePath
 }
 
 export function FileAttachmentGrid({
@@ -919,7 +947,9 @@ export function FileAttachmentGrid({
     collapsed = false,
     project,
     standalone = false,
-    alignRight = false
+    alignRight = false,
+    storageUrls,
+    supabasePaths
 }: FileAttachmentGridProps) {
     if (!attachments || attachments.length === 0) return null;
 
@@ -952,6 +982,8 @@ export function FileAttachmentGrid({
             project={project}
             standalone={standalone}
             alignRight={alignRight}
+            storageUrls={storageUrls}
+            supabasePaths={supabasePaths} // Added supabasePaths prop
         />
     );
 

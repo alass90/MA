@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button"
-import { FolderOpen, Upload, Monitor, Copy, Check, Layout } from "lucide-react"
+import { FolderOpen, Upload, Monitor, Copy, Check, Layout, Package } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { toast } from "sonner"
 import {
@@ -28,6 +28,7 @@ interface ThreadSiteHeaderProps {
   projectName: string;
   onViewFiles: () => void;
   onToggleSidePanel: () => void;
+  onToggleDeliverables?: () => void;
   onProjectRenamed?: (newName: string) => void;
   isMobileView?: boolean;
   variant?: 'default' | 'shared';
@@ -39,6 +40,7 @@ export function SiteHeader({
   projectName,
   onViewFiles,
   onToggleSidePanel,
+  onToggleDeliverables,
   onProjectRenamed,
   isMobileView,
   variant = 'default',
@@ -237,6 +239,22 @@ export function SiteHeader({
               </TooltipTrigger>
               <TooltipContent side={isMobile ? "bottom" : "bottom"}>
                 <p>Open Preview Workspace</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onToggleDeliverables}
+                  className="h-9 w-9 cursor-pointer"
+                >
+                  <Package className={cn("h-4 w-4", onToggleDeliverables ? "text-primary" : "")} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side={isMobile ? "bottom" : "bottom"}>
+                <p>View Generated Files (Deliverables)</p>
               </TooltipContent>
             </Tooltip>
 

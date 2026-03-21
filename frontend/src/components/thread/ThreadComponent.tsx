@@ -111,6 +111,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
 
   const agents = isShared ? [] : (agentsQuery?.data?.agents || []);
   const [isSidePanelAnimating, setIsSidePanelAnimating] = useState(false);
+  const [sidePanelView, setSidePanelView] = useState<'tools' | 'browser' | 'preview' | 'deliverables'>('tools');
   const [userInitiatedRun, setUserInitiatedRun] = useState(false);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const [showAgentLimitDialog, setShowAgentLimitDialog] = useState(false);
@@ -179,6 +180,17 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
     userClosedPanelRef.current = true;
     setAutoOpenedPanel(true);
   }, [setIsSidePanelOpen, setAutoOpenedPanel]);
+
+  const handleToggleDeliverables = useCallback(() => {
+    if (isSidePanelOpen && sidePanelView === 'deliverables') {
+      setIsSidePanelOpen(false);
+      userClosedPanelRef.current = true;
+    } else {
+      setSidePanelView('deliverables');
+      setIsSidePanelOpen(true);
+      userClosedPanelRef.current = false;
+    }
+  }, [isSidePanelOpen, sidePanelView, setIsSidePanelOpen]);
 
   // Billing hooks - always call unconditionally, but disable for unauthenticated/shared
   const billingModal = useBillingModal();
@@ -1043,6 +1055,9 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           previewFramework={deployment?.framework}
           previewProjectName={deployment?.projectName}
           onClosePreview={closePanel}
+          sidePanelView={sidePanelView}
+          onSidePanelViewChange={setSidePanelView}
+          onToggleDeliverables={handleToggleDeliverables}
         >
           {/* Thread Content - Scrollable */}
           <div
@@ -1248,6 +1263,9 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         previewFramework={deployment?.framework}
         previewProjectName={deployment?.projectName}
         onClosePreview={closePanel}
+        sidePanelView={sidePanelView}
+        onSidePanelViewChange={setSidePanelView}
+        onToggleDeliverables={handleToggleDeliverables}
       >
         <ThreadContent
           messages={isShared ? playback.playbackState.visibleMessages : messages}

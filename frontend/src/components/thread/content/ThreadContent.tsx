@@ -37,7 +37,7 @@ const PROMPT_SAMPLES_CONFIG = {
 } as const;
 
 // Helper function to render attachments (keeping original implementation for now)
-export function renderAttachments(attachments: string[], fileViewerHandler?: (filePath?: string, filePathList?: string[]) => void, sandboxId?: string, project?: Project) {
+export function renderAttachments(attachments: string[], fileViewerHandler?: (filePath?: string, filePathList?: string[]) => void, sandboxId?: string, project?: Project, storageUrls?: Record<string, string>, supabasePaths?: Record<string, string>) {
     if (!attachments || attachments.length === 0) return null;
 
     // Filter out empty strings and check if we have any valid attachments
@@ -50,6 +50,8 @@ export function renderAttachments(attachments: string[], fileViewerHandler?: (fi
         showPreviews={true}
         sandboxId={sandboxId}
         project={project}
+        storageUrls={storageUrls}
+        supabasePaths={supabasePaths}
     />;
 }
 
@@ -481,12 +483,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                             <div key={group.key} ref={groupIndex === groupedMessages.length - 1 ? latestMessageRef : null}>
                                                 <div className="flex flex-col gap-2">
                                                     <div className="flex items-center">
-                                                        <div className="rounded-md flex items-center justify-center relative">
-                                                            {getAgentInfo().avatar}
-                                                        </div>
-                                                        <p className='ml-2 text-sm text-muted-foreground'>
-                                                            {getAgentInfo().name}
-                                                        </p>
+                                                        <KortixLogo variant="logomark" size={20} className="mb-1" />
                                                     </div>
 
                                                     {/* Message content - ALL messages in the group */}
@@ -502,6 +499,22 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                                                             toolResultsMap.set(assistantId, []);
                                                                         }
                                                                         toolResultsMap.get(assistantId)?.push(msg);
+                                                                    }
+                                                                });
+
+                                                                // Collect all storage URLs from tool results in this group
+                                                                const storageUrlMap: Record<string, string> = {};
+                                                                const supabasePathMap: Record<string, string> = {};
+                                                                group.messages.forEach(msg => {
+                                                                    if (msg.type === 'tool') {
+                                                                        const meta = safeJsonParse<any>(msg.metadata, {});
+                                                                        if (meta.storage_url && (meta.snapshot_path || meta.supabase_path)) {
+                                                                            const key = meta.snapshot_path || meta.supabase_path;
+                                                                            storageUrlMap[key] = meta.storage_url;
+                                                                            if (meta.supabase_path) {
+                                                                                supabasePathMap[key] = meta.supabase_path;
+                                                                            }
+                                                                        }
                                                                     }
                                                                 });
 
@@ -535,6 +548,8 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                                                             t,
                                                                             threadId,
                                                                             onPromptFill,
+                                                                            storageUrls: storageUrlMap,
+                                                                            supabasePaths: supabasePathMap,
                                                                         });
                                                                         
                                                                         // Skip if no content rendered
@@ -881,12 +896,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                         <div className="flex flex-col gap-2">
                                             {/* Logo positioned above the loader */}
                                             <div className="flex items-center">
-                                                <div className="rounded-md flex items-center justify-center">
-                                                    {getAgentInfo().avatar}
-                                                </div>
-                                                <p className='ml-2 text-sm text-muted-foreground'>
-                                                    {getAgentInfo().name}
-                                                </p>
+                                                <KortixLogo variant="logomark" size={20} className="mb-1" />
                                             </div>
 
                                             {/* Loader content */}
@@ -901,12 +911,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                     <div className="flex flex-col gap-2">
                                         {/* Logo positioned above the tool call */}
                                         <div className="flex justify-start">
-                                            <div className="rounded-md flex items-center justify-center">
-                                                {getAgentInfo().avatar}
-                                            </div>
-                                            <p className='ml-2 text-sm text-muted-foreground'>
-                                                {getAgentInfo().name}
-                                            </p>
+                                            <KortixLogo variant="logomark" size={20} className="mb-1" />
                                         </div>
 
                                         {/* Tool call content */}
@@ -928,12 +933,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                     <div className="flex flex-col gap-2">
                                         {/* Logo positioned above the streaming indicator */}
                                         <div className="flex justify-start">
-                                            <div className="rounded-md flex items-center justify-center">
-                                                {getAgentInfo().avatar}
-                                            </div>
-                                            <p className='ml-2 text-sm text-muted-foreground'>
-                                                {getAgentInfo().name}
-                                            </p>
+                                            <KortixLogo variant="logomark" size={20} className="mb-1" />
                                         </div>
 
                                         {/* Streaming indicator content */}

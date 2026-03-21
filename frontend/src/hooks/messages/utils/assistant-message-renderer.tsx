@@ -25,6 +25,8 @@ export interface AssistantMessageRendererProps {
   t?: (key: string) => string;
   threadId?: string;
   onPromptFill?: (message: string) => void;
+  storageUrls?: Record<string, string>;
+  supabasePaths?: Record<string, string>;
 }
 
 /**
@@ -81,7 +83,7 @@ function renderAskToolCall(
   index: number,
   props: AssistantMessageRendererProps
 ): React.ReactNode {
-  const { onFileClick, sandboxId, project, isLatestMessage, t, onPromptFill } = props;
+  const { onFileClick, sandboxId, project, isLatestMessage, t, onPromptFill, storageUrls, supabasePaths } = props;
   const askText = toolCall.arguments?.text || '';
   const attachments = normalizeAttachments(toolCall.arguments?.attachments);
   const followUpAnswers = normalizeArrayValue(toolCall.arguments?.follow_up_answers);
@@ -92,7 +94,7 @@ function renderAskToolCall(
         content={askText} 
         className="text-sm prose prose-sm dark:prose-invert chat-markdown max-w-none break-words [&>:first-child]:mt-0 prose-headings:mt-3" 
       />
-      {renderAttachments(attachments, onFileClick, sandboxId, project)}
+      {renderAttachments(attachments, onFileClick, sandboxId, project, storageUrls, supabasePaths)}
       {isLatestMessage && (
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-orange-500 flex-shrink-0" />
@@ -122,7 +124,7 @@ function renderCompleteToolCall(
   index: number,
   props: AssistantMessageRendererProps
 ): React.ReactNode {
-  const { onFileClick, sandboxId, project, isLatestMessage, t, onPromptFill, threadId, message } = props;
+  const { onFileClick, sandboxId, project, isLatestMessage, t, onPromptFill, threadId, message, storageUrls, supabasePaths } = props;
   const completeText = toolCall.arguments?.text || '';
   const attachments = normalizeAttachments(toolCall.arguments?.attachments);
   const followUpPrompts = normalizeArrayValue(toolCall.arguments?.follow_up_prompts);
@@ -133,7 +135,7 @@ function renderCompleteToolCall(
         content={completeText} 
         className="text-sm prose prose-sm dark:prose-invert chat-markdown max-w-none break-words [&>:first-child]:mt-0 prose-headings:mt-3" 
       />
-      {renderAttachments(attachments, onFileClick, sandboxId, project)}
+      {renderAttachments(attachments, onFileClick, sandboxId, project, storageUrls, supabasePaths)}
       <TaskCompletedFeedback
         taskSummary={completeText}
         followUpPrompts={isLatestMessage && followUpPrompts.length > 0 ? followUpPrompts : undefined}

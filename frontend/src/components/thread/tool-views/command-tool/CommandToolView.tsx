@@ -133,6 +133,12 @@ export function CommandToolView({
       processedOutput = String(output);
     }
 
+    // Strip ANSI escape codes
+    processedOutput = processedOutput.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+    
+    // Strip other non-printable control characters, but keep newlines and tabs
+    processedOutput = processedOutput.replace(/[\x00-\x08\x0B-\x1F\x7F-\x9F]/g, '');
+
     processedOutput = processedOutput.replace(/\\\\/g, '\\');
     processedOutput = processedOutput
       .replace(/\\n/g, '\n')
@@ -162,46 +168,12 @@ export function CommandToolView({
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-transparent">
-      <div className="flex items-center justify-between px-4 py-2 border-b bg-zinc-50/50 dark:bg-zinc-900/50">
-        <div className="flex items-center gap-2">
-          {!isStreaming && (
-            <Badge
-              variant="secondary"
-              className={cn(
-                "text-[10px] h-4 px-1 leading-none border-none",
-                actualIsSuccess
-                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                  : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
-              )}
-            >
-              {actualIsSuccess ? (
-                <CheckCircle className="h-3 w-3 mr-1" />
-              ) : (
-                <AlertTriangle className="h-3 w-3 mr-1" />
-              )}
-              {actualIsSuccess ? 'Completed' : 'Failed'}
-            </Badge>
-          )}
-
-          {isStreaming && (
-            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-              <Loader2 className="h-3 w-3 animate-spin text-blue-600 dark:text-blue-400" />
-              <span className="text-[10px] font-medium text-blue-700 dark:text-blue-300">
-                {name === 'check-command-output' ? 'Checking output' : 'Executing command'}
-              </span>
-            </div>
-          )}
-        </div>
-        <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-          {toolTitle}
-        </div>
-      </div>
 
       <div className="p-0 h-full flex-1 overflow-hidden relative">
         {isStreaming ? (
           <div className="h-full flex flex-col overflow-hidden">
             <div className="flex-1 overflow-hidden p-4">
-              <div className="h-full bg-zinc-50 dark:bg-[#1a1a1b] rounded-xl border border-black/10 dark:border-white/5 overflow-hidden flex flex-col relative group">
+              <div className="h-full bg-zinc-50 dark:bg-[#1a1a1b] rounded-xl overflow-hidden flex flex-col relative group">
                 <div className="flex-1 overflow-hidden">
                   <ScrollArea className="h-full">
                     <div className="p-4 font-mono text-[13px] leading-relaxed">
@@ -227,7 +199,7 @@ export function CommandToolView({
           </div>
         ) : displayText ? (
           <div className="h-full flex flex-col overflow-hidden p-4">
-            <div className="flex-1 bg-white dark:bg-[#1a1a1b] rounded-xl border border-black/10 dark:border-white/10 shadow-sm dark:shadow-lg overflow-hidden flex flex-col relative group font-sans">
+            <div className="flex-1 bg-white dark:bg-[#1a1a1b] rounded-xl overflow-hidden flex flex-col relative group font-sans">
               {/* Terminal Header/Controls */}
               <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                 <button
@@ -291,35 +263,11 @@ export function CommandToolView({
             <h3 className="text-xl font-semibold mb-2 text-zinc-900 dark:text-zinc-100">
               {name === 'check-command-output' ? 'No Session Found' : 'No Command Found'}
             </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center max-w-md">
-              {name === 'check-command-output'
-                ? 'No session name was detected. Please provide a valid session name to check.'
-                : 'No command was detected. Please provide a valid command to execute.'
-              }
-            </p>
+            {/* Removed contextText for minimal design */}
           </div>
         )}
       </div>
 
-      <div className="px-4 py-2 h-10 bg-gradient-to-r from-zinc-50/90 to-zinc-100/90 dark:from-zinc-900/90 dark:to-zinc-800/90 backdrop-blur-sm border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center gap-4">
-        <div className="h-full flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
-          {!isStreaming && displayText && (
-            <Badge variant="outline" className="h-6 py-0.5 bg-zinc-50 dark:bg-zinc-900">
-              <Terminal className="h-3 w-3 mr-1" />
-              {displayLabel}
-            </Badge>
-          )}
-        </div>
-
-        <div className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
-          <Clock className="h-3.5 w-3.5" />
-          {actualToolTimestamp && !isStreaming
-            ? formatTimestamp(actualToolTimestamp)
-            : actualAssistantTimestamp
-              ? formatTimestamp(actualAssistantTimestamp)
-              : ''}
-        </div>
-      </div>
     </div>
   );
 }

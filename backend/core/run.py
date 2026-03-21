@@ -597,7 +597,8 @@ class AgentRunner:
         tm_start = time.time()
         self.thread_manager = ThreadManager(
             trace=self.config.trace, 
-            agent_config=self.config.agent_config
+            agent_config=self.config.agent_config,
+            project_id=self.config.project_id
         )
         logger.debug(f"⏱️ [TIMING] ThreadManager init: {(time.time() - tm_start) * 1000:.1f}ms")
         

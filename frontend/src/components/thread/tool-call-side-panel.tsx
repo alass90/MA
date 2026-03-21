@@ -6,7 +6,7 @@ import React, { memo, useMemo, useCallback, useState, useEffect, useRef } from '
 import { Slider } from '@/components/ui/slider';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApiMessageType } from '@/components/thread/types';
-import { CircleDashed, X, ChevronLeft, ChevronRight, Computer, Minimize2, Globe, Wrench, CheckCircle } from 'lucide-react';
+import { CircleDashed, X, ChevronLeft, ChevronRight, Computer, Minimize2, Globe, Wrench, CheckCircle, Package } from 'lucide-react';
 import { useIsMobile } from '@/hooks/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +23,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer';
 import { useDocumentModalStore } from '@/stores/use-document-modal-store';
+import { DeliverablesView } from './deliverables-view';
 
 // ============================================================================
 // Types & Interfaces
@@ -67,6 +68,8 @@ interface ToolCallSidePanelProps {
   compact?: boolean;
   streamingText?: string; // Live streaming content from assistant message
   sandboxId?: string | null;
+  initialView?: ViewType;
+  onViewChange?: (view: ViewType) => void;
 }
 
 interface ToolCallSnapshot {
@@ -77,7 +80,7 @@ interface ToolCallSnapshot {
 }
 
 type NavigationMode = 'live' | 'manual';
-type ViewType = 'tools' | 'browser' | 'preview';
+type ViewType = 'tools' | 'browser' | 'preview' | 'deliverables';
 
 // ============================================================================
 // Constants
@@ -102,7 +105,7 @@ const ViewToggle = memo(function ViewToggle({ currentView, onViewChange }: ViewT
         className="absolute h-7 w-7 bg-white rounded-xl shadow-sm"
         initial={false}
         animate={{
-          x: currentView === 'tools' ? 0 : 32,
+          x: currentView === 'tools' ? 0 : currentView === 'browser' ? 32 : 64,
         }}
         transition={{
           type: "spring",
@@ -133,6 +136,18 @@ const ViewToggle = memo(function ViewToggle({ currentView, onViewChange }: ViewT
         title="Switch to Browser View"
       >
         <Globe className="h-3.5 w-3.5" />
+      </Button>
+
+      <Button
+        size="sm"
+        onClick={() => onViewChange('deliverables')}
+        className={`relative z-10 h-7 w-7 p-0 rounded-xl bg-transparent hover:bg-transparent shadow-none ${currentView === 'deliverables'
+          ? 'text-black'
+          : 'text-gray-500 dark:text-gray-400'
+          }`}
+        title="Switch to Deliverables View"
+      >
+        <Package className="h-3.5 w-3.5" />
       </Button>
     </div>
   );
@@ -455,8 +470,8 @@ const LoadingState = memo(function LoadingState({ agentName, onClose, isMobile }
       />
 
       <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4">
-        <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] border border-black/[0.08] dark:border-white/[0.08] shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] overflow-hidden p-6 space-y-6">
-          <div className="h-9 w-full bg-[#f8f8f7] dark:bg-[#1a1a1b] rounded-t-[22px] -mt-6 -mx-6 border-b border-black/[0.08] dark:border-white/[0.08] flex items-center px-6">
+        <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] overflow-hidden p-6 space-y-6">
+          <div className="h-9 flex items-center px-6 bg-[#f8f8f7] dark:bg-[#1a1a1b] rounded-t-[22px] -mt-6 -mx-6 flex items-center">
             <Skeleton className="h-3 w-32" />
           </div>
           
@@ -527,6 +542,8 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
   compact = false,
   streamingText,
   sandboxId,
+  initialView,
+  onViewChange,
 }: ToolCallSidePanelProps) {
   const t = useTranslations('thread');
   const [dots, setDots] = useState('');
@@ -534,7 +551,7 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
   const [navigationMode, setNavigationMode] = useState<NavigationMode>('live');
   const [toolCallSnapshots, setToolCallSnapshots] = useState<ToolCallSnapshot[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [currentView, setCurrentView] = useState<ViewType>('tools');
+  const [currentView, setCurrentView] = useState<ViewType>(initialView || 'tools');
   const currentViewRef = useRef(currentView);
   const [vncRefreshKey, setVncRefreshKey] = useState(0);
 
@@ -542,10 +559,19 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
   const { isOpen: isDocumentModalOpen } = useDocumentModalStore();
   const sandbox = project?.sandbox;
 
-  // Update ref when state changes
   useEffect(() => {
     currentViewRef.current = currentView;
-  }, [currentView]);
+    if (onViewChange) {
+      onViewChange(currentView);
+    }
+  }, [currentView, onViewChange]);
+
+  // Sync with initialView prop when it changes externally
+  useEffect(() => {
+    if (initialView && initialView !== currentView) {
+      setCurrentView(initialView);
+    }
+  }, [initialView]);
 
   const handleVncRefresh = useCallback(() => {
     setVncRefreshKey(prev => prev + 1);
@@ -959,8 +985,8 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
             )}
             
             <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4">
-              <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] border border-black/[0.08] dark:border-white/[0.08] shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col">
-                <div className="h-9 flex items-center justify-center px-4 bg-[#f8f8f7] dark:bg-[#1a1a1b] border-b border-black/[0.08] dark:border-white/[0.08] rounded-t-[22px] shadow-[inset_0px_1px_0px_0px_#FFFFFF] dark:shadow-[inset_0px_1px_0px_0px_#FFFFFF10]">
+              <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] overflow-hidden flex flex-col">
+                <div className="h-9 flex items-center justify-center px-4 bg-[#f8f8f7] dark:bg-[#1a1a1b] rounded-t-[22px] shadow-[inset_0px_1px_0px_0px_#FFFFFF] dark:shadow-[inset_0px_1px_0px_0px_#FFFFFF10]">
                   <span className="text-[13px] font-medium text-zinc-400 dark:text-zinc-500 truncate max-w-[300px]">
                     {userFriendlyName}
                   </span>
@@ -1070,7 +1096,7 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
       ? `Talos is using ${userFriendlyName} | Executing...`
       : `Talos is using ${userFriendlyName} | Ready`;
     const capsuleHeader = (
-      <div className="h-9 flex items-center justify-center px-4 bg-[#f8f8f7] dark:bg-[#1a1a1b] border-b border-black/[0.08] dark:border-white/[0.08] rounded-t-[22px] shadow-[inset_0px_1px_0px_0px_#FFFFFF] dark:shadow-[inset_0px_1px_0px_0px_#FFFFFF10]">
+      <div className="h-9 flex items-center justify-center px-4 bg-[#f8f8f7] dark:bg-[#1a1a1b] rounded-t-[22px] shadow-[inset_0px_1px_0px_0px_#FFFFFF] dark:shadow-[inset_0px_1px_0px_0px_#FFFFFF10]">
         <span className="text-[13px] font-medium text-zinc-400 dark:text-zinc-500 truncate max-w-[300px]">
           {contextText}
         </span>
@@ -1090,7 +1116,7 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
         )}
 
         <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4">
-          <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] border border-black/[0.08] dark:border-white/[0.08] shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col">
+          <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] overflow-hidden flex flex-col">
             {capsuleHeader}
             <div className="flex-1 overflow-hidden flex flex-col">
             {persistentVncIframe && (
@@ -1125,6 +1151,14 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
             )}
 
             {currentView === 'tools' && toolView}
+            {currentView === 'deliverables' && (
+              <DeliverablesView
+                messages={messages || []}
+                project={project}
+                onFileClick={onFileClick}
+                sandboxId={sandboxId}
+              />
+            )}
             </div>
           </div>
         </div>
