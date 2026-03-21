@@ -57,6 +57,7 @@ import { backendApi } from '@/lib/api-client';
 import { WebsitePreviewPanel } from '@/components/thread/website-preview-panel';
 import { usePreviewPanelStore } from '@/stores/use-preview-panel-store';
 import { usePresentationPanelStore } from '@/stores/use-presentation-panel-store';
+import { ThreadFilesOverlay } from './thread-files-overlay';
 import { usePresentationDetector } from '@/hooks/use-presentation-detector';
 import { TalosSlidesPanel } from '@/components/artifacts/TalosSlidesPanel';
 import { useDeploymentDetector } from '@/hooks/use-deployment-detector';
@@ -111,10 +112,12 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
 
   const agents = isShared ? [] : (agentsQuery?.data?.agents || []);
   const [isSidePanelAnimating, setIsSidePanelAnimating] = useState(false);
-  const [sidePanelView, setSidePanelView] = useState<'tools' | 'browser' | 'preview' | 'deliverables'>('tools');
+  const [sidePanelView, setSidePanelView] = useState<'tools' | 'browser'>('tools');
+  const [isFilesOverlayOpen, setIsFilesOverlayOpen] = useState(false);
   const [userInitiatedRun, setUserInitiatedRun] = useState(false);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const [showAgentLimitDialog, setShowAgentLimitDialog] = useState(false);
+  const [isFileViewerPanelOpen, setIsFileViewerPanelOpen] = useState(false);
   const [agentLimitData, setAgentLimitData] = useState<{
     runningCount: number;
     runningThreadIds: string[];
@@ -181,16 +184,9 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
     setAutoOpenedPanel(true);
   }, [setIsSidePanelOpen, setAutoOpenedPanel]);
 
-  const handleToggleDeliverables = useCallback(() => {
-    if (isSidePanelOpen && sidePanelView === 'deliverables') {
-      setIsSidePanelOpen(false);
-      userClosedPanelRef.current = true;
-    } else {
-      setSidePanelView('deliverables');
-      setIsSidePanelOpen(true);
-      userClosedPanelRef.current = false;
-    }
-  }, [isSidePanelOpen, sidePanelView, setIsSidePanelOpen]);
+  const handleToggleFilesOverlay = useCallback(() => {
+    setIsFilesOverlayOpen(prev => !prev);
+  }, []);
 
   // Billing hooks - always call unconditionally, but disable for unauthenticated/shared
   const billingModal = useBillingModal();
@@ -676,7 +672,6 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
   const handleOpenFileViewer = useCallback(
     (filePath?: string, filePathList?: string[]) => {
       // Invalidate project query to ensure fresh data when opening modal
-      // The modal's refetchOnMount will handle the actual refetch
       if (projectId) {
         queryClient.invalidateQueries({
           queryKey: threadKeys.project(projectId),
@@ -686,9 +681,12 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
 
       setFileToView(filePath || null);
       setFilePathList(filePathList);
-      setFileViewerOpen(true);
+      
+      // Open as panel instead of modal for PDF/DOCX or by default in sidebar
+      setIsFileViewerPanelOpen(true);
+      setIsSidePanelOpen(true); // Ensure side panel area is visible
     },
-    [projectId, queryClient],
+    [projectId, queryClient, setIsSidePanelOpen],
   );
 
   const toolViewAssistant = useCallback(
@@ -1055,9 +1053,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           previewFramework={deployment?.framework}
           previewProjectName={deployment?.projectName}
           onClosePreview={closePanel}
-          sidePanelView={sidePanelView}
-          onSidePanelViewChange={setSidePanelView}
-          onToggleDeliverables={handleToggleDeliverables}
+          onToggleDeliverables={handleToggleFilesOverlay}
         >
           {/* Thread Content - Scrollable */}
           <div
@@ -1176,6 +1172,13 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
             onClose={closePresentation}
           />
         )}
+
+        <ThreadFilesOverlay
+          isOpen={isFilesOverlayOpen}
+          onClose={() => setIsFilesOverlayOpen(false)}
+          messages={messages}
+          onFileClick={handleOpenFileViewer}
+        />
       </>
     );
   }
@@ -1263,9 +1266,9 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         previewFramework={deployment?.framework}
         previewProjectName={deployment?.projectName}
         onClosePreview={closePanel}
-        sidePanelView={sidePanelView}
-        onSidePanelViewChange={setSidePanelView}
-        onToggleDeliverables={handleToggleDeliverables}
+        onToggleDeliverables={handleToggleFilesOverlay}
+        isFileViewerPanelOpen={isFileViewerPanelOpen}
+        onCloseFileViewerPanel={() => setIsFileViewerPanelOpen(false)}
       >
         <ThreadContent
           messages={isShared ? playback.playbackState.visibleMessages : messages}
@@ -1319,6 +1322,13 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           projectId={projectId}
         />
       )}
+
+      <ThreadFilesOverlay
+        isOpen={isFilesOverlayOpen}
+        onClose={() => setIsFilesOverlayOpen(false)}
+        messages={messages}
+        onFileClick={handleOpenFileViewer}
+      />
     </>
   );
 }

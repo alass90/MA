@@ -4,6 +4,7 @@ import { SiteHeader } from '@/components/thread/thread-site-header';
 import { FileViewerModal } from '@/components/thread/file-viewer-modal';
 import { ToolCallSidePanel } from '@/components/thread/tool-call-side-panel';
 import { WebsitePreviewPanel } from '@/components/thread/website-preview-panel';
+import { FileViewerPanel } from '@/components/thread/FileViewerPanel';
 import { Project } from '@/lib/api/threads';
 import { ApiMessageType } from '@/components/thread/types';
 import { ToolCallInput } from '@/components/thread/tool-call-side-panel';
@@ -37,11 +38,8 @@ interface ThreadLayoutProps {
   currentToolIndex: number;
   onSidePanelNavigate: (index: number) => void;
   onSidePanelClose: () => void;
-  sidePanelView?: 'tools' | 'browser' | 'preview' | 'deliverables';
-  onSidePanelViewChange?: (view: 'tools' | 'browser' | 'preview' | 'deliverables') => void;
-  onToggleDeliverables?: () => void;
-  renderAssistantMessage: (assistantContent?: string, toolContent?: string) => React.ReactNode;
   renderToolResult: (toolContent?: string, isSuccess?: boolean) => React.ReactNode;
+  onToggleDeliverables?: () => void;
   isLoading: boolean;
   isMobile: boolean;
   initialLoadCompleted: boolean;
@@ -60,6 +58,9 @@ interface ThreadLayoutProps {
   previewFramework?: string;
   previewProjectName?: string;
   onClosePreview?: () => void;
+  // File viewer panel props
+  isFileViewerPanelOpen?: boolean;
+  onCloseFileViewerPanel?: () => void;
 }
 
 export const ThreadLayout = memo(function ThreadLayout({
@@ -103,14 +104,14 @@ export const ThreadLayout = memo(function ThreadLayout({
   previewFramework,
   previewProjectName,
   onClosePreview,
-  sidePanelView = 'tools',
-  onSidePanelViewChange,
   onToggleDeliverables,
+  isFileViewerPanelOpen,
+  onCloseFileViewerPanel,
 }: ThreadLayoutProps) {
   const isActuallyMobile = useIsMobile();
 
   // Track when panel should be visible
-  const shouldShowPanel = (isSidePanelOpen || isPreviewPanelOpen) && initialLoadCompleted;
+  const shouldShowPanel = (isSidePanelOpen || isPreviewPanelOpen || isFileViewerPanelOpen) && initialLoadCompleted;
 
   // Extract streaming tool arguments as JSON string (what FileOperationToolView expects)
   const streamingToolArgsJson = React.useMemo(() => {
@@ -142,8 +143,8 @@ export const ThreadLayout = memo(function ThreadLayout({
   // Update sizes when panel visibility changes with smooth animation
   useEffect(() => {
     if (shouldShowPanel) {
-      // Open panel smoothly - use larger size for Preview Panel
-      const targetSize = isPreviewPanelOpen ? 65 : 40;
+      // Open panel smoothly - use larger size for Preview Panel or File Viewer
+      const targetSize = (isPreviewPanelOpen || isFileViewerPanelOpen) ? 65 : 40;
       const mainSize = 100 - targetSize;
       
       requestAnimationFrame(() => {
@@ -171,7 +172,15 @@ export const ThreadLayout = memo(function ThreadLayout({
           </div>
 
           {/* Preview Panel OR Tool Call Side Panel - Full replacement overlay for compact */}
-          {isPreviewPanelOpen && onClosePreview ? (
+          {isFileViewerPanelOpen ? (
+            <div className="absolute inset-0 bg-background z-40">
+              <FileViewerPanel
+                sandboxId={sandboxId || ''}
+                filePath={fileToView || ''}
+                onClose={onCloseFileViewerPanel || (() => {})}
+              />
+            </div>
+          ) : isPreviewPanelOpen && onClosePreview ? (
             <div className="absolute inset-0 bg-background z-40">
               <WebsitePreviewPanel
                 isOpen={true}
@@ -208,8 +217,6 @@ export const ThreadLayout = memo(function ThreadLayout({
                 compact={true}
                 streamingText={streamingToolArgsJson}
                 sandboxId={sandboxId}
-                initialView={sidePanelView}
-                onViewChange={onSidePanelViewChange}
               />
             </div>
           )}
@@ -278,8 +285,6 @@ export const ThreadLayout = memo(function ThreadLayout({
           disableInitialAnimation={disableInitialAnimation}
           streamingText={streamingToolArgsJson}
           sandboxId={sandboxId}
-          initialView={sidePanelView}
-          onViewChange={onSidePanelViewChange}
         />
 
         {sandboxId && (
@@ -291,6 +296,17 @@ export const ThreadLayout = memo(function ThreadLayout({
             projectId={projectId}
             filePathList={filePathList}
           />
+        )}
+
+        {/* File Viewer Panel Overlay for Mobile Layout */}
+        {isFileViewerPanelOpen && (
+          <div className="absolute inset-0 bg-background z-[100]">
+            <FileViewerPanel
+              sandboxId={sandboxId || ''}
+              filePath={fileToView || ''}
+              onClose={onCloseFileViewerPanel || (() => {})}
+            />
+          </div>
         )}
 
         {/* Preview Panel Overlay for Mobile Layout */}
@@ -376,7 +392,13 @@ export const ThreadLayout = memo(function ThreadLayout({
             !shouldShowPanel ? "hidden" : ""
           )}
         >
-          {isPreviewPanelOpen && onClosePreview ? (
+          {isFileViewerPanelOpen ? (
+            <FileViewerPanel
+              sandboxId={sandboxId || ''}
+              filePath={fileToView || ''}
+              onClose={onCloseFileViewerPanel || (() => {})}
+            />
+          ) : isPreviewPanelOpen && onClosePreview ? (
             <WebsitePreviewPanel
               isOpen={true}
               onClose={onClosePreview}
@@ -410,8 +432,6 @@ export const ThreadLayout = memo(function ThreadLayout({
               disableInitialAnimation={disableInitialAnimation}
               streamingText={streamingToolArgsJson}
               sandboxId={sandboxId}
-              initialView={sidePanelView}
-              onViewChange={onSidePanelViewChange}
             />
           )}
         </ResizablePanel>

@@ -6,7 +6,7 @@ import React, { memo, useMemo, useCallback, useState, useEffect, useRef } from '
 import { Slider } from '@/components/ui/slider';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ApiMessageType } from '@/components/thread/types';
-import { CircleDashed, X, ChevronLeft, ChevronRight, Computer, Minimize2, Globe, Wrench, CheckCircle, Package } from 'lucide-react';
+import { CircleDashed, X, ChevronLeft, ChevronRight, Computer, Minimize2, Globe, Wrench, CheckCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +23,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer';
 import { useDocumentModalStore } from '@/stores/use-document-modal-store';
-import { DeliverablesView } from './deliverables-view';
+
 
 // ============================================================================
 // Types & Interfaces
@@ -80,7 +80,7 @@ interface ToolCallSnapshot {
 }
 
 type NavigationMode = 'live' | 'manual';
-type ViewType = 'tools' | 'browser' | 'preview' | 'deliverables';
+type ViewType = 'tools' | 'browser';
 
 // ============================================================================
 // Constants
@@ -105,7 +105,7 @@ const ViewToggle = memo(function ViewToggle({ currentView, onViewChange }: ViewT
         className="absolute h-7 w-7 bg-white rounded-xl shadow-sm"
         initial={false}
         animate={{
-          x: currentView === 'tools' ? 0 : currentView === 'browser' ? 32 : 64,
+          x: currentView === 'tools' ? 0 : 32,
         }}
         transition={{
           type: "spring",
@@ -136,18 +136,6 @@ const ViewToggle = memo(function ViewToggle({ currentView, onViewChange }: ViewT
         title="Switch to Browser View"
       >
         <Globe className="h-3.5 w-3.5" />
-      </Button>
-
-      <Button
-        size="sm"
-        onClick={() => onViewChange('deliverables')}
-        className={`relative z-10 h-7 w-7 p-0 rounded-xl bg-transparent hover:bg-transparent shadow-none ${currentView === 'deliverables'
-          ? 'text-black'
-          : 'text-gray-500 dark:text-gray-400'
-          }`}
-        title="Switch to Deliverables View"
-      >
-        <Package className="h-3.5 w-3.5" />
       </Button>
     </div>
   );
@@ -1151,14 +1139,6 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
             )}
 
             {currentView === 'tools' && toolView}
-            {currentView === 'deliverables' && (
-              <DeliverablesView
-                messages={messages || []}
-                project={project}
-                onFileClick={onFileClick}
-                sandboxId={sandboxId}
-              />
-            )}
             </div>
           </div>
         </div>
