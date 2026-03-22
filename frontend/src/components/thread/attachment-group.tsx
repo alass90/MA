@@ -110,12 +110,11 @@ export function AttachmentGroup({
     };
 
     // Ensure path has proper format when clicking
-    const handleFileClick = (path: string) => {
+    const handleFileClick = (path: string, filePathList?: string[], storageUrl?: string) => {
         if (onFileClick) {
-            // Create the file path list from all files in the group
-            const filePathList = uniqueFiles.map(file => getFilePath(file));
-            // Pass both the clicked path and the complete list
-            onFileClick(path, filePathList);
+            // If filePathList is not provided, create it from all files in the group
+            const finalPathList = filePathList || uniqueFiles.map(file => getFilePath(file));
+            onFileClick(path, finalPathList, storageUrl);
         }
     };
 
@@ -282,7 +281,7 @@ export function AttachmentGroup({
                             )} style={currentItem.wrapperStyle}>
                                 <FileAttachment
                                     filepath={currentFilePath}
-                                    onClick={handleFileClick}
+                                    onFileClick={handleFileClick}
                                     sandboxId={sandboxId}
                                     showPreview={showPreviews}
                                     localPreviewUrl={getLocalPreviewUrl(currentItem.file)}
@@ -374,7 +373,7 @@ export function AttachmentGroup({
                         >
                             <FileAttachment
                                 filepath={item.path}
-                                onClick={handleFileClick}
+                                onFileClick={(path, list, storageUrl) => handleFileClick(path, list, storageUrl)}
                                 sandboxId={sandboxId}
                                 showPreview={showPreviews}
                                 localPreviewUrl={getLocalPreviewUrl(item.file)}

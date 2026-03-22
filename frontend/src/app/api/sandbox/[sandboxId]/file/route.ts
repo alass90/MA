@@ -28,10 +28,14 @@ export async function GET(
     // Get backend URL from environment
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
+    // Get the authorization header from the incoming request
+    const authHeader = request.headers.get('Authorization');
+
     // Call backend API to get file content
     // Backend endpoint is /sandboxes/{id}/files/content
     const response = await fetch(`${backendUrl}/sandboxes/${sandboxId}/files/content?path=${encodeURIComponent(filePath)}`, {
       method: 'GET',
+      headers: authHeader ? { 'Authorization': authHeader } : {},
     });
 
     if (!response.ok) {

@@ -4,6 +4,15 @@ import remarkGfm from 'remark-gfm';
 import { cn } from '@/lib/utils';
 import { MermaidRenderer } from './mermaid-renderer';
 import { isMermaidCode } from '@/lib/mermaid-utils';
+import {
+  CodeBlock,
+  CodeBlockHeader,
+  CodeBlockFilename,
+  CodeBlockCopyButton,
+  CodeBlockBody,
+  CodeBlockItem,
+  CodeBlockContent,
+} from "@/components/ui/shadcn-io/code-block";
 
 export type MarkdownProps = {
   children: string;
@@ -30,7 +39,7 @@ export const Markdown: React.FC<MarkdownProps> = React.memo(({
           code: ({ children, className }) => {
             const match = /language-(\w+)/.exec(className || '');
             const language = match ? match[1] : '';
-            const code = String(children);
+            const code = String(children).replace(/\n$/, '');
             const isInline = !className?.includes('language-');
 
             if (isInline) {
@@ -43,12 +52,40 @@ export const Markdown: React.FC<MarkdownProps> = React.memo(({
             }
 
             return (
-              <code className={cn('block bg-muted p-2 rounded text-xs font-mono overflow-x-auto', className)}>
-                {children}
-              </code>
+              <CodeBlock
+                data={[{
+                  language: language || 'text',
+                  filename: language || 'code',
+                  code: code,
+                }]}
+                defaultValue={language || 'text'}
+                className="my-4"
+              >
+                <div className="bg-muted border-b border-border px-3 py-2 flex items-center justify-between">
+                  <span className="text-xs font-mono text-muted-foreground font-medium uppercase tracking-wider">
+                    {language || 'code'}
+                  </span>
+                  <CodeBlockCopyButton className="h-7 w-7 text-muted-foreground hover:text-foreground" />
+                </div>
+                <CodeBlockBody>
+                  {(item) => (
+                    <CodeBlockItem value={item.language}>
+                      <CodeBlockContent 
+                         language={item.language as any}
+                         themes={{
+                            light: 'github-light',
+                            dark: 'github-dark'
+                         }}
+                      >
+                         {item.code}
+                      </CodeBlockContent>
+                    </CodeBlockItem>
+                  )}
+                </CodeBlockBody>
+              </CodeBlock>
             );
           },
-          pre: ({ children }) => <pre className="bg-muted p-2 rounded text-xs font-mono overflow-x-auto mb-2">{children}</pre>,
+          pre: ({ children }) => <>{children}</>,
           blockquote: ({ children }) => <blockquote className="border-l-4 border-muted-foreground/20 pl-4 italic mb-2">{children}</blockquote>,
           strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
           em: ({ children }) => <em className="italic">{children}</em>,

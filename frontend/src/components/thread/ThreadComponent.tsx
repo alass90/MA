@@ -87,7 +87,9 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
   const [filePathList, setFilePathList] = useState<string[] | undefined>(
     undefined,
   );
+  const [storageToView, setStorageToView] = useState<string | null>(null);
   const [chatInputValue, setChatInputValue] = useState('');
+  const [isFileViewerPanelOpen, setIsFileViewerPanelOpen] = useState(false);
   const [initialPanelOpenAttempted, setInitialPanelOpenAttempted] =
     useState(false);
   // Use Zustand store for agent selection persistence - skip in shared mode
@@ -117,7 +119,6 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
   const [userInitiatedRun, setUserInitiatedRun] = useState(false);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const [showAgentLimitDialog, setShowAgentLimitDialog] = useState(false);
-  const [isFileViewerPanelOpen, setIsFileViewerPanelOpen] = useState(false);
   const [agentLimitData, setAgentLimitData] = useState<{
     runningCount: number;
     runningThreadIds: string[];
@@ -670,7 +671,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
   }, [stopStreaming, agentRunId, stopAgentMutation, setAgentStatus, isShared]);
 
   const handleOpenFileViewer = useCallback(
-    (filePath?: string, filePathList?: string[]) => {
+    (filePath?: string, filePathList?: string[], storageUrl?: string) => {
       // Invalidate project query to ensure fresh data when opening modal
       if (projectId) {
         queryClient.invalidateQueries({
@@ -681,12 +682,13 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
 
       setFileToView(filePath || null);
       setFilePathList(filePathList);
+      setStorageToView(storageUrl || null);
       
       // Open as panel instead of modal for PDF/DOCX or by default in sidebar
       setIsFileViewerPanelOpen(true);
       setIsSidePanelOpen(true); // Ensure side panel area is visible
     },
-    [projectId, queryClient, setIsSidePanelOpen],
+    [projectId, queryClient, setIsSidePanelOpen, setIsFileViewerPanelOpen],
   );
 
   const toolViewAssistant = useCallback(
@@ -994,6 +996,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         setFileViewerOpen={setFileViewerOpen}
         fileToView={fileToView}
         filePathList={filePathList}
+        storageToView={storageToView}
         toolCalls={toolCalls}
         messages={messages as ApiMessageType[]}
         externalNavIndex={externalNavIndex}
@@ -1030,6 +1033,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           setFileViewerOpen={setFileViewerOpen}
           fileToView={fileToView}
           filePathList={filePathList}
+          storageToView={storageToView}
           toolCalls={toolCalls}
           messages={messages as ApiMessageType[]}
           externalNavIndex={externalNavIndex}
@@ -1164,15 +1168,6 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           />
         )}
 
-        {/* Full-page Presentation Overlay */}
-        {isPresentationOpen && presentationSandboxId && presentationPath && (
-          <TalosSlidesPanel
-            sandboxId={presentationSandboxId}
-            presentationPath={presentationPath}
-            onClose={closePresentation}
-          />
-        )}
-
         <ThreadFilesOverlay
           isOpen={isFilesOverlayOpen}
           onClose={() => setIsFilesOverlayOpen(false)}
@@ -1205,19 +1200,6 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         agentName={agent && agent.name}
         selectedAgentId={selectedAgentId}
         onAgentSelect={handleAgentSelect}
-        bgColor='bg-white'
-        threadId={threadId}
-        hideAgentSelection={!!configuredAgentId}
-        toolCalls={toolCalls}
-        toolCallIndex={currentToolIndex}
-        showToolPreview={!isSidePanelOpen && toolCalls.length > 0}
-        onExpandToolPreview={() => {
-          setIsSidePanelOpen(true);
-          userClosedPanelRef.current = false;
-        }}
-        defaultShowSnackbar="tokens"
-        showScrollToBottomIndicator={showScrollToBottom}
-        onScrollToBottom={scrollToBottom}
         bgColor="bg-card"
         value={chatInputValue}
         onChange={setChatInputValue}
@@ -1241,6 +1223,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         setFileViewerOpen={setFileViewerOpen}
         fileToView={fileToView}
         filePathList={filePathList}
+        storageToView={storageToView}
         toolCalls={toolCalls}
         messages={messages as ApiMessageType[]}
         externalNavIndex={externalNavIndex}

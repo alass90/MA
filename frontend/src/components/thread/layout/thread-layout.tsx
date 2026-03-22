@@ -61,6 +61,8 @@ interface ThreadLayoutProps {
   // File viewer panel props
   isFileViewerPanelOpen?: boolean;
   onCloseFileViewerPanel?: () => void;
+  renderAssistantMessage?: (props: any) => React.ReactNode;
+  storageToView?: string | null;
 }
 
 export const ThreadLayout = memo(function ThreadLayout({
@@ -98,6 +100,8 @@ export const ThreadLayout = memo(function ThreadLayout({
   leftSidebarState = 'collapsed',
   streamingTextContent,
   streamingToolCall,
+  isFileViewerPanelOpen,
+  onCloseFileViewerPanel,
   isPreviewPanelOpen = false,
   previewUrl,
   previewProjectPath,
@@ -105,8 +109,7 @@ export const ThreadLayout = memo(function ThreadLayout({
   previewProjectName,
   onClosePreview,
   onToggleDeliverables,
-  isFileViewerPanelOpen,
-  onCloseFileViewerPanel,
+  storageToView,
 }: ThreadLayoutProps) {
   const isActuallyMobile = useIsMobile();
 
@@ -177,6 +180,7 @@ export const ThreadLayout = memo(function ThreadLayout({
               <FileViewerPanel
                 sandboxId={sandboxId || ''}
                 filePath={fileToView || ''}
+                storageUrl={storageToView || undefined}
                 onClose={onCloseFileViewerPanel || (() => {})}
               />
             </div>
@@ -304,6 +308,7 @@ export const ThreadLayout = memo(function ThreadLayout({
             <FileViewerPanel
               sandboxId={sandboxId || ''}
               filePath={fileToView || ''}
+              storageUrl={storageToView || undefined}
               onClose={onCloseFileViewerPanel || (() => {})}
             />
           </div>
@@ -388,7 +393,10 @@ export const ThreadLayout = memo(function ThreadLayout({
           className={cn(
             "relative bg-transparent",
             // Match ChatInput horizontal spacing: px-4
-            shouldShowPanel ? (isPreviewPanelOpen ? "pr-4 pb-5 pt-0" : "pr-4 pb-5 pt-4") : "px-0",
+            shouldShowPanel ? (
+              isFileViewerPanelOpen ? "p-0" :
+              isPreviewPanelOpen ? "pr-4 pb-5 pt-0" : "pr-4 pb-5 pt-4"
+            ) : "px-0",
             !shouldShowPanel ? "hidden" : ""
           )}
         >
@@ -396,6 +404,7 @@ export const ThreadLayout = memo(function ThreadLayout({
             <FileViewerPanel
               sandboxId={sandboxId || ''}
               filePath={fileToView || ''}
+              storageUrl={storageToView}
               onClose={onCloseFileViewerPanel || (() => {})}
             />
           ) : isPreviewPanelOpen && onClosePreview ? (

@@ -5,7 +5,7 @@ from core.utils.logger import logger
 from core.services.supabase import DBConnection
 from core.sandbox.sandbox import get_or_start_sandbox
 
-async def upload_generated_file_to_supabase(sandbox_id: str, file_path: str, bucket_name: str = "generated-files") -> str:
+async def upload_generated_file_to_supabase(sandbox_id: str, file_path: str, bucket_name: str = "file-uploads") -> str:
     """
     Downloads a file from a Daytona sandbox and uploads it to Supabase Storage.
         tuple: (signed_url, storage_path) or (None, None) if the upload failed.
@@ -77,7 +77,7 @@ async def upload_generated_file_to_supabase(sandbox_id: str, file_path: str, buc
         # We catch all errors to ensure the main agent loop continues even if snapshotting fails
         return None, None
 
-async def get_snapshot_signed_url(storage_path: str, bucket_name: str = "generated-files", expires_in: int = 3600) -> str:
+async def get_snapshot_signed_url(storage_path: str, bucket_name: str = "file-uploads", expires_in: int = 3600) -> str:
     """
     Generates a new signed URL for an existing snapshot in Supabase Storage.
     

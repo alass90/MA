@@ -24,4 +24,4 @@ async def refresh_url(request: RefreshUrlRequest):
         logger.warning(f"Failed to refresh signed URL for: {request.supabase_path}")
         raise HTTPException(status_code=404, detail="Failed to generate signed URL. File might not exist or storage is unavailable.")
     
-    return {"signed_url": signed_url}
+    return {"url": signed_url}

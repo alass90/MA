@@ -10,12 +10,14 @@ import { Button } from '@/components/ui/button';
 interface FileViewerPanelProps {
   sandboxId: string;
   filePath: string;
+  storageUrl?: string; // New prop for direct Supabase URL
   onClose: () => void;
 }
 
 export const FileViewerPanel: React.FC<FileViewerPanelProps> = ({
   sandboxId,
   filePath,
+  storageUrl,
   onClose,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,24 +33,55 @@ export const FileViewerPanel: React.FC<FileViewerPanelProps> = ({
   const extension = useMemo(() => filePath.split('.').pop()?.toLowerCase(), [filePath]);
   const filename = useMemo(() => filePath.split('/').pop() || filePath, [filePath]);
 
-  // Fetch file as blob for PDF and DOCX
-  const { data: fileData, isLoading, error: fetchError } = useFileContentQuery(sandboxId, filePath, {
+  // Fetch file as blob for PDF and DOCX (from sandbox, when no storageUrl is provided)
+  const { data: fileData, isLoading: isContentQueryLoading, error: fetchError } = useFileContentQuery(sandboxId, filePath, {
     contentType: 'blob',
-    enabled: !!sandboxId && !!filePath,
+    enabled: !!sandboxId && !!filePath && !storageUrl,
   });
+
+  // Fetch remote DOCX blob if storageUrl is provided
+  const [remoteDocxBlob, setRemoteDocxBlob] = useState<Blob | null>(null);
+  const [isFetchingRemote, setIsFetchingRemote] = useState(false);
+
+  useEffect(() => {
+    if (storageUrl && (extension === 'docx' || extension === 'doc')) {
+      setIsFetchingRemote(true);
+      setError(null);
+      fetch(storageUrl)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch file from storage');
+          return res.blob();
+        })
+        .then(blob => setRemoteDocxBlob(blob))
+        .catch(err => {
+          console.error('Error fetching remote DOCX:', err);
+          setError(err.message);
+        })
+        .finally(() => setIsFetchingRemote(false));
+    }
+  }, [storageUrl, extension]);
+
+  const activeBlob = remoteDocxBlob || (fileData instanceof Blob ? fileData : null);
+  const isLoading = isContentQueryLoading || isFetchingRemote;
 
   // Handle Blob URL creation and Cleanup
   useEffect(() => {
+    // If we have a direct storageUrl (Supabase), use it (no need to fetch as blob again)
+    if (storageUrl) {
+      setBlobUrl(storageUrl);
+      return;
+    }
+
     if (fileData instanceof Blob) {
       const url = URL.createObjectURL(fileData);
       setBlobUrl(url);
       return () => URL.revokeObjectURL(url);
     }
-  }, [fileData]);
+  }, [fileData, storageUrl]);
 
   // Handle DOCX Rendering
   useEffect(() => {
-    if (extension === 'docx' && fileData instanceof Blob && containerRef.current) {
+    if ((extension === 'docx' || extension === 'doc') && activeBlob && containerRef.current) {
       setIsRendering(true);
       setError(null);
       
@@ -56,7 +89,7 @@ export const FileViewerPanel: React.FC<FileViewerPanelProps> = ({
         try {
           if (containerRef.current) {
             containerRef.current.innerHTML = ''; // Clear previous content
-            await renderAsync(fileData, containerRef.current, undefined, {
+            await renderAsync(activeBlob, containerRef.current, undefined, {
               className: "docx-viewer",
               inWrapper: true,
               ignoreLastRenderedPageBreak: false,
@@ -72,7 +105,7 @@ export const FileViewerPanel: React.FC<FileViewerPanelProps> = ({
 
       renderDocx();
     }
-  }, [extension, fileData]);
+  }, [extension, activeBlob]);
 
   const handleDownload = () => {
     if (blobUrl) {
@@ -87,7 +120,7 @@ export const FileViewerPanel: React.FC<FileViewerPanelProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-white dark:bg-zinc-900 rounded-2xl border">
+      <div className="flex flex-col items-center justify-center h-full bg-white dark:bg-zinc-900 border-l border-border">
         <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
         <p className="text-sm text-muted-foreground">Loading file...</p>
       </div>
@@ -96,7 +129,7 @@ export const FileViewerPanel: React.FC<FileViewerPanelProps> = ({
 
   if (fetchError || error) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-white dark:bg-zinc-900 rounded-2xl border p-8 text-center">
+      <div className="flex flex-col items-center justify-center h-full bg-white dark:bg-zinc-900 border-l border-border p-8 text-center">
         <FileWarning className="w-12 h-12 text-destructive mb-4 opacity-50" />
         <h3 className="text-lg font-semibold mb-2">Error Displaying File</h3>
         <p className="text-sm text-muted-foreground mb-6">
@@ -108,7 +141,7 @@ export const FileViewerPanel: React.FC<FileViewerPanelProps> = ({
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#f8f8f7] dark:bg-[#1a1a1b] rounded-2xl border overflow-hidden shadow-lg">
+    <div className="flex flex-col h-full bg-[#f8f8f7] dark:bg-[#1a1a1b] border-l border-border overflow-hidden shadow-lg">
       <AdaptiveHeader
         filename={filename}
         currentPage={currentPage}
@@ -121,7 +154,7 @@ export const FileViewerPanel: React.FC<FileViewerPanelProps> = ({
       <div className="flex-1 overflow-hidden relative bg-zinc-100/50 dark:bg-zinc-900/50 p-4">
         {extension === 'pdf' && blobUrl ? (
           <iframe
-            src={`/pdfjs/web/viewer.html?file=${encodeURIComponent(blobUrl)}`}
+            src={storageUrl ? blobUrl : `/pdfjs/web/viewer.html?file=${encodeURIComponent(blobUrl)}`}
             className="w-full h-full border rounded-xl shadow-inner bg-white"
             title="PDF Viewer"
           />

@@ -22,6 +22,7 @@ import { TaskCompletedFeedback } from '@/components/thread/tool-views/shared/Tas
 import { PromptExamples } from '@/components/shared/prompt-examples';
 import { 
     renderAssistantMessage,
+    renderGroupedAssistantMessages,
     extractTextFromPartialJson,
     extractTextFromStreamingAskComplete,
     isAskOrCompleteTool,
@@ -36,8 +37,53 @@ const PROMPT_SAMPLES_CONFIG = {
   enableCompleteSamples: true,
 } as const;
 
+// Helper function to extract storage URLs from messages (outside component)
+function extractStorageUrls(messages: any[]): Record<string, string> {
+    const urlMap: Record<string, string> = {};
+    messages.forEach(msg => {
+        if (msg.type === 'tool') {
+            const meta = safeJsonParse<any>(msg.metadata, {});
+            const storageUrl = meta.storage_url;
+            const filePath = meta.file_path || meta.snapshot_path || meta.supabase_path;
+            
+            if (storageUrl && filePath) {
+                urlMap[filePath] = storageUrl;
+                
+                // Also index by filename only as a fallback
+                const fileName = filePath.split('/').pop();
+                if (fileName) {
+                    urlMap[fileName] = storageUrl;
+                }
+            }
+        }
+    });
+    return urlMap;
+}
+
+function extractSupabasePaths(messages: any[]): Record<string, string> {
+    const pathMap: Record<string, string> = {};
+    messages.forEach(msg => {
+        if (msg.type === 'tool') {
+            const meta = safeJsonParse<any>(msg.metadata, {});
+            const supabasePath = meta.supabase_path || meta.file_path || meta.snapshot_path;
+            const key = meta.snapshot_path || meta.supabase_path || meta.file_path;
+            
+            if (supabasePath && key) {
+                pathMap[key] = supabasePath;
+                
+                // Also index by filename only
+                const fileName = key.split('/').pop();
+                if (fileName) {
+                    pathMap[fileName] = supabasePath;
+                }
+            }
+        }
+    });
+    return pathMap;
+}
+
 // Helper function to render attachments (keeping original implementation for now)
-export function renderAttachments(attachments: string[], fileViewerHandler?: (filePath?: string, filePathList?: string[]) => void, sandboxId?: string, project?: Project, storageUrls?: Record<string, string>, supabasePaths?: Record<string, string>) {
+export function renderAttachments(attachments: string[], fileViewerHandler?: (filePath?: string, filePathList?: string[]) => void, sandboxId?: string, project?: Project, storageUrls?: Record<string, string>, supabasePaths?: Record<string, string>, toolResults?: Record<string, any>) {
     if (!attachments || attachments.length === 0) return null;
 
     // Filter out empty strings and check if we have any valid attachments
@@ -237,6 +283,10 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
             });
         }
     }, [displayMessages, sandboxId, session?.access_token, preloadFiles]);
+  
+    // Pre-calculate storage URLs for the entire thread to ensure text-based attachments can find them
+    const threadStorageUrls = React.useMemo(() => extractStorageUrls(displayMessages), [displayMessages]);
+    const threadSupabasePaths = React.useMemo(() => extractSupabasePaths(displayMessages), [displayMessages]);
 
     return (
         <>
@@ -469,11 +519,11 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                                 <div className="flex max-w-[85%] rounded-3xl rounded-br-lg bg-card border px-4 py-3 break-words overflow-hidden">
                                                     <div className="space-y-3 min-w-0 flex-1">
                                                         {cleanContent && (
-                                                            <ComposioUrlDetector content={cleanContent} className="text-sm prose prose-sm dark:prose-invert chat-markdown max-w-none [&>:first-child]:mt-0 prose-headings:mt-3 break-words overflow-wrap-anywhere" />
+                                                            <ComposioUrlDetector content={cleanContent} className="text-base prose prose-base dark:prose-invert chat-markdown max-w-none [&>:first-child]:mt-0 prose-headings:mt-3 break-words overflow-wrap-anywhere" />
                                                         )}
 
                                                         {/* Use the helper function to render user attachments */}
-                                                        {renderAttachments(attachments as string[], handleOpenFileViewer, sandboxId, project)}
+                                                        {renderAttachments(attachments as string[], handleOpenFileViewer, sandboxId, project, threadStorageUrls, threadSupabasePaths)}
                                                     </div>
                                                 </div>
                                             </div>
@@ -487,90 +537,39 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                                     </div>
 
                                                     {/* Message content - ALL messages in the group */}
-                                                    <div className="flex max-w-[90%] text-sm break-words overflow-hidden">
+                                                    <div className="flex max-w-[90%] text-base break-words overflow-hidden">
                                                         <div className="space-y-2 min-w-0 flex-1">
                                                             {(() => {
-                                                                const toolResultsMap = new Map<string | null, UnifiedMessage[]>();
-                                                                group.messages.forEach(msg => {
-                                                                    if (msg.type === 'tool') {
-                                                                        const meta = safeJsonParse<ParsedMetadata>(msg.metadata, {});
-                                                                        const assistantId = meta.assistant_message_id || null;
-                                                                        if (!toolResultsMap.has(assistantId)) {
-                                                                            toolResultsMap.set(assistantId, []);
-                                                                        }
-                                                                        toolResultsMap.get(assistantId)?.push(msg);
-                                                                    }
-                                                                });
-
-                                                                // Collect all storage URLs from tool results in this group
-                                                                const storageUrlMap: Record<string, string> = {};
-                                                                const supabasePathMap: Record<string, string> = {};
-                                                                group.messages.forEach(msg => {
-                                                                    if (msg.type === 'tool') {
-                                                                        const meta = safeJsonParse<any>(msg.metadata, {});
-                                                                        if (meta.storage_url && (meta.snapshot_path || meta.supabase_path)) {
-                                                                            const key = meta.snapshot_path || meta.supabase_path;
-                                                                            storageUrlMap[key] = meta.storage_url;
-                                                                            if (meta.supabase_path) {
-                                                                                supabasePathMap[key] = meta.supabase_path;
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                });
-
-                                                                const elements: React.ReactNode[] = [];
-                                                                let assistantMessageCount = 0; // Move this outside the loop
-
-                                                                // Check if this is the last group
-                                                                const isLastGroup = groupIndex === finalGroupedMessages.length - 1;
-                                                                
-                                                                // Find the last assistant message in this group
                                                                 const assistantMessages = group.messages.filter(m => m.type === 'assistant');
-                                                                const lastAssistantMessageId = assistantMessages.length > 0 
-                                                                    ? assistantMessages[assistantMessages.length - 1].message_id 
-                                                                    : null;
+                                                                if (assistantMessages.length === 0) return null;
 
-                                                                group.messages.forEach((message, msgIndex) => {
-                                                                    if (message.type === 'assistant') {
-                                                                        const msgKey = message.message_id || `submsg-assistant-${msgIndex}`;
+                                                                const isLastGroup = groupIndex === finalGroupedMessages.length - 1;
 
-                                                                        // Check if this is the latest message (last assistant message in the last group)
-                                                                        const isLatestMessage = isLastGroup && message.message_id === lastAssistantMessageId;
-
-                                                                        // Use ONLY metadata for rendering
-                                                                        const renderedContent = renderAssistantMessage({
-                                                                            message,
+                                                                return (
+                                                                    <div className="prose prose-base dark:prose-invert chat-markdown max-w-none [&>:first-child]:mt-0 prose-headings:mt-3 break-words overflow-hidden">
+                                                                        {renderGroupedAssistantMessages(assistantMessages, {
                                                                             onToolClick: handleToolClick,
                                                                             onFileClick: handleOpenFileViewer,
                                                                             sandboxId,
                                                                             project,
-                                                                            isLatestMessage,
+                                                                            isLatestMessage: isLastGroup,
                                                                             t,
                                                                             threadId,
                                                                             onPromptFill,
-                                                                            storageUrls: storageUrlMap,
-                                                                            supabasePaths: supabasePathMap,
-                                                                        });
-                                                                        
-                                                                        // Skip if no content rendered
-                                                                        if (!renderedContent) return;
-
-                                                                        elements.push(
-                                                                            <div key={msgKey} className={assistantMessageCount > 0 ? "mt-4" : ""}>
-                                                                                <div className="prose prose-sm dark:prose-invert chat-markdown max-w-none [&>:first-child]:mt-0 prose-headings:mt-3 break-words overflow-hidden">
-                                                                                    {renderedContent}
-                                                                                </div>
-                                                                            </div>
-                                                                        );
-
-                                                                        assistantMessageCount++; // Increment after adding the element
-                                                                    }
-                                                                });
-
-                                                                return elements;
+                                                                            storageUrls: threadStorageUrls,
+                                                                            supabasePaths: threadSupabasePaths,
+                                                                            toolResults: group.messages.reduce((acc, m) => {
+                                                                                if (m.role === 'tool' && m.tool_call_id) {
+                                                                                    acc[m.tool_call_id] = m.content;
+                                                                                }
+                                                                                return acc;
+                                                                            }, {} as Record<string, any>),
+                                                                        })}
+                                                                    </div>
+                                                                );
                                                             })()}
 
-                                                            {/* Render streaming text content (XML tool calls or regular text) */}
+                                                        {/* Render streaming text content (XML tool calls or regular text) */}
                                                             {groupIndex === finalGroupedMessages.length - 1 && !readOnly && streamingTextContent && (streamHookStatus === 'streaming' || streamHookStatus === 'connecting') && (
                                                                 <div className="mt-2">
                                                                     {(() => {
@@ -624,7 +623,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                                                         return (
                                                                             <>
                                                                                 {textBeforeTag && (
-                                                                                    <ComposioUrlDetector content={textBeforeTag} className="text-sm prose prose-sm dark:prose-invert chat-markdown max-w-none [&>:first-child]:mt-0 prose-headings:mt-3 break-words overflow-wrap-anywhere" />
+                                                                                    <ComposioUrlDetector content={textBeforeTag} className="text-base prose prose-base dark:prose-invert chat-markdown max-w-none [&>:first-child]:mt-0 prose-headings:mt-3 break-words overflow-wrap-anywhere" />
                                                                                 )}
 
                                                                                 {detectedTag && isAskOrComplete ? (
@@ -635,7 +634,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                                                                         return (
                                                                                             <ComposioUrlDetector 
                                                                                                 content={extractedText} 
-                                                                                                className="text-sm prose prose-sm dark:prose-invert chat-markdown max-w-none break-words [&>:first-child]:mt-0 prose-headings:mt-3" 
+                                                                                                className="text-base prose prose-base dark:prose-invert chat-markdown max-w-none break-words [&>:first-child]:mt-0 prose-headings:mt-3" 
                                                                                             />
                                                                                         );
                                                                                     })()
@@ -711,7 +710,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                                                         return (
                                                                             <>
                                                                                 {textBeforeTag && (
-                                                                                            <ComposioUrlDetector content={textBeforeTag} className="text-sm prose prose-sm dark:prose-invert chat-markdown max-w-none [&>:first-child]:mt-0 prose-headings:mt-3 break-words overflow-wrap-anywhere" />
+                                                                                            <ComposioUrlDetector content={textBeforeTag} className="text-base prose prose-base dark:prose-invert chat-markdown max-w-none [&>:first-child]:mt-0 prose-headings:mt-3 break-words overflow-wrap-anywhere" />
                                                                                         )}
 
                                                                                         {detectedTag && isAskOrComplete ? (
@@ -722,7 +721,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                                                                                 return (
                                                                                                     <ComposioUrlDetector 
                                                                                                         content={extractedText} 
-                                                                                                        className="text-sm prose prose-sm dark:prose-invert chat-markdown max-w-none break-words [&>:first-child]:mt-0 prose-headings:mt-3" 
+                                                                                                        className="text-base prose prose-base dark:prose-invert chat-markdown max-w-none break-words [&>:first-child]:mt-0 prose-headings:mt-3" 
                                                                                                     />
                                                                                                 );
                                                                                             })()

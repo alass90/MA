@@ -1,10 +1,3 @@
-/**
- * Renders assistant message content from metadata
- * 
- * This module handles rendering of assistant messages by extracting
- * tool calls and text content from the message metadata structure.
- */
-
 import React from 'react';
 import { Clock } from 'lucide-react';
 import { UnifiedMessage, ParsedMetadata } from '@/components/thread/types';
@@ -14,6 +7,7 @@ import { renderAttachments } from '@/components/thread/content/ThreadContent';
 import { TaskCompletedFeedback } from '@/components/thread/tool-views/shared/TaskCompletedFeedback';
 import { PromptExamples } from '@/components/shared/prompt-examples';
 import type { Project } from '@/lib/api/threads';
+import { ActivityLog, ActivityStep } from '@/components/thread/ActivityLog';
 
 export interface AssistantMessageRendererProps {
   message: UnifiedMessage;
@@ -27,7 +21,10 @@ export interface AssistantMessageRendererProps {
   onPromptFill?: (message: string) => void;
   storageUrls?: Record<string, string>;
   supabasePaths?: Record<string, string>;
+  toolResults?: Record<string, any>;
 }
+
+import { GenericToolView } from '@/components/thread/tool-views/GenericToolView';
 
 /**
  * Normalizes an array value that might be a string, array, or other type
@@ -72,7 +69,7 @@ function normalizeAttachments(attachments: unknown): string[] {
  */
 function getToolCallDisplayParam(toolCall: { arguments?: Record<string, any> }): string {
   const args = toolCall.arguments || {};
-  return args.file_path || args.command || args.query || args.url || '';
+  return args.file_path || args.command || args.query || args.url || args.path || args.filename || '';
 }
 
 /**
@@ -92,7 +89,7 @@ function renderAskToolCall(
     <div key={`ask-${index}`} className="space-y-3">
       <ComposioUrlDetector 
         content={askText} 
-        className="text-sm prose prose-sm dark:prose-invert chat-markdown max-w-none break-words [&>:first-child]:mt-0 prose-headings:mt-3" 
+        className="text-base prose prose-base dark:prose-invert chat-markdown max-w-none break-words [&>:first-child]:mt-0 prose-headings:mt-3" 
       />
       {renderAttachments(attachments, onFileClick, sandboxId, project, storageUrls, supabasePaths)}
       {isLatestMessage && (
@@ -133,7 +130,7 @@ function renderCompleteToolCall(
     <div key={`complete-${index}`} className="space-y-3">
       <ComposioUrlDetector 
         content={completeText} 
-        className="text-sm prose prose-sm dark:prose-invert chat-markdown max-w-none break-words [&>:first-child]:mt-0 prose-headings:mt-3" 
+        className="text-base prose prose-base dark:prose-invert chat-markdown max-w-none break-words [&>:first-child]:mt-0 prose-headings:mt-3" 
       />
       {renderAttachments(attachments, onFileClick, sandboxId, project, storageUrls, supabasePaths)}
       <TaskCompletedFeedback
@@ -149,96 +146,191 @@ function renderCompleteToolCall(
 }
 
 /**
- * Renders a regular tool call as a clickable button
+ * Helper to extract a summary from tool results (e.g. "18 results")
  */
-function renderRegularToolCall(
-  toolCall: { function_name: string; arguments?: Record<string, any> },
-  index: number,
-  toolName: string,
-  props: AssistantMessageRendererProps
-): React.ReactNode {
-  const { message, onToolClick } = props;
-  const IconComponent = getToolIcon(toolName);
-  const paramDisplay = getToolCallDisplayParam(toolCall);
+function getToolResultSummary(toolName: string, result: any): string | undefined {
+  if (!result) return undefined;
+  
+  const toolNameLower = toolName.toLowerCase();
+  
+  // Handle web search results
+  if (toolNameLower.includes('search') || toolNameLower.includes('crawl')) {
+    try {
+      const parsed = typeof result === 'string' ? JSON.parse(result) : result;
+      // Many search tools return an object with a results array or total_results
+      const results = parsed.results || (Array.isArray(parsed) ? parsed : null);
+      if (Array.isArray(results)) {
+        return `${results.length} results`;
+      }
+      if (parsed.total_results) {
+        return `${parsed.total_results} results`;
+      }
+    } catch (e) {
+      // Fallback
+    }
+  }
+  
+  // Handle file operations
+  if (toolNameLower.includes('create-file') || toolNameLower.includes('write-file')) {
+    return 'File created';
+  }
+  if (toolNameLower.includes('edit-file') || toolNameLower.includes('str-replace')) {
+    return 'File updated';
+  }
+  
+  // Handle shell commands
+  if (toolNameLower.includes('execute-command')) {
+    return 'Command executed';
+  }
 
-  return (
-    <div key={`tool-${index}`} className="my-1">
-      <button
-        onClick={() => onToolClick(message.message_id, toolName)}
-        className="inline-flex items-center gap-1.5 py-1 px-1 pr-1.5 text-xs text-muted-foreground bg-muted hover:bg-muted/80 rounded-lg transition-colors cursor-pointer border border-neutral-200 dark:border-neutral-700/50"
-      >
-        <div className='border-2 bg-gradient-to-br from-neutral-200 to-neutral-300 dark:from-neutral-700 dark:to-neutral-800 flex items-center justify-center p-0.5 rounded-sm border-neutral-400/20 dark:border-neutral-600'>
-          <IconComponent className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-        </div>
-        <span className="font-mono text-xs text-foreground">{getUserFriendlyToolName(toolName)}</span>
-        {paramDisplay && (
-          <span className="ml-1 text-xs text-muted-foreground truncate max-w-[200px]" title={paramDisplay}>
-            {paramDisplay}
-          </span>
+  return undefined;
+}
+
+/**
+ * Renders a group of assistant messages as a single unit following the Kimi pattern:
+ * - Chronological order is preserved.
+ * - Consecutive regular tool calls are grouped into a single ActivityLog.
+ * - Text content and interactive tools (ask/complete) are rendered in their natural positions.
+ */
+export function renderGroupedAssistantMessages(
+  messages: UnifiedMessage[],
+  props: Omit<AssistantMessageRendererProps, 'message'>
+): React.ReactNode {
+  const contentParts: React.ReactNode[] = [];
+  const allAttachments: string[] = [];
+  let currentToolBuffer: ActivityStep[] = [];
+  
+  // Helper to flush buffered tool calls into an ActivityLog
+  const flushToolBuffer = (key: string) => {
+    if (currentToolBuffer.length > 0) {
+      contentParts.push(
+        <ActivityLog 
+          key={`activity-log-${key}`} 
+          steps={[...currentToolBuffer]} 
+          onToolLogClick={props.onToolClick}
+          className="mb-4" 
+        />
+      );
+      currentToolBuffer = [];
+    }
+  };
+
+  messages.forEach((message, msgIndex) => {
+    if (message.role !== 'assistant' && message.type !== 'assistant') return;
+    
+    const metadata = safeJsonParse<ParsedMetadata>(message.metadata, {});
+    const toolCalls = metadata.tool_calls || [];
+    const textContent = metadata.text_content?.trim();
+    const attachments = normalizeAttachments(metadata.attachments);
+    if (attachments.length > 0) {
+      allAttachments.push(...attachments);
+    }
+
+    // 1. Render text content of this message
+    if (textContent) {
+      flushToolBuffer(`before-text-${msgIndex}`);
+      contentParts.push(
+        <ComposioUrlDetector 
+          key={`text-${msgIndex}`} 
+          content={textContent} 
+          className="text-base prose prose-base dark:prose-invert chat-markdown max-w-none break-words mb-4 last:mb-0" 
+        />
+      );
+    }
+    
+    // 2. Process tool calls
+    toolCalls.forEach((tc, tcIndex) => {
+      const toolName = tc.function_name.replace(/_/g, '-');
+      
+      // Normalize arguments
+      let normalizedArguments: Record<string, any> = {};
+      if (tc.arguments) {
+        if (typeof tc.arguments === 'object' && tc.arguments !== null) {
+          normalizedArguments = tc.arguments;
+        } else if (typeof tc.arguments === 'string') {
+          try {
+            normalizedArguments = JSON.parse(tc.arguments);
+          } catch {
+            normalizedArguments = {};
+          }
+        }
+      }
+      
+      const normalizedTC = { ...tc, arguments: normalizedArguments };
+      const msgProps = { ...props, message };
+      
+      if (toolName === 'ask' || toolName === 'complete') {
+        flushToolBuffer(`before-interactive-${msgIndex}-${tcIndex}`);
+        if (toolName === 'ask') {
+          contentParts.push(renderAskToolCall(normalizedTC, tcIndex, msgProps));
+        } else {
+          contentParts.push(renderCompleteToolCall(normalizedTC, tcIndex, msgProps));
+        }
+      } else {
+        // Collect into activity log buffer
+        const result = props.toolResults?.[tc.call_id];
+        const extra = getToolResultSummary(toolName, result);
+        
+        let stepContent = null;
+        if (result) {
+          const mockToolResult = {
+            output: typeof result === 'string' ? safeJsonParse(result, result) : result,
+            status: 'success'
+          };
+          stepContent = (
+            <div className="max-h-[400px] overflow-hidden">
+              <GenericToolView 
+                toolCall={normalizedTC} 
+                toolResult={mockToolResult as any}
+                isStreaming={false}
+              />
+            </div>
+          );
+        }
+
+        currentToolBuffer.push({
+          id: tc.call_id || `tool-${msgIndex}-${tcIndex}`,
+          type: 'default',
+          name: getUserFriendlyToolName(toolName),
+          iconName: tc.function_name,
+          parameter: getToolCallDisplayParam(normalizedTC),
+          extra: extra,
+          content: stepContent,
+          messageId: message.message_id,
+          toolName: tc.function_name
+        });
+      }
+    });
+  });
+
+  // Final flush
+  flushToolBuffer('final');
+
+  // Render top-level attachments last
+  const uniqueAttachments = Array.from(new Set(allAttachments));
+  if (uniqueAttachments.length > 0) {
+    contentParts.push(
+      <div key="metadata-attachments" className="mt-4 text-sm">
+        <div className="text-xs font-medium text-muted-foreground mb-2">Attachments</div>
+        {renderAttachments(
+          uniqueAttachments, 
+          props.onFileClick, 
+          props.sandboxId, 
+          props.project, 
+          props.storageUrls, 
+          props.supabasePaths
         )}
-      </button>
-    </div>
-  );
+      </div>
+    );
+  }
+  
+  return contentParts.length > 0 ? contentParts : null;
 }
 
 /**
  * Renders assistant message content from metadata
- * 
- * Extracts tool calls and text content from message metadata and renders
- * them appropriately (ask/complete tools inline, regular tools as buttons).
  */
 export function renderAssistantMessage(props: AssistantMessageRendererProps): React.ReactNode {
-  const { message } = props;
-  const metadata = safeJsonParse<ParsedMetadata>(message.metadata, {});
-  
-  const toolCalls = metadata.tool_calls || [];
-  const textContent = metadata.text_content || '';
-  
-  const contentParts: React.ReactNode[] = [];
-  
-  // Render text content first (if any)
-  if (textContent.trim()) {
-    contentParts.push(
-      <ComposioUrlDetector 
-        key="text-content" 
-        content={textContent} 
-        className="text-sm prose prose-sm dark:prose-invert chat-markdown max-w-none break-words" 
-      />
-    );
-  }
-  
-  // Render tool calls
-  toolCalls.forEach((toolCall, index) => {
-    const toolName = toolCall.function_name.replace(/_/g, '-');
-    
-    // Normalize arguments - handle both string and object types
-    let normalizedArguments: Record<string, any> = {};
-    if (toolCall.arguments) {
-      if (typeof toolCall.arguments === 'object' && toolCall.arguments !== null) {
-        normalizedArguments = toolCall.arguments;
-      } else if (typeof toolCall.arguments === 'string') {
-        try {
-          normalizedArguments = JSON.parse(toolCall.arguments);
-        } catch {
-          normalizedArguments = {};
-        }
-      }
-    }
-    
-    const normalizedToolCall = {
-      ...toolCall,
-      arguments: normalizedArguments
-    };
-    
-    if (toolName === 'ask') {
-      contentParts.push(renderAskToolCall(normalizedToolCall, index, props));
-    } else if (toolName === 'complete') {
-      contentParts.push(renderCompleteToolCall(normalizedToolCall, index, props));
-    } else {
-      contentParts.push(renderRegularToolCall(normalizedToolCall, index, toolName, props));
-    }
-  });
-  
-  return contentParts.length > 0 ? contentParts : null;
+  return renderGroupedAssistantMessages([props.message], props);
 }
 

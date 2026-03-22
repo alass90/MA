@@ -179,7 +179,7 @@ function getFileUrl(sandboxId: string | undefined, path: string): string {
 
 interface FileAttachmentProps {
     filepath: string;
-    onClick?: (path: string) => void;
+    onFileClick?: (path: string) => void;
     className?: string;
     sandboxId?: string;
     showPreview?: boolean;
@@ -206,7 +206,7 @@ interface FileAttachmentProps {
 
 export function FileAttachment({
     filepath,
-    onClick,
+    onFileClick,
     className,
     sandboxId,
     showPreview = true,
@@ -367,8 +367,8 @@ export function FileAttachment({
     }, [isXlsx, xlsxBlobUrl, shouldShowPreview]);
 
     const handleClick = () => {
-        if (onClick) {
-            onClick(filepath);
+        if (onFileClick) {
+            onFileClick(filepath, undefined, currentUrl || storageUrl);
         }
     };
 

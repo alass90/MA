@@ -76,7 +76,16 @@ class SandboxUploadFileTool(SandboxToolsBase):
             file_extension = Path(original_filename).suffix.lower()
             content_type, _ = mimetypes.guess_type(original_filename)
             if not content_type:
-                content_type = "application/octet-stream"
+                # Fallback for common types if guess_type fails
+                ext = Path(original_filename).suffix.lower()
+                if ext == '.pdf':
+                    content_type = 'application/pdf'
+                elif ext == '.docx':
+                    content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                elif ext == '.xlsx':
+                    content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                else:
+                    content_type = "application/octet-stream"
             
             if custom_filename:
                 storage_filename = custom_filename
@@ -128,7 +137,13 @@ class SandboxUploadFileTool(SandboxToolsBase):
                 message += f"⏰ URL expires: {url_expires_at.strftime('%Y-%m-%d %H:%M:%S UTC')}\n"
                 message += f"\n🔐 This file is stored in private, secure storage with account isolation."
                 
-                return self.success_response(message)
+                return self.success_response({
+                    "message": message,
+                    "storage_url": signed_url,
+                    "file_path": f"/workspace/{storage_path}",
+                    "original_filename": original_filename,
+                    "expires_at": url_expires_at.isoformat()
+                })
                 
             except Exception as e:
                 logger.error(f"Failed to upload file to Supabase: {str(e)}")
