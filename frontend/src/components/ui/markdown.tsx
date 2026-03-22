@@ -4,6 +4,13 @@ import remarkGfm from 'remark-gfm';
 import { cn } from '@/lib/utils';
 import { MermaidRenderer } from './mermaid-renderer';
 import { isMermaidCode } from '@/lib/mermaid-utils';
+import { 
+  Play, 
+  Copy, 
+  RefreshCw, 
+  Download, 
+  Share2 
+} from 'lucide-react';
 import {
   CodeBlock,
   CodeBlockHeader,
@@ -13,11 +20,37 @@ import {
   CodeBlockItem,
   CodeBlockContent,
 } from "@/components/ui/shadcn-io/code-block";
+import {
+  Artifact,
+  ArtifactHeader,
+  ArtifactTitle,
+  ArtifactDescription,
+  ArtifactActions,
+  ArtifactAction,
+  ArtifactContent,
+} from "@/components/ai-elements/artifact";
 
 export type MarkdownProps = {
   children: string;
   className?: string;
 };
+
+const isArtifact = (code: string, language?: string) =>
+  code.split('\n').length >= 15;
+
+const downloadFile = (code: string, language?: string) => {
+  const ext = language === 'python' ? 'py' 
+    : language === 'typescript' ? 'ts'
+    : language === 'javascript' ? 'js'
+    : language || 'txt'
+  const blob = new Blob([code], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `code.${ext}`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 export const Markdown: React.FC<MarkdownProps> = React.memo(({
   children,
@@ -49,6 +82,73 @@ export const Markdown: React.FC<MarkdownProps> = React.memo(({
             // Check if this is a Mermaid diagram
             if (isMermaidCode(language, code)) {
               return <MermaidRenderer chart={code} className="my-2" />;
+            }
+
+            if (isArtifact(code, language)) {
+              return (
+                <Artifact className="my-4">
+                  <ArtifactHeader>
+                    <div className="flex flex-col gap-0.5">
+                      <ArtifactTitle>{language || 'code'}</ArtifactTitle>
+                      <ArtifactDescription>
+                        {new Date().toLocaleTimeString()}
+                      </ArtifactDescription>
+                    </div>
+                    <ArtifactActions>
+                      <ArtifactAction 
+                        icon={Play} 
+                        label="Run" 
+                        tooltip="Run code" 
+                      />
+                      <ArtifactAction 
+                        icon={Copy} 
+                        label="Copy" 
+                        tooltip="Copy code"
+                        onClick={() => navigator.clipboard.writeText(code)}
+                      />
+                      <ArtifactAction 
+                        icon={RefreshCw} 
+                        label="Regenerate" 
+                        tooltip="Regenerate"
+                      />
+                      <ArtifactAction 
+                        icon={Download} 
+                        label="Download" 
+                        tooltip="Download file"
+                        onClick={() => downloadFile(code, language)}
+                      />
+                      <ArtifactAction 
+                        icon={Share2} 
+                        label="Share" 
+                        tooltip="Share"
+                      />
+                    </ArtifactActions>
+                  </ArtifactHeader>
+                  <ArtifactContent className="p-0">
+                    <CodeBlock 
+                      data={[{ language: language || 'text', filename: language || 'code', code }]}
+                      defaultValue={language || 'text'}
+                      className="border-none rounded-none"
+                    >
+                      <CodeBlockBody>
+                        {(item) => (
+                          <CodeBlockItem value={item.language} className="rounded-none">
+                            <CodeBlockContent 
+                               language={item.language as any}
+                               themes={{
+                                  light: 'github-light',
+                                  dark: 'github-dark'
+                               }}
+                            >
+                               {item.code}
+                            </CodeBlockContent>
+                          </CodeBlockItem>
+                        )}
+                      </CodeBlockBody>
+                    </CodeBlock>
+                  </ArtifactContent>
+                </Artifact>
+              );
             }
 
             return (
