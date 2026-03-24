@@ -132,7 +132,7 @@ export const Markdown: React.FC<MarkdownProps> = React.memo(({
                     >
                       <CodeBlockBody>
                         {(item) => (
-                          <CodeBlockItem value={item.language} className="rounded-none">
+                          <CodeBlockItem key={item.language || item.filename} value={item.language} className="rounded-none">
                             <CodeBlockContent 
                                language={item.language as any}
                                themes={{
@@ -169,7 +169,7 @@ export const Markdown: React.FC<MarkdownProps> = React.memo(({
                 </div>
                 <CodeBlockBody>
                   {(item) => (
-                    <CodeBlockItem value={item.language}>
+                    <CodeBlockItem key={item.language || item.filename} value={item.language}>
                       <CodeBlockContent 
                          language={item.language as any}
                          themes={{

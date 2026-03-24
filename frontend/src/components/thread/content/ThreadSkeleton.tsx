@@ -109,7 +109,7 @@ export function ThreadSkeleton({
     return (
         <div className="flex h-screen">
             <div
-                className="flex flex-col flex-1 overflow-hidden transition-all duration-200 ease-in-out sm:mr-[450px] md:mr-[500px] lg:mr-[550px] xl:mr-[650px]"
+                className="flex flex-col flex-1 overflow-hidden"
             >
                 {/* Skeleton Header */}
                 {showHeader && (
@@ -214,58 +214,6 @@ export function ThreadSkeleton({
                 </div>
 
             </div>
-
-            {/* Side Panel - Elegant floating skeleton matching actual design */}
-            <div className="hidden sm:block fixed top-2 right-2 bottom-4 w-[40vw] sm:w-[450px] md:w-[500px] lg:w-[550px] xl:w-[645px] pointer-events-none z-30">
-                <div className="h-full border rounded-3xl bg-card pointer-events-auto flex flex-col overflow-hidden">
-                    {/* Header */}
-                    <div className="pt-4 pl-4 pr-4">
-                        <div className="flex items-center justify-between">
-                            <div className="ml-2">
-                                <Skeleton className="h-5 w-32" />
-                            </div>
-                            <Skeleton className="h-8 w-8 rounded-md" />
-                        </div>
-                    </div>
-
-                    {/* Content area */}
-                    <div className="flex-1 overflow-hidden p-6 pt-4">
-                        <div className="space-y-3">
-                            {/* Tool sections */}
-                            <div className="space-y-2">
-                                <Skeleton className="h-4 w-24" />
-                                <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
-                                    <Skeleton className="h-3 w-full" />
-                                    <Skeleton className="h-3 w-3/4" />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Skeleton className="h-4 w-32" />
-                                <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
-                                    <Skeleton className="h-3 w-full" />
-                                    <Skeleton className="h-3 w-5/6" />
-                                    <Skeleton className="h-3 w-2/3" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Footer navigation */}
-                    <div className="border-t bg-muted/20 px-4 py-2.5">
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1">
-                                <Skeleton className="h-7 w-7 rounded-md" />
-                                <Skeleton className="h-4 w-12" />
-                                <Skeleton className="h-7 w-7 rounded-md" />
-                            </div>
-                            <Skeleton className="h-2 flex-1 rounded-full" />
-                            <Skeleton className="h-6 w-24 rounded-full" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     );
 }

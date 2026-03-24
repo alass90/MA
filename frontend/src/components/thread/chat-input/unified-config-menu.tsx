@@ -595,7 +595,7 @@ const LoggedInMenu: React.FC<UnifiedConfigMenuProps> = memo(function LoggedInMen
         <Button
             variant="ghost"
             size="sm"
-            className="h-8 px-2 bg-transparent border-0 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center gap-1.5"
+            className="h-8 px-2 bg-transparent border-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center gap-1.5"
             aria-label="Config menu"
             onClick={() => setIsOpen(true)}
         >
@@ -750,7 +750,7 @@ const GuestMenu: React.FC<UnifiedConfigMenuProps> = memo(function GuestMenu() {
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 px-2 bg-border border-0 rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center gap-1.5 cursor-not-allowed opacity-80 pointer-events-none"
+                            className="h-8 px-2 bg-border border-0 rounded-full text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center gap-1.5 cursor-not-allowed opacity-80 pointer-events-none"
                             disabled
                         >
                             <div className="flex items-center gap-2 min-w-0 max-w-[180px]">

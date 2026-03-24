@@ -366,7 +366,7 @@ export const FileUploadHandler = forwardRef<
               type="button"
               variant="outline"
               size="sm"
-              className="h-8 w-8 p-0 bg-transparent border border-border rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center justify-center cursor-pointer"
+              className="h-8 w-8 p-0 bg-transparent border border-border rounded-full text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center justify-center cursor-pointer"
               disabled={
                 !isLoggedIn || loading || (disabled && !isAgentRunning) || isUploading
               }

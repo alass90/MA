@@ -18,7 +18,7 @@ import { handleFiles, FileUploadHandler } from './file-upload-handler';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowUp, X, Image as ImageIcon, Presentation, BarChart3, FileText, Search, Users, Code2, Sparkles, Brain as BrainIcon, MessageSquare, CornerDownLeft, Plug, Lock, Loader2 } from 'lucide-react';
+import { ArrowUp, X, Image as ImageIcon, GalleryVerticalEnd, BarChart3, FileText, Search, Users, Code2, Sparkles, Brain as BrainIcon, MessageSquare, CornerDownLeft, Plug, Lock, Loader2, Sheet, AppWindow, Telescope } from 'lucide-react';
 import { KortixLoader } from '@/components/ui/kortix-loader';
 import { VoiceRecorder } from './voice-recorder';
 import { useTheme } from 'next-themes';
@@ -51,7 +51,7 @@ const getModeIcon = (mode: string) => {
   const iconClass = "w-4 h-4";
   switch (mode) {
     case 'research':
-      return <Search className={iconClass} />;
+      return <Telescope className={iconClass} />;
     case 'people':
       return <Users className={iconClass} />;
     case 'code':
@@ -59,9 +59,11 @@ const getModeIcon = (mode: string) => {
     case 'docs':
       return <FileText className={iconClass} />;
     case 'data':
-      return <BarChart3 className={iconClass} />;
+      return <Sheet className={iconClass} />;
     case 'slides':
-      return <Presentation className={iconClass} />;
+      return <GalleryVerticalEnd className={iconClass} />;
+    case 'websites':
+      return <AppWindow className={iconClass} />;
     case 'image':
       return <ImageIcon className={iconClass} />;
     default:
@@ -111,7 +113,7 @@ const SubmitButton = memo(function SubmitButton({
               onClick={isAgentRunning && onStopAgent ? onStopAgent : onSubmit}
               size="sm"
               className={cn(
-                "w-8 h-8 flex-shrink-0 self-end rounded-xl relative z-10",
+                "w-8 h-8 flex-shrink-0 self-end rounded-full relative z-10",
                 (loading || isUploading) && "opacity-100 [&[disabled]]:opacity-100"
               )}
               disabled={isDisabled}
@@ -790,7 +792,7 @@ export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-8 w-8 p-0 bg-transparent border border-border rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center justify-center cursor-pointer"
+                          className="h-8 w-8 p-0 bg-transparent border border-border rounded-full text-muted-foreground hover:text-foreground hover:bg-accent/50 flex items-center justify-center cursor-pointer"
                           disabled={loading || (disabled && !isAgentRunning)}
                         >
                           <Plug className="h-4 w-4" />
@@ -1002,7 +1004,12 @@ export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
               )}
             >
               {selectedMode && getModeIcon(selectedMode)}
-              <span className="hidden sm:inline text-sm">{selectedMode?.charAt(0).toUpperCase()}{selectedMode?.slice(1)}</span>
+              <span className="hidden sm:inline text-sm">
+                {selectedMode === 'research' ? 'Deep Research' : 
+                 selectedMode === 'data' ? 'Sheets' : 
+                 selectedMode === 'websites' ? 'Websites' : 
+                 (selectedMode?.charAt(0).toUpperCase() + selectedMode?.slice(1))}
+              </span>
               <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Button>
           )}
@@ -1088,7 +1095,7 @@ export const ChatInput = memo(forwardRef<ChatInputHandles, ChatInputProps>(
             }}
           >
             <div className="w-full text-sm flex flex-col justify-between items-start rounded-lg">
-              <CardContent className={`w-full p-1.5 pb-2 ${bgColor} border rounded-3xl`}>
+              <CardContent className={`w-full p-1.5 pb-2 ${bgColor} border border-black/20 dark:border-white/20 rounded-3xl shadow-[0_5px_16px_-4px_rgba(0,0,0,0.1)] dark:shadow-[0_5px_16px_-4px_rgba(255,255,255,0.05)]`}>
                 {(uploadedFiles.length > 0 || isUploading) && (
                   <div className="relative">
                     <AttachmentGroup

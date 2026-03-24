@@ -6,11 +6,14 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import {
   Image as ImageIcon,
-  Presentation,
+  GalleryVerticalEnd,
   BarChart3,
   ArrowUpRight,
   FileText,
   Search,
+  Sheet,
+  AppWindow,
+  Telescope,
   Users,
   RefreshCw,
   Check,
@@ -42,7 +45,7 @@ interface SunaModesPanelProps {
   onTemplateChange?: (template: string | null) => void;
 }
 
-type ModeType = 'image' | 'slides' | 'data' | 'docs' | 'people' | 'research';
+type ModeType = 'image' | 'slides' | 'data' | 'docs' | 'people' | 'research' | 'websites';
 
 interface Mode {
   id: ModeType;
@@ -70,51 +73,9 @@ interface Mode {
 
 const modes: Mode[] = [
   {
-    id: 'image',
-    label: 'Image',
-    icon: <ImageIcon className="w-4 h-4" />,
-    samplePrompts: [
-      'A majestic golden eagle soaring through misty mountain peaks at sunrise with dramatic lighting',
-      'Close-up portrait of a fashion model with avant-garde makeup, studio lighting, high contrast shadows',
-      'Cozy Scandinavian living room with natural wood furniture, indoor plants, and soft morning sunlight',
-      'Futuristic cyberpunk street market at night with neon signs, rain-slicked pavement, and holographic displays',
-      'Elegant product photography of luxury perfume bottle on marble surface with soft reflections',
-      'Whimsical floating islands connected by rope bridges in a pastel sky with dreamy clouds',
-      'Macro close-up of morning dew drops on vibrant flower petals with bokeh background',
-      'Modern workspace desk setup with laptop, coffee, notebook, and succulent plants from above',
-      'Mystical forest path with ancient trees, glowing fireflies, and ethereal light beams through fog',
-      'Architectural detail of contemporary glass building facade with geometric patterns and reflections',
-      'Vibrant street food vendor stall with colorful ingredients, steam rising, and warm lighting',
-      'Serene Japanese zen garden with raked sand, moss-covered stones, and cherry blossom petals',
-      'Dynamic action shot of athlete mid-jump against dramatic sunset sky, silhouette effect',
-      'Rustic farmhouse kitchen with copper pots, fresh herbs, wooden cutting boards, and natural textures',
-      'Abstract fluid art with swirling metallic gold, deep blue, and emerald green organic patterns',
-    ],
-    options: {
-      title: 'Choose a style',
-      items: [
-        { id: 'photorealistic', name: 'Photorealistic', image: '/images/image-styles/photorealistic_eagle-min.png' },
-        { id: 'watercolor', name: 'Watercolor', image: '/images/image-styles/watercolor_garden-min.png' },
-        { id: 'digital-art', name: 'Digital Art', image: '/images/image-styles/digital_art_cyberpunk-min.png' },
-        { id: 'oil-painting', name: 'Oil Painting', image: '/images/image-styles/oil_painting_villa-min.png' },
-        { id: 'minimalist', name: 'Minimalist', image: '/images/image-styles/minimalist_coffee-min.png' },
-        { id: 'isometric', name: 'Isometric', image: '/images/image-styles/isometric_bedroom-min.png' },
-        { id: 'vintage', name: 'Vintage', image: '/images/image-styles/vintage_diner-min.png' },
-        { id: 'comic', name: 'Comic Book', image: '/images/image-styles/comic_book_robot-min.png' },
-        { id: 'neon', name: 'Neon', image: '/images/image-styles/neon_jellyfish-min.png' },
-        { id: 'pastel', name: 'Pastel', image: '/images/image-styles/pastel_landscape-min.png' },
-        { id: 'geometric', name: 'Geometric', image: '/images/image-styles/geometric_crystal-min.png' },
-        { id: 'abstract', name: 'Abstract', image: '/images/image-styles/abstract_organic-min.png' },
-        { id: 'anime', name: 'Anime', image: '/images/image-styles/anime_forest-min.png' },
-        { id: 'impressionist', name: 'Impressionist', image: '/images/image-styles/impressionist_garden-min.png' },
-        { id: 'surreal', name: 'Surreal', image: '/images/image-styles/surreal_islands-min.png' },
-      ],
-    },
-  },
-  {
     id: 'slides',
     label: 'Slides',
-    icon: <Presentation className="w-4 h-4" />,
+    icon: <GalleryVerticalEnd className="w-4 h-4" />,
     samplePrompts: [
       'Create a Series A pitch deck with market size, traction, and financial projections',
       'Build a Q4 business review showcasing KPIs, wins, and strategic initiatives',
@@ -151,8 +112,8 @@ const modes: Mode[] = [
   },
   {
     id: 'data',
-    label: 'Data',
-    icon: <BarChart3 className="w-4 h-4" />,
+    label: 'Sheets',
+    icon: <Sheet className="w-4 h-4" />,
     samplePrompts: [
       'Build a financial model projecting ARR growth with different pricing scenarios',
       'Create an interactive sales dashboard tracking metrics by region and quarter',
@@ -220,26 +181,9 @@ const modes: Mode[] = [
     },
   },
   {
-    id: 'people',
-    label: 'People',
-    icon: <Users className="w-4 h-4" />,
-    samplePrompts: [
-      'Find VP of Engineering candidates at Series B+ AI/ML startups in San Francisco Bay Area with 10+ years experience and proven track record scaling engineering teams',
-      'Build lead list of CMOs at B2B SaaS companies ($10M-$50M ARR) who recently raised Series A/B funding - include email patterns and tech stack',
-      'Research Senior Blockchain Engineers with Solidity/Rust experience at top crypto projects, open to relocation to Dubai or Singapore',
-      'Generate prospect list of technical founders at Seed-Series A startups in Enterprise AI who raised $2M-$15M in last 6 months',
-      'Identify Senior Product Managers at fintech companies with 5-10 years experience from FAANG or unicorns, skilled in 0-1 product development',
-      'Find CIOs and VP Engineering at mid-market healthcare IT companies (500-5000 employees) with $500K+ IT budgets planning cloud migration',
-      'Research VP Sales at B2B SaaS companies showing 100%+ YoY growth, with 7+ years closing $100K+ deals and PLG experience',
-      'Build list of CTOs at enterprise companies actively implementing AI infrastructure with multi-million dollar budgets in 2024',
-      'Find Senior UX/UI Designers with mobile-first consumer app experience and 1M+ user portfolios, actively looking or open to opportunities',
-      'Identify Senior DevOps Engineers at cloud-native startups with Kubernetes/Terraform expertise and 5-8 years building infrastructure for 10M+ users',
-    ],
-  },
-  {
     id: 'research',
-    label: 'Research',
-    icon: <Search className="w-4 h-4" />,
+    label: 'Deep Research',
+    icon: <Telescope className="w-4 h-4" />,
     samplePrompts: [
       'Analyze emerging trends in quantum computing and potential business applications',
       'Research top 10 competitors in the AI-powered CRM space with feature comparison',
@@ -251,6 +195,19 @@ const modes: Mode[] = [
       'Investigate the latest developments in gene therapy for rare diseases',
       'Study pricing strategies of successful D2C subscription box companies',
       'Research the competitive landscape of AI-powered cybersecurity solutions',
+    ],
+  },
+  {
+    id: 'websites',
+    label: 'Websites',
+    icon: <AppWindow className="w-4 h-4" />,
+    samplePrompts: [
+      'Create a modern, high-converting landing page for a B2B SaaS platform with a dark theme and glassmorphism',
+      'Build a responsive personal portfolio website with a blog, project showcase, and interactive timeline',
+      'Design a sleek e-commerce storefront for a boutique coffee brand with product grids and a shopping cart',
+      'Develop a technical documentation site using a clean, minimalist layout with sidebar navigation and search',
+      'Construct a professional agency website with case studies, service descriptions, and a lead capture form',
+      'Create a creative landing page for a mobile app with 3D illustrations, parallax effects, and app store links',
     ],
   },
 ];
@@ -661,7 +618,7 @@ const SlideTemplateIcon = ({ type, className }: { type: string; className?: stri
       );
     
     default:
-      return <Presentation className="w-6 h-6" />;
+      return <GalleryVerticalEnd className="w-6 h-6" />;
   }
 };
 
@@ -1254,7 +1211,7 @@ export function SunaModesPanel({
                 variant="outline"
                 size="sm"
                 onClick={() => onModeSelect(mode.id)}
-                className="flex items-center justify-center sm:justify-start gap-2.5 shrink-0 transition-all duration-200 bg-background/50 hover:bg-accent/50 rounded-full px-4 text-muted-foreground hover:text-foreground border-border/60 hover:border-border cursor-pointer h-9 shadow-sm"
+                className="flex items-center justify-center gap-[7px] shrink-0 transition-all duration-200 bg-transparent hover:bg-accent/10 rounded-full py-2 px-4 text-[14px] font-normal text-muted-foreground hover:text-foreground border border-[#e5e7eb] hover:border-border cursor-pointer h-auto shadow-none"
               >
                 {mode.icon}
                 <span>{mode.label}</span>

@@ -2,6 +2,7 @@
 
 import { Project } from '@/lib/api/threads';
 import { getUserFriendlyToolName } from '@/components/thread/utils';
+import { cn } from '@/lib/utils';
 import React, { memo, useMemo, useCallback, useState, useEffect, useRef } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -287,69 +288,36 @@ const NavigationControls = memo(function NavigationControls({
   onJumpToLatest,
   isMobile = false,
 }: NavigationControlsProps & { isMobile?: boolean }) {
-  const renderStatusButton = () => {
-    if (isLiveMode) {
-      const isIdle = agentStatus === 'idle';
-      return (
-        <Badge
-          variant="secondary"
-          className={`h-7 px-2.5 gap-1.5 border-none shadow-none font-medium text-xs whitespace-nowrap
-            ${isIdle
-              ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
-              : "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-            }`}
-        >
-          <div className={`w-1.5 h-1.5 rounded-full ${isIdle ? "bg-zinc-400 dark:bg-zinc-500" : "bg-blue-500 animate-pulse"}`} />
-          <span>{isIdle ? 'Live' : 'Running'}</span>
-        </Badge>
-      );
-    }
-
-    return (
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onJumpToLatest}
-        className="h-7 px-2.5 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 gap-1.5 border-zinc-200 dark:border-zinc-800"
-      >
-        <span className="text-xs font-medium">To Latest</span>
-      </Button>
-    );
-  };
+  const timestamp = "Live"; // Fallback if no timestamp is found
+  // Note: timestamps are handled in snapshots, but for simplicity we use "live" logic from snippet
 
   if (isMobile) {
     return (
-      <div className="px-4 py-3 bg-card border-t flex flex-col gap-4">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
+      <div className="px-4 py-3 bg-[var(--background-menu-white)] border-t border-[var(--border-main)] flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant="ghost"
+              size="icon"
               onClick={onPrevious}
               disabled={displayIndex <= 0}
-              className="h-8 px-2.5 text-xs"
+              className="h-8 w-8 text-[var(--icon-secondary)] hover:text-[var(--icon-blue)]"
             >
-              <ChevronLeft className="h-3.5 w-3.5 mr-1" />
-              <span>Prev</span>
+              <ChevronLeft className="h-4 w-4" />
             </Button>
-
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-zinc-600 dark:text-zinc-400 font-medium tabular-nums min-w-[44px]">
-                {safeInternalIndex + 1}/{displayTotalCalls}
-              </span>
-              {renderStatusButton()}
-            </div>
-
             <Button
-              variant="outline"
-              size="sm"
+              variant="ghost"
+              size="icon"
               onClick={onNext}
-              disabled={displayIndex >= displayTotalCalls - 1}
-              className="h-8 px-2.5 text-xs"
+              disabled={safeInternalIndex >= latestIndex}
+              className="h-8 w-8 text-[var(--icon-secondary)] hover:text-[var(--icon-blue)]"
             >
-              <span>Next</span>
-              <ChevronRight className="h-3.5 w-3.5 ml-1" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
+          </div>
+          <div className="flex items-center gap-1 text-sm">
+             <div className="h-[8px] w-[8px] rounded-full bg-[var(--text-tertiary)]"></div>
+             <span className="text-[var(--text-tertiary)]">{isLiveMode ? 'live' : `${displayIndex + 1}/${displayTotalCalls}`}</span>
           </div>
         </div>
       </div>
@@ -357,46 +325,53 @@ const NavigationControls = memo(function NavigationControls({
   }
 
   return (
-    <div className="px-4 py-2 mt-auto border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50 backdrop-blur-sm">
-      <div className="flex items-center gap-4 max-w-2xl mx-auto h-10">
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onPrevious}
-            disabled={displayIndex <= 0}
-            className="h-8 w-8 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onNext}
-            disabled={safeInternalIndex >= latestIndex}
-            className="h-8 w-8 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+    <div className="mt-auto flex w-full items-center gap-2 px-4 h-[44px] relative bg-[var(--background-menu-white)] border-t border-[var(--border-main)]">
+      <div className="flex items-center" dir="ltr">
+        <button
+          type="button"
+          onClick={onPrevious}
+          disabled={displayIndex <= 0}
+          className="flex items-center justify-center w-[24px] h-[24px] text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-blue)] cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-skip-back" aria-hidden="true"><path d="M17.971 4.285A2 2 0 0 1 21 6v12a2 2 0 0 1-3.029 1.715l-9.997-5.998a2 2 0 0 1-.003-3.432z"></path><path d="M3 20V4"></path></svg>
+        </button>
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={safeInternalIndex >= latestIndex}
+          className="flex items-center justify-center w-[24px] h-[24px] text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-blue)] cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-skip-forward" aria-hidden="true"><path d="M21 4v16"></path><path d="M6.029 4.285A2 2 0 0 0 3 6v12a2 2 0 0 0 3.029 1.715l9.997-5.998a2 2 0 0 0 .003-3.432z"></path></svg>
+        </button>
+      </div>
 
-        <div className="flex-1 relative flex items-center gap-4">
-          <Slider
-            min={0}
-            max={Math.max(0, displayTotalCalls - 1)}
-            step={1}
-            value={[safeInternalIndex]}
-            onValueChange={onSliderChange}
-            className="flex-1 [&>span:first-child]:h-1.5 [&>span:first-child]:bg-zinc-200 dark:[&>span:first-child]:bg-zinc-800 [&>span:first-child>span]:bg-zinc-500 dark:[&>span:first-child>span]:bg-zinc-400 [&>span:first-child>span]:h-1.5"
-          />
-          <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium tabular-nums min-w-[32px]">
-            {safeInternalIndex + 1}/{displayTotalCalls}
-          </span>
+      <div className="flex-1 relative flex items-center group touch-none select-none">
+        <Slider
+          min={0}
+          max={Math.max(0, displayTotalCalls - 1)}
+          step={1}
+          value={[safeInternalIndex]}
+          onValueChange={onSliderChange}
+          className="flex-1 [&>span:first-child]:h-1 [&>span:first-child]:bg-[var(--fill-tsp-gray-dark)] [&>span:first-child>span]:bg-[var(--text-blue)] [&>span:first-child>span]:h-1 [&_[role=slider]]:h-3 [&_[role=slider]]:w-3 [&_[role=slider]]:bg-[var(--text-blue)] [&_[role=slider]]:border-2 [&_[role=slider]]:border-[var(--fill-input-chat)] [&_[role=slider]]:shadow-sm"
+        />
+        {/* Tooltip purely visual for now as in snippet */}
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 rounded bg-[var(--text-blue)] px-[10px] h-[28px] text-xs text-[var(--text-white)] hidden transition-opacity group-hover:flex items-center whitespace-nowrap">
+          {isLiveMode ? 'Latest' : `Action ${safeInternalIndex + 1}`}
         </div>
+      </div>
 
-        <div className="flex items-center gap-1.5">
-          {renderStatusButton()}
-        </div>
+      <div 
+        className="flex items-center gap-1 text-sm ms-[2px] cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={onJumpToLatest}
+      >
+        <div className={cn(
+          "h-[8px] w-[8px] rounded-full",
+          isLiveMode ? "bg-[var(--text-blue)]" : "bg-[var(--text-tertiary)]"
+        )}></div>
+        <span className={cn(
+          "text-[13px] font-medium",
+          isLiveMode ? "text-[var(--text-blue)]" : "text-[var(--text-tertiary)]"
+        )}>live</span>
       </div>
     </div>
   );
@@ -412,7 +387,7 @@ interface EmptyStateProps {
 
 const EmptyState = memo(function EmptyState({ t }: EmptyStateProps) {
   return (
-    <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4 bg-[#f8f8f7] dark:bg-[#1a1a1b]">
+    <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4">
       <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] border border-black/[0.08] dark:border-white/[0.08] shadow-[0px_0px_8px_0px_rgba(0,0,0,0.02)] overflow-hidden flex flex-col items-center justify-center p-8">
         <div className="flex flex-col items-center space-y-6 max-w-sm text-center">
           <div className="relative">
@@ -449,7 +424,7 @@ interface LoadingStateProps {
 
 const LoadingState = memo(function LoadingState({ agentName, onClose, isMobile }: LoadingStateProps) {
   const content = (
-    <div className="flex-1 flex flex-col overflow-hidden bg-[#f8f8f7] dark:bg-[#1a1a1b]">
+    <>
       <PanelHeader
         agentName={agentName}
         onClose={onClose}
@@ -473,11 +448,11 @@ const LoadingState = memo(function LoadingState({ agentName, onClose, isMobile }
       </div>
 
       <div className="h-12 px-4 bg-transparent border-t border-black/[0.04] dark:border-white/[0.04] flex justify-between items-center gap-4">
-        <div className="flex items-center gap-2 flex-1">
+        <div className="items-center gap-2 flex-1 hidden sm:flex">
           <Skeleton className="h-4 w-4 rounded-full" />
           <Skeleton className="h-3 w-24" />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1 sm:flex-none justify-between sm:justify-end">
            <Skeleton className="h-3 w-12" />
            <div className="flex gap-1">
              <Skeleton className="h-7 w-7 rounded-lg" />
@@ -485,7 +460,7 @@ const LoadingState = memo(function LoadingState({ agentName, onClose, isMobile }
            </div>
         </div>
       </div>
-    </div>
+    </>
   );
 
   if (isMobile) {
@@ -499,7 +474,7 @@ const LoadingState = memo(function LoadingState({ agentName, onClose, isMobile }
   return (
     <div className="fixed inset-0 z-30 pointer-events-none">
       <div className="p-4 h-full flex items-stretch justify-end pointer-events-auto">
-        <div className="border border-black/[0.08] dark:border-white/[0.08] rounded-3xl flex flex-col shadow-2xl bg-white dark:bg-[#1a1a1b] w-[90%] sm:w-[450px] md:w-[500px] lg:w-[550px] xl:w-[650px] overflow-hidden">
+        <div className="border border-black/[0.08] dark:border-white/[0.08] rounded-3xl flex flex-col shadow-[0px_12px_44px_rgba(0,0,0,0.1),0px_0px_1px_rgba(0,0,0,0.18)] dark:shadow-[0px_12px_44px_rgba(0,0,0,0.3),0px_0px_1px_rgba(255,255,255,0.15)] bg-white dark:bg-[#1a1a1b] w-[90%] sm:w-[450px] md:w-[500px] lg:w-[550px] xl:w-[650px] overflow-hidden">
           {content}
         </div>
       </div>
@@ -962,7 +937,7 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
         const userFriendlyName = getUserFriendlyToolName(toolName);
         
         return (
-          <div className="flex flex-col h-full bg-[#f8f8f7] dark:bg-[#1a1a1b]">
+          <div className="flex flex-col h-full">
             {!isMobile && (
               <PanelHeader
                 agentName={agentName}
@@ -973,11 +948,13 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
             )}
             
             <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4">
-              <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] overflow-hidden flex flex-col">
-                <div className="h-9 flex items-center justify-center px-4 bg-[#f8f8f7] dark:bg-[#1a1a1b] rounded-t-[22px] shadow-[inset_0px_1px_0px_0px_#FFFFFF] dark:shadow-[inset_0px_1px_0px_0px_#FFFFFF10]">
-                  <span className="text-[13px] font-medium text-zinc-400 dark:text-zinc-500 truncate max-w-[300px]">
-                    {userFriendlyName}
-                  </span>
+              <div className="flex-1 bg-[var(--background-gray-main)] border border-[var(--border-dark)] dark:border-black/30 shadow-[0px_4px_32px_0px_rgba(0,0,0,0.04)] rounded-[12px] overflow-hidden flex flex-col">
+                <div className="h-[36px] flex items-center px-3 w-full bg-[var(--background-gray-main)] border-b border-[var(--border-main)] rounded-t-lg shadow-[inset_0px_1px_0px_0px_#FFFFFF] dark:shadow-[inset_0px_1px_0px_0px_#FFFFFF15]">
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="max-w-[250px] truncate text-[var(--text-tertiary)] text-sm font-medium text-center">
+                      {userFriendlyName}
+                    </div>
+                  </div>
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center p-8">
                 <div className="flex flex-col items-center space-y-6 max-w-sm text-center">
@@ -1084,15 +1061,17 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
       ? `Talos is using ${userFriendlyName} | Executing...`
       : `Talos is using ${userFriendlyName} | Ready`;
     const capsuleHeader = (
-      <div className="h-9 flex items-center justify-center px-4 bg-[#f8f8f7] dark:bg-[#1a1a1b] rounded-t-[22px] shadow-[inset_0px_1px_0px_0px_#FFFFFF] dark:shadow-[inset_0px_1px_0px_0px_#FFFFFF10]">
-        <span className="text-[13px] font-medium text-zinc-400 dark:text-zinc-500 truncate max-w-[300px]">
-          {contextText}
-        </span>
+      <div className="h-[36px] flex items-center px-3 w-full bg-[var(--background-gray-main)] border-b border-[var(--border-main)] rounded-t-lg shadow-[inset_0px_1px_0px_0px_#FFFFFF] dark:shadow-[inset_0px_1px_0px_0px_#FFFFFF15]">
+        <div className="flex-1 flex items-center justify-center">
+          <div className="max-w-[250px] truncate text-[var(--text-tertiary)] text-sm font-medium text-center">
+            {contextText}
+          </div>
+        </div>
       </div>
     );
 
     return (
-      <div className="flex flex-col h-full bg-[#f8f8f7] dark:bg-[#1a1a1b]">
+      <div className="flex flex-col h-full">
         {!isMobile && (
           <PanelHeader
             agentName={agentName}
@@ -1104,7 +1083,7 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
         )}
 
         <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4">
-          <div className="flex-1 bg-white dark:bg-[#272728] rounded-[22px] overflow-hidden flex flex-col">
+          <div className="flex-1 bg-[var(--background-gray-main)] border border-[var(--border-dark)] dark:border-black/30 shadow-[0px_4px_32px_0px_rgba(0,0,0,0.04)] rounded-[12px] overflow-hidden flex flex-col">
             {capsuleHeader}
             <div className="flex-1 overflow-hidden flex flex-col">
             {persistentVncIframe && (
@@ -1120,7 +1099,7 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
               <div className="h-full flex flex-col">
                 <BrowserHeader isConnected={false} viewToggle={<ViewToggle currentView={currentView} onViewChange={setCurrentView} />} />
 
-                <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#f8f8f7] dark:bg-[#272728]/50">
+                <div className="flex-1 flex flex-col items-center justify-center p-8">
                   <div className="flex flex-col items-center space-y-4 max-w-sm text-center">
                     <div className="w-16 h-16 bg-white dark:bg-[#1a1a1b] rounded-full flex items-center justify-center border border-black/[0.08] dark:border-white/[0.08]">
                       <Globe className="h-8 w-8 text-zinc-400 dark:text-zinc-500" />
@@ -1200,12 +1179,12 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
                 damping: 35
               }
             }}
-            className="m-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] border rounded-3xl flex flex-col z-30"
+            className="m-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] border border-black/[0.08] dark:border-white/[0.08] rounded-3xl flex flex-col z-30 shadow-[0px_12px_44px_rgba(0,0,0,0.1),0px_0px_1px_rgba(0,0,0,0.18)] dark:shadow-[0px_12px_44px_rgba(0,0,0,0.3),0px_0px_1px_rgba(255,255,255,0.15)]"
             style={{
               overflow: 'hidden',
             }}
           >
-            <div className="flex-1 flex flex-col overflow-hidden bg-[#f8f8f7] dark:bg-[#1a1a1b]">
+            <div className="flex-1 flex flex-col overflow-hidden">
               {renderContent()}
             </div>
           </motion.div>
@@ -1230,9 +1209,9 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
           ease: [0.4, 0, 0.2, 1]
         }
       }}
-      className="h-full w-full flex flex-col bg-card overflow-hidden rounded-3xl border border-black/[0.08] dark:border-white/[0.08]"
+      className="h-full w-full flex flex-col bg-card overflow-hidden rounded-3xl border border-black/[0.08] dark:border-white/[0.08] shadow-[0px_12px_44px_rgba(0,0,0,0.1),0px_0px_1px_rgba(0,0,0,0.18)] dark:shadow-[0px_12px_44px_rgba(0,0,0,0.3),0px_0px_1px_rgba(255,255,255,0.15)]"
     >
-      <div className="flex-1 flex flex-col overflow-hidden bg-[#f8f8f7] dark:bg-[#1a1a1b]">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {renderContent()}
       </div>
     </motion.div>

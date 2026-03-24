@@ -30,7 +30,7 @@ interface AttachmentGroupProps {
     onRemove?: (index: number) => void;
     layout?: LayoutStyle;
     className?: string;
-    onFileClick?: (path: string, filePathList?: string[]) => void;
+    onFileClick?: (path: string, filePathList?: string[], storageUrl?: string) => void;
     showPreviews?: boolean;
     maxHeight?: string;
     gridImageHeight?: number; // New prop for grid image height
@@ -451,7 +451,7 @@ export function AttachmentGroup({
                             >
                                 <FileAttachment
                                     filepath={item.path}
-                                    onClick={handleFileClick}
+                                    onFileClick={handleFileClick}
                                     sandboxId={sandboxId}
                                     showPreview={showPreviews}
                                     localPreviewUrl={getLocalPreviewUrl(item.file)}

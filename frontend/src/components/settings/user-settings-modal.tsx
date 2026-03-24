@@ -28,6 +28,7 @@ import {
     Smartphone,
     AppWindow,
     Users,
+    Bot,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
@@ -85,8 +86,11 @@ import { formatCredits } from '@/lib/utils/credit-formatter';
 import { LanguageSwitcher } from './language-switcher';
 import { useTranslations } from 'next-intl';
 import { ReferralsTab } from '@/components/referrals/referrals-tab';
+import { NavAgentsView } from '@/components/sidebar/nav-agents-view';
+import { NavGlobalConfig } from '@/components/sidebar/nav-global-config';
+import { NavTriggerRuns } from '@/components/sidebar/nav-trigger-runs';
 
-type TabId = 'general' | 'plan' | 'billing' | 'usage' | 'env-manager' | 'knowledge-base' | 'integrations' | 'referrals';
+type TabId = 'general' | 'plan' | 'billing' | 'usage' | 'env-manager' | 'knowledge-base' | 'integrations' | 'referrals' | 'workers' | 'triggers';
 
 interface Tab {
     id: TabId;
@@ -118,7 +122,9 @@ export function UserSettingsModal({
         { id: 'plan', label: 'Plan', icon: Zap },
         { id: 'billing', label: 'Billing', icon: CreditCard },
         { id: 'usage', label: 'Usage', icon: TrendingDown },
-        ...(!isProduction ? [{ id: 'referrals' as TabId, label: 'Referrals', icon: Users }] : []),
+        { id: 'referrals' as TabId, label: 'Referrals', icon: Users },
+        { id: 'workers', label: 'Workers', icon: Bot },
+        { id: 'triggers', label: 'Triggers', icon: Zap },
         { id: 'knowledge-base', label: 'Knowledge Base', icon: FileText },
         { id: 'integrations', label: 'Integrations', icon: Plug },
         ...(isLocal ? [{ id: 'env-manager' as TabId, label: 'Env Manager', icon: KeyRound }] : []),
@@ -208,6 +214,23 @@ export function UserSettingsModal({
                                 {activeTab === 'env-manager' && isLocal && <EnvManagerTab />}
                                 {activeTab === 'knowledge-base' && <KnowledgeBaseTab />}
                                 {activeTab === 'integrations' && <IntegrationsTab />}
+                                {activeTab === 'workers' && (
+                                    <div className="p-4">
+                                        <h3 className="text-lg font-semibold mb-4">AI Workers</h3>
+                                        <NavAgentsView />
+                                    </div>
+                                )}
+                                {activeTab === 'triggers' && (
+                                    <div className="p-4 space-y-6">
+                                        <div>
+                                            <h3 className="text-lg font-semibold mb-4">Triggers</h3>
+                                            <NavGlobalConfig />
+                                        </div>
+                                        <div className="pt-6 border-t border-border">
+                                            <NavTriggerRuns />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -262,6 +285,23 @@ export function UserSettingsModal({
                             {activeTab === 'env-manager' && isLocal && <EnvManagerTab />}
                             {activeTab === 'knowledge-base' && <KnowledgeBaseTab />}
                             {activeTab === 'integrations' && <IntegrationsTab />}
+                            {activeTab === 'workers' && (
+                                <div className="p-4 sm:p-6">
+                                    <h3 className="text-lg font-semibold mb-4">AI Workers</h3>
+                                    <NavAgentsView />
+                                </div>
+                            )}
+                            {activeTab === 'triggers' && (
+                                <div className="p-4 sm:p-6 space-y-6">
+                                    <div>
+                                        <h3 className="text-lg font-semibold mb-4">Triggers</h3>
+                                        <NavGlobalConfig />
+                                    </div>
+                                    <div className="pt-6 border-t border-border">
+                                        <NavTriggerRuns />
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}

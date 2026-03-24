@@ -167,7 +167,7 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
 
     const containerClassName = isPreviewMode
         ? "flex-1 overflow-y-auto scrollbar-hide px-4 py-4 pb-0"
-        : "flex-1 overflow-y-auto scrollbar-hide px-4 py-4 pb-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60";
+        : "flex-1 overflow-y-auto scrollbar-hide px-4 py-4 pb-0 bg-background";
 
     // In playback mode, we use visibleMessages instead of messages
     const displayMessages = readOnly && visibleMessages ? visibleMessages : messages;
@@ -515,17 +515,17 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                         const cleanContent = messageContent.replace(/\[Uploaded File: .*?\]/g, '').trim();
 
                                         return (
-                                            <div key={group.key} className="flex justify-end">
-                                                <div className="flex max-w-[85%] rounded-3xl rounded-br-lg bg-card border px-4 py-3 break-words overflow-hidden">
-                                                    <div className="space-y-3 min-w-0 flex-1">
-                                                        {cleanContent && (
-                                                            <ComposioUrlDetector content={cleanContent} className="text-base prose prose-base dark:prose-invert chat-markdown max-w-none [&>:first-child]:mt-0 prose-headings:mt-3 break-words overflow-wrap-anywhere" />
-                                                        )}
-
-                                                        {/* Use the helper function to render user attachments */}
-                                                        {renderAttachments(attachments as string[], handleOpenFileViewer, sandboxId, project, threadStorageUrls, threadSupabasePaths)}
+                                            <div key={group.key} className="flex flex-col items-end gap-2 text-base">
+                                                {cleanContent && (
+                                                    <div className="flex max-w-[85%] rounded-3xl rounded-br-lg bg-card border px-4 py-3 break-words overflow-hidden">
+                                                        <ComposioUrlDetector 
+                                                            content={cleanContent} 
+                                                            className="text-base prose prose-base dark:prose-invert chat-markdown max-w-none [&>:first-child]:mt-0 prose-headings:mt-3 break-words overflow-wrap-anywhere" 
+                                                        />
                                                     </div>
-                                                </div>
+                                                )}
+                                                {/* Use the helper function to render user attachments outside the text bubble */}
+                                                {renderAttachments(attachments as string[], handleOpenFileViewer, sandboxId, project, threadStorageUrls, threadSupabasePaths)}
                                             </div>
                                         );
                                     } else if (group.type === 'assistant_group') {
@@ -559,8 +559,11 @@ export const ThreadContent: React.FC<ThreadContentProps> = ({
                                                                             storageUrls: threadStorageUrls,
                                                                             supabasePaths: threadSupabasePaths,
                                                                             toolResults: group.messages.reduce((acc, m) => {
-                                                                                if (m.role === 'tool' && m.tool_call_id) {
-                                                                                    acc[m.tool_call_id] = m.content;
+                                                                                if (m.type === 'tool') {
+                                                                                    const meta = safeJsonParse<ParsedMetadata>(m.metadata, {});
+                                                                                    if (meta.tool_call_id) {
+                                                                                        acc[meta.tool_call_id] = m.content;
+                                                                                    }
                                                                                 }
                                                                                 return acc;
                                                                             }, {} as Record<string, any>),

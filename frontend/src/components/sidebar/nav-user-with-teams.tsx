@@ -22,6 +22,7 @@ import {
   KeyRound,
   Plug,
   Zap,
+  Bot,
   Shield,
   DollarSign,
   Users,
@@ -250,7 +251,7 @@ export function NavUserWithTeams({
                     <span className="truncate text-xs text-muted-foreground leading-tight">{user.email}</span>
                   )}
                 </div>
-                <ChevronsUpDown className="ml-auto size-4 flex-shrink-0 group-data-[collapsible=icon]:hidden" />
+                <ChevronsUpDown className="ml-auto size-[18px] flex-shrink-0 group-data-[collapsible=icon]:hidden" strokeWidth={2} />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -352,12 +353,12 @@ export function NavUserWithTeams({
                   }}
                   className="gap-2 p-2"
                 >
-                  <Zap className="h-4 w-4" />
+                  <Zap className="size-[18px]" strokeWidth={2} />
                   <span>Plan</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/knowledge" className="gap-2 p-2">
-                    <FileText className="h-4 w-4" />
+                    <FileText className="size-[18px]" strokeWidth={2} />
                     <span>Knowledge Base</span>
                   </Link>
                 </DropdownMenuItem>
@@ -368,8 +369,28 @@ export function NavUserWithTeams({
                   }}
                   className="gap-2 p-2"
                 >
-                  <CreditCard className="h-4 w-4" />
+                  <CreditCard className="size-[18px]" strokeWidth={2} />
                   <span>Billing</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSettingsTab('workers' as any);
+                    setShowSettingsModal(true);
+                  }}
+                  className="gap-2 p-2"
+                >
+                  <Bot className="size-[18px]" strokeWidth={2} />
+                  <span>Workers</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSettingsTab('triggers' as any);
+                    setShowSettingsModal(true);
+                  }}
+                  className="gap-2 p-2"
+                >
+                  <Zap className="size-[18px]" strokeWidth={2} />
+                  <span>Triggers</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
@@ -378,12 +399,12 @@ export function NavUserWithTeams({
                   }}
                   className="gap-2 p-2"
                 >
-                  <TrendingDown className="h-4 w-4" />
+                  <TrendingDown className="size-[18px]" strokeWidth={2} />
                   <span>Usage</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/settings/credentials" className="gap-2 p-2">
-                    <Plug className="h-4 w-4" />
+                    <Plug className="size-[18px]" strokeWidth={2} />
                     <span>Integrations</span>
                   </Link>
                 </DropdownMenuItem>
@@ -394,7 +415,7 @@ export function NavUserWithTeams({
                   }}
                   className="gap-2 p-2"
                 >
-                  <Settings className="h-4 w-4" />
+                  <Settings className="size-[18px]" strokeWidth={2} />
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -402,8 +423,8 @@ export function NavUserWithTeams({
                   className="gap-2 p-2"
                 >
                   <div className="relative h-4 w-4">
-                    <Sun className="h-4 w-4 absolute rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                    <Moon className="h-4 w-4 absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                    <Sun className="size-[18px] absolute rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" strokeWidth={2} />
+                    <Moon className="size-[18px] absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" strokeWidth={2} />
                   </div>
                   <span>{t('theme')}</span>
                 </DropdownMenuItem>
@@ -419,7 +440,7 @@ export function NavUserWithTeams({
                     {user.isAdmin && (
                       <DropdownMenuItem asChild>
                         <Link href="/admin/billing" className="gap-2 p-2">
-                          <Shield className="h-4 w-4" />
+                          <Shield className="size-[18px]" strokeWidth={2} />
                           <span>Admin Panel</span>
                         </Link>
                       </DropdownMenuItem>
@@ -427,7 +448,7 @@ export function NavUserWithTeams({
                     {user.isAdmin && (
                       <DropdownMenuItem asChild>
                         <Link href="/admin/notifications" className="gap-2 p-2">
-                          <Bell className="h-4 w-4" />
+                          <Bell className="size-[18px]" strokeWidth={2} />
                           <span>Notifications</span>
                         </Link>
                       </DropdownMenuItem>
@@ -435,7 +456,7 @@ export function NavUserWithTeams({
                     {user.isAdmin && (
                       <DropdownMenuItem asChild>
                         <Link href="/settings/api-keys" className="gap-2 p-2">
-                          <Key className="h-4 w-4" />
+                          <Key className="size-[18px]" strokeWidth={2} />
                           <span>API Keys</span>
                         </Link>
                       </DropdownMenuItem>
@@ -448,7 +469,7 @@ export function NavUserWithTeams({
                         }}
                         className="gap-2 p-2"
                       >
-                        <KeyRound className="h-4 w-4" />
+                        <KeyRound className="size-[18px]" strokeWidth={2} />
                         <span>Local .Env Manager</span>
                       </DropdownMenuItem>
                     )}
@@ -458,7 +479,7 @@ export function NavUserWithTeams({
 
               <DropdownMenuSeparator className="my-1" />
               <DropdownMenuItem onClick={handleLogout} className="gap-2 p-2">
-                <LogOut className="h-4 w-4" />
+                <LogOut className="size-[18px]" strokeWidth={2} />
                 <span>{t('logout')}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>

@@ -2,13 +2,8 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Bot, Menu, Plus, Zap, MessageCircle, PanelLeftOpen, PanelLeftClose, PanelLeft } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-
+import { MessageCircle, Menu, Plus, PanelLeftOpen, PanelLeftClose, PanelLeft, Search, X, Library, Folder, FolderOpen, ChevronRight } from 'lucide-react';
 import { NavAgents } from '@/components/sidebar/nav-agents';
-import { NavAgentsView } from '@/components/sidebar/nav-agents-view';
-import { NavGlobalConfig } from '@/components/sidebar/nav-global-config';
-import { NavTriggerRuns } from '@/components/sidebar/nav-trigger-runs';
 import { NavUserWithTeams } from '@/components/sidebar/nav-user-with-teams';
 import { KortixLogo } from '@/components/sidebar/kortix-logo';
 import { siteConfig } from '@/lib/home';
@@ -17,8 +12,17 @@ import {
   SidebarContent,
   SidebarHeader,
   SidebarRail,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuAction,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { Switch } from '@/components/ui/switch';
+import { useProjects } from '@/hooks/sidebar/use-sidebar';
 import { NewAgentDialog } from '@/components/agents/new-agent-dialog';
 import { ThreadSearchModal } from '@/components/sidebar/thread-search-modal';
 import { useEffect, useState } from 'react';
@@ -101,7 +105,6 @@ export function SidebarLeft({
   const isMobile = useIsMobile();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
-  const [activeView, setActiveView] = useState<'chats' | 'agents' | 'starred'>('chats');
   const [showEnterpriseCard, setShowEnterpriseCard] = useState(true);
   const [user, setUser] = useState<{
     name: string;
@@ -120,13 +123,9 @@ export function SidebarLeft({
   const [showNewAgentDialog, setShowNewAgentDialog] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const { isOpen: isDocumentModalOpen } = useDocumentModalStore();
+  const { data: projects = [] } = useProjects();
+  const [showAllProjects, setShowAllProjects] = useState(true);
 
-  // Update active view based on pathname
-  useEffect(() => {
-    if (pathname?.includes('/triggers') || pathname?.includes('/knowledge')) {
-      setActiveView('starred');
-    }
-  }, [pathname]);
 
   // Logout handler
   const handleLogout = async () => {
@@ -211,13 +210,13 @@ export function SidebarLeft({
       className="border-r border-border/50 bg-background [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']"
       {...props}
     >
-      <SidebarHeader className={cn("px-6 pt-7 overflow-hidden", state === 'collapsed' && "px-6")}>
-        <div className={cn("flex h-[32px] items-center justify-between min-w-[200px]")}>
-          <div className="">
+      <SidebarHeader className={cn("px-6 pt-7 overflow-hidden group-data-[collapsible=icon]:px-[8px] group-data-[collapsible=icon]:py-[12px] group-data-[collapsible=icon]:h-[56px] group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:items-center")}>
+        <div className={cn("flex h-[32px] items-center justify-between min-w-[200px] group-data-[collapsible=icon]:min-w-0 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:h-full")}>
+          <div className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:size-[32px] group-data-[collapsible=icon]:mx-[2px]">
             {state === 'collapsed' ? (
-              <div className="pl-2 relative flex items-center justify-center w-fit group/logo">
+              <div className="relative flex items-center justify-center w-full group/logo">
                 <Link href="/dashboard" onClick={() => isMobile && setOpenMobile(false)}>
-                  <KortixLogo size={20} className="flex-shrink-0 opacity-100 group-hover/logo:opacity-0 transition-opacity" />
+                  <KortixLogo size={24} className="flex-shrink-0 opacity-100 group-hover/logo:opacity-0 transition-opacity" />
                 </Link>
                 <Tooltip delayDuration={2000}>
                   <TooltipTrigger asChild>
@@ -227,22 +226,22 @@ export function SidebarLeft({
                       className="h-8 w-8 absolute opacity-0 group-hover/logo:opacity-100 transition-opacity"
                       onClick={() => setOpen(true)}
                     >
-                      <PanelLeftOpen className="!h-5 !w-5" />
+                      <PanelLeftOpen className="size-[18px]" strokeWidth={2} />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Expand sidebar (CMD+B)</TooltipContent>
                 </Tooltip>
               </div>
             ) : (
-              <div className="pl-2 relative flex items-center justify-center w-fit">
+              <div className="relative flex items-center justify-center w-fit">
                 <Link href="/dashboard" onClick={() => isMobile && setOpenMobile(false)}>
-                  <KortixLogo size={20} className="flex-shrink-0" />
+                  <KortixLogo size={18} className="flex-shrink-0" />
                 </Link>
               </div>
             )}
 
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 group-data-[collapsible=icon]:hidden">
             <Button
               variant="ghost"
               size="icon"
@@ -255,145 +254,98 @@ export function SidebarLeft({
                 }
               }}
             >
-              <PanelLeft className="!h-5 !w-5" />
+              <PanelLeft className="size-[18px]" strokeWidth={2} />
             </Button>
           </div>
         </div>
       </SidebarHeader>
       <SidebarContent className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
-        <AnimatePresence mode="wait">
-          {state === 'collapsed' ? (
-            /* Collapsed layout: + button and 4 state buttons only */
-            <motion.div
-              key="collapsed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
-              className="px-6 pt-4 space-y-3 flex flex-col items-center"
-            >
-              {/* + button */}
-              <div className="w-full flex justify-center">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-10 w-10 p-0 shadow-none"
-                  asChild
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                size="lg"
+                className="w-full justify-start gap-3 h-[36px] px-4 rounded-[10px] border border-border/50 hover:bg-muted/50 transition-colors group-data-[collapsible=icon]:!px-0 group-data-[collapsible=icon]:!justify-center"
+                asChild
+              >
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-3 group-data-[collapsible=icon]:gap-0"
+                  onClick={() => {
+                    posthog.capture('new_task_clicked');
+                    if (isMobile) setOpenMobile(false);
+                  }}
                 >
-                  <Link
-                    href="/dashboard"
-                    onClick={() => {
-                      posthog.capture('new_task_clicked');
-                      if (isMobile) setOpenMobile(false);
-                    }}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-              <div className="w-full flex flex-col items-center space-y-3">
-                {[
-                  { view: 'chats' as const, icon: MessageCircle },
-                  { view: 'agents' as const, icon: Bot },
-                  { view: 'starred' as const, icon: Zap },
-                ].map(({ view, icon: Icon }) => (
-                  <Button
-                    key={view}
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                      "h-10 w-10 p-0 cursor-pointer hover:bg-card hover:border-[1.5px] hover:border-border",
-                      activeView === view ? 'bg-card border-[1.5px] border-border' : ''
-                    )}
-                    onClick={() => {
-                      setActiveView(view);
-                      setOpen(true); // Expand sidebar when clicking state button
-                    }}
-                  >
-                    <Icon className="!h-4 !w-4" />
-                  </Button>
-                ))}
-              </div>
-            </motion.div>
-          ) : (
-            /* Expanded layout */
-            <motion.div
-              key="expanded"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
-              className="flex flex-col h-full"
+                  <Plus className="size-[18px]" strokeWidth={1.5} />
+                  <span className="text-[14px] group-data-[collapsible=icon]:hidden">{t('newChat')}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+
+        <SidebarGroup className="-mt-2">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={() => setShowSearchModal(true)}
+                  className="hover:text-foreground h-10 px-4 group-data-[collapsible=icon]:!px-0 group-data-[collapsible=icon]:!justify-center"
+                >
+                  <Search className="size-[18px]" strokeWidth={2} />
+                  <span className="text-[14px] group-data-[collapsible=icon]:hidden">Search</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton className="hover:text-foreground h-[36px] px-4 group-data-[collapsible=icon]:!px-0 group-data-[collapsible=icon]:!justify-center">
+                  <FolderOpen className="size-[18px]" strokeWidth={2} />
+                  <span className="text-[14px] group-data-[collapsible=icon]:hidden">Library</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup className="mt-4">
+          <SidebarGroupLabel className="flex items-center justify-between pr-2">
+            <span className="uppercase tracking-wider font-semibold text-[11px] text-muted-foreground/70 pl-2">Projects</span>
+            <button 
+              className="p-1 rounded-md hover:bg-muted/50 text-muted-foreground/70 transition-colors"
+              onClick={() => {
+                // Future: open new project dialog
+                toast.info("Create new project");
+              }}
             >
-              <div className="px-6 pt-4 space-y-4">
-                {/* New Chat button */}
-                <div className="w-full">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full shadow-none justify-between h-10 px-4"
+              <Plus className="size-[18px]" strokeWidth={2} />
+            </button>
+          </SidebarGroupLabel>
+          <SidebarGroupContent className="mt-1">
+            <SidebarMenu>
+              {projects.slice(0, 5).map((project) => (
+                <SidebarMenuItem key={project.id}>
+                  <SidebarMenuButton
                     asChild
+                    className="text-muted-foreground hover:text-foreground h-[36px] px-4 group"
                   >
-                    <Link
-                      href="/dashboard"
-                      onClick={() => {
-                        posthog.capture('new_task_clicked');
-                        if (isMobile) setOpenMobile(false);
-                      }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Plus className="h-4 w-4" />
-                        {t('newChat')}
-                      </div>
-                      <div className="flex items-center gap-1">
-                      <KbdGroup>
-                        <Kbd>⌘</Kbd>
-                        <Kbd>J</Kbd>
-                      </KbdGroup>
-                      </div>
+                    <Link href={`/projects/${project.id}`}>
+                      <Folder className="h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+                      <span className="text-[14px]">{project.name}</span>
                     </Link>
-                  </Button>
-                </div>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-                {/* State buttons horizontally */}
-                <div className="flex justify-between items-center gap-2">
-                  {[
-                    { view: 'chats' as const, icon: MessageCircle, label: t('chats') },
-                    { view: 'agents' as const, icon: Bot, label: t('workers') },
-                    { view: 'starred' as const, icon: Zap, label: t('triggers') }
-                  ].map(({ view, icon: Icon, label }) => (
-                    <button
-                      key={view}
-                      className={cn(
-                        "flex flex-col items-center justify-center gap-1.5 p-1.5 rounded-2xl cursor-pointer transition-colors w-[64px] h-[64px]",
-                        "hover:bg-muted/60 hover:border-[1.5px] hover:border-border",
-                        activeView === view ? 'bg-card border-[1.5px] border-border' : 'border-[1.5px] border-transparent'
-                      )}
-                      onClick={() => setActiveView(view)}
-                    >
-                      <Icon className="!h-4 !w-4" />
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        {label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Content area */}
-              <div className="px-6 flex-1 overflow-hidden">
-                {activeView === 'chats' && <NavAgents />}
-                {activeView === 'agents' && <NavAgentsView />}
-                {activeView === 'starred' && (
-                  <>
-                    <NavGlobalConfig />
-                    <NavTriggerRuns />
-                  </>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <SidebarGroup className="mt-2 flex-1 overflow-hidden">
+          <SidebarGroupLabel className="uppercase tracking-wider font-semibold text-[11px] text-muted-foreground/70 pl-2 mb-1">
+            Chats
+          </SidebarGroupLabel>
+          <div className="px-1 overflow-hidden h-full">
+            <NavAgents />
+          </div>
+        </SidebarGroup>
       </SidebarContent>
 
       {/* Enterprise Demo Card - Only show when expanded */}
@@ -427,7 +379,7 @@ export function SidebarLeft({
         )
       } */}
 
-      <div className={cn("pb-4", state === 'collapsed' ? "px-6" : "px-6")}>
+      <div className={cn("pb-4", state === 'collapsed' ? "px-2 flex justify-center" : "px-6")}>
         <UserProfileSection user={user} />
       </div>
       <SidebarRail />

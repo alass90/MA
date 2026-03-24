@@ -266,7 +266,9 @@ export const ThreadLayout = memo(function ThreadLayout({
           {/* ChatInput - positioned at bottom for mobile */}
           {chatInput && (
             <div className="flex-shrink-0 relative z-10 bg-gradient-to-b from-background via-background/90 to-transparent px-4">
-              {chatInput}
+              <div className="mx-auto max-w-[748px] w-full">
+                {chatInput}
+              </div>
             </div>
           )}
         </div>
@@ -339,10 +341,10 @@ export const ThreadLayout = memo(function ThreadLayout({
 
   // Desktop layout with resizable panels
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-background text-foreground">
       <ResizablePanelGroup
         direction="horizontal"
-        className="h-screen"
+        className="h-screen bg-background"
         style={{ transition: 'none' }}
       >
         {/* Main content panel */}
@@ -351,7 +353,7 @@ export const ThreadLayout = memo(function ThreadLayout({
           defaultSize={shouldShowPanel ? 60 : 100}
           minSize={shouldShowPanel ? 30 : 100}
           maxSize={shouldShowPanel ? 95 : 100}
-          className="flex flex-col overflow-hidden relative bg-transparent"
+          className="flex flex-col overflow-hidden relative bg-background"
         >
           <SiteHeader
             threadId={threadId}
@@ -372,15 +374,16 @@ export const ThreadLayout = memo(function ThreadLayout({
           {/* ChatInput - positioned at bottom of main content panel */}
           {chatInput && (
             <div className="flex-shrink-0 relative z-10 bg-gradient-to-b from-background via-background/90 to-transparent px-4">
-              {chatInput}
+              <div className="mx-auto max-w-[748px] w-full">
+                {chatInput}
+              </div>
             </div>
           )}
         </ResizablePanel>
 
         {/* Resizable handle - always render */}
         <ResizableHandle
-          withHandle={true}
-          className="z-20 w-0"
+          className="z-20 w-1 bg-transparent hover:bg-black/5 transition-colors"
         />
 
         {/* Side panel - always render but control size */}
@@ -391,11 +394,11 @@ export const ThreadLayout = memo(function ThreadLayout({
           maxSize={shouldShowPanel ? 85 : 0}
           collapsible={true}
           className={cn(
-            "relative bg-transparent",
+            "relative bg-background",
             // Match ChatInput horizontal spacing: px-4
             shouldShowPanel ? (
               isFileViewerPanelOpen ? "p-0" :
-              isPreviewPanelOpen ? "pr-4 pb-5 pt-0" : "pr-4 pb-5 pt-4"
+              isPreviewPanelOpen ? "px-4 pb-5 pt-0" : "px-4 pb-5 pt-4"
             ) : "px-0",
             !shouldShowPanel ? "hidden" : ""
           )}

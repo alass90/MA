@@ -241,8 +241,8 @@ export function HeroSection() {
             <div className="relative flex flex-col items-center w-full px-4 sm:px-6 pb-8 sm:pb-10">
                 <div className="relative z-10 pt-20 sm:pt-24 md:pt-32 mx-auto h-full w-full max-w-6xl flex flex-col items-center justify-center min-h-[60vh] sm:min-h-0">
 
-                    <div className="flex flex-col items-center justify-center gap-3 sm:gap-4 pt-12 sm:pt-20 max-w-4xl mx-auto pb-6 sm:pb-7">
-                        <h2 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-medium tracking-tighter text-balance text-center px-4 sm:px-2">
+                    <div className="flex flex-col items-center justify-center gap-3 sm:gap-4 pt-12 sm:pt-20 max-w-4xl mx-auto mb-10">
+                        <h2 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-bold tracking-tighter text-balance text-center px-4 sm:px-2">
                             {t('whatWouldYouLike')}
                         </h2>
                     </div>

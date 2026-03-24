@@ -479,9 +479,9 @@ export function DashboardContent() {
                         </div>
                       )}
 
-                      <div className="flex flex-col items-center text-center w-full">
+                      <div className="flex flex-col items-center text-center w-full mb-10">
                         <p
-                          className="tracking-tight text-2xl sm:text-2xl md:text-3xl font-normal text-foreground/90"
+                          className="tracking-tight text-2xl sm:text-2xl md:text-3xl font-bold text-foreground/90"
                         >
                           {t('whatWouldYouLike')}
                         </p>

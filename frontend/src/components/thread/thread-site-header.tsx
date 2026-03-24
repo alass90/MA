@@ -1,8 +1,19 @@
 'use client';
 
 import { Button } from "@/components/ui/button"
-import { FolderOpen, Upload, Monitor, Copy, Check, Layout, Package } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { 
+  FolderOpen, 
+  Upload, 
+  Monitor, 
+  Copy, 
+  Check, 
+  Layout, 
+  Package, 
+  ChevronDown, 
+  Pencil, 
+  Trash2 
+} from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
 import { toast } from "sonner"
 import {
   Tooltip,
@@ -10,9 +21,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useState, useRef, KeyboardEvent } from "react"
 import { Input } from "@/components/ui/input"
-import { useUpdateProject } from "@/hooks/threads/use-project";
+import { useUpdateProject, useDeleteProject } from "@/hooks/threads/use-project";
 import { Skeleton } from "@/components/ui/skeleton"
 import { useIsMobile } from "@/hooks/utils"
 import { cn } from "@/lib/utils"
@@ -21,6 +38,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { projectKeys } from "@/hooks/threads/keys";
 import { threadKeys } from "@/hooks/threads/keys";
 import { usePreviewPanelStore } from "@/stores/use-preview-panel-store";
+import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 
 interface ThreadSiteHeaderProps {
   threadId?: string;
@@ -46,25 +64,24 @@ export function SiteHeader({
   variant = 'default',
 }: ThreadSiteHeaderProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState(projectName)
   const inputRef = useRef<HTMLInputElement>(null)
   const isSharedVariant = variant === 'shared'
   const [showShareModal, setShowShareModal] = useState(false);
   const [showKnowledgeBase, setShowKnowledgeBase] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [copied, setCopied] = useState(false);
   const queryClient = useQueryClient();
   const { togglePanel, deployment } = usePreviewPanelStore();
 
   const isMobile = useIsMobile() || isMobileView
   const updateProjectMutation = useUpdateProject()
+  const deleteProjectMutation = useDeleteProject()
 
   const openShareModal = () => {
     setShowShareModal(true)
-  }
-
-  const openKnowledgeBase = () => {
-    setShowKnowledgeBase(true)
   }
 
   const copyShareLink = async () => {
@@ -75,6 +92,18 @@ export function SiteHeader({
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast.error("Failed to copy link");
+    }
+  };
+
+  const handleDeleteProject = async () => {
+    if (!projectId) return;
+    try {
+      await deleteProjectMutation.mutateAsync({ projectId });
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Failed to delete project:', error);
+    } finally {
+      setShowDeleteDialog(false);
     }
   };
 
@@ -141,16 +170,16 @@ export function SiteHeader({
   return (
     <>
       <header className={cn(
-        "bg-background sticky top-0 flex h-14 shrink-0 items-center gap-2 z-20 w-full",
-        isMobile && "px-2"
+        "bg-background sticky top-0 flex h-14 shrink-0 items-center gap-2 z-20 w-full px-6 chat-header",
+        isMobile && "px-4"
       )}>
-
-
-        <div className="flex flex-1 items-center gap-2 px-3">
+        <div className="chat-header-content flex flex-1 items-center gap-2">
           {variant === 'shared' ? (
-            <div className="text-base font-medium text-muted-foreground flex items-center gap-2">
-              {projectName}
-              <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+            <div className="flex items-center gap-2 max-w-[500px]">
+              <h2 data-v-2b360a7a="" className="text-[14px] leading-[24px] font-normal text-[#1d1d1f] dark:text-[#f5f5f7] truncate font-['PingFang_SC','Microsoft_YaHei','SimHei',sans-serif]">
+                {projectName}
+              </h2>
+              <span className="text-[10px] uppercase tracking-wider font-bold bg-[#8e8e93]/10 text-[#8e8e93] px-2 py-0.5 rounded-full shrink-0">
                 Shared
               </span>
             </div>
@@ -161,20 +190,47 @@ export function SiteHeader({
               onChange={(e) => setEditName(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={saveNewName}
-              className="h-8 w-auto min-w-[180px] text-base font-medium"
+              className="h-8 w-auto min-w-[180px] text-[14px] leading-[24px] font-normal text-[#1d1d1f] dark:text-[#f5f5f7] bg-transparent border-none focus-visible:ring-0 p-0 font-['PingFang_SC','Microsoft_YaHei','SimHei',sans-serif]"
               maxLength={50}
             />
           ) : !projectName || projectName === 'Project' ? (
             <Skeleton className="h-5 w-32" />
           ) : (
-            <div
-              className={`text-base font-medium text-muted-foreground flex items-center ${isSharedVariant ? '' : 'hover:text-foreground cursor-pointer'
-                }`}
-              onClick={isSharedVariant ? undefined : startEditing}
-              title={isSharedVariant ? undefined : 'Click to rename project'}
-            >
-              {projectName}
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div
+                  className={cn(
+                    "flex items-center gap-1 cursor-pointer group hover:opacity-80 transition-opacity"
+                  )}
+                >
+                  <h2 data-v-2b360a7a="" className="text-[14px] leading-[24px] font-normal text-[#1d1d1f] dark:text-[#f5f5f7] transition-colors truncate max-w-[400px] font-['PingFang_SC','Microsoft_YaHei','SimHei',sans-serif]">
+                    {projectName}
+                  </h2>
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="1em" 
+                    height="1em" 
+                    viewBox="0 0 1024 1024" 
+                    className="menu-arrow ml-0.5 mt-0.5 text-[#1d1d1f] dark:text-[#f5f5f7] h-3 w-3 opacity-60 group-hover:opacity-100 transition-opacity fill-current"
+                  >
+                    <path d="M482.95936 717.33248a36.864 36.864 0 0 0 52.0192-0.08192l285.696-285.696a36.864 36.864 0 1 0-52.10112-52.10112l-259.72736 259.6864-261.69344-259.80928a36.864 36.864 0 1 0-51.93728 52.34688l287.744 285.65504z" />
+                  </svg>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuItem onClick={startEditing} className="gap-2">
+                  <Pencil className="h-4 w-4" />
+                  <span>Edit Name</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setShowDeleteDialog(true)} 
+                  className="gap-2 text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span>Delete</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
 
@@ -284,6 +340,13 @@ export function SiteHeader({
           projectId={projectId}
         />
       )}
+      <DeleteConfirmationDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDeleteProject}
+        threadName={projectName}
+        isDeleting={deleteProjectMutation.isPending}
+      />
     </>
   )
 }

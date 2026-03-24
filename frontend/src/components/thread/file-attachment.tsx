@@ -179,7 +179,7 @@ function getFileUrl(sandboxId: string | undefined, path: string): string {
 
 interface FileAttachmentProps {
     filepath: string;
-    onFileClick?: (path: string) => void;
+    onFileClick?: (path: string, filePathList?: string[], storageUrl?: string) => void;
     className?: string;
     sandboxId?: string;
     showPreview?: boolean;
@@ -234,7 +234,7 @@ export function FileAttachment({
     const [xlsxSheetNames, setXlsxSheetNames] = React.useState<string[]>([]);
 
     // Handle signed URL refreshment for snapshots
-    const { url: currentUrl, handleLoadError } = useFileSnapshot(storageUrl, supabasePath);
+    const { url: currentUrl, handleLoadError, refreshUrl } = useFileSnapshot(storageUrl, supabasePath);
 
     // Basic file info
     const filename = filepath.split('/').pop() || 'file';

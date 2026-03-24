@@ -185,7 +185,7 @@ export function TalosSlidesPanel({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const typing = document.activeElement &&
-        (document.activeElement.isContentEditable ||
+        ((document.activeElement as HTMLElement).isContentEditable ||
          ["TEXTAREA", "INPUT"].includes((document.activeElement as HTMLElement).tagName));
       
       if (e.key === "Escape" && isFullscreen) { setIsFullscreen(false); return; }
