@@ -281,7 +281,7 @@ export function FullstackBuilderPanel({
   if (!isOpen) return null;
 
   return (
-    <div className="flex flex-col h-full w-full bg-background overflow-hidden relative z-50">
+    <div className="flex flex-col h-full w-full bg-background overflow-hidden relative z-50 rounded-3xl border border-border/50 shadow-2xl mb-1 mt-1">
       {renderHeader()}
       
       <div className="flex-1 flex flex-col w-full bg-background min-h-0" style={{ contain: 'strict' }}>
@@ -379,7 +379,7 @@ export function FullstackBuilderPanel({
               <div className="flex-1 bg-muted/10 relative min-h-0 flex items-center justify-center p-4 overflow-hidden">
                 <div className={cn(
                   "bg-white shadow-xl border border-border/40 transition-all duration-300 relative",
-                  responsiveMode === 'desktop' ? "w-full h-full rounded-xl overflow-hidden" : "w-[375px] h-[667px] rounded-[32px] border-[8px] border-zinc-900 p-0 shadow-2xl shrink-0"
+                  responsiveMode === 'desktop' ? "w-full h-full rounded-[24px] overflow-hidden" : "w-[375px] h-[667px] rounded-[32px] border-[8px] border-zinc-900 p-0 shadow-2xl shrink-0"
                 )}>
                   {previewUrl ? (
                     <iframe

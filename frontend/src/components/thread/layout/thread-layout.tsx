@@ -369,7 +369,8 @@ export const ThreadLayout = memo(function ThreadLayout({
             "relative bg-background",
             // Match ChatInput horizontal spacing: px-4
             shouldShowPanel ? (
-              isFullstackBuilderOpen || isFileViewerPanelOpen ? "p-0" : "px-4 pb-5 pt-4"
+            isFullstackBuilderOpen ? "p-3 pl-0" : 
+              isFileViewerPanelOpen ? "p-0" : "px-4 pb-5 pt-4"
             ) : "px-0",
             !shouldShowPanel ? "hidden" : ""
           )}
