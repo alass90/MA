@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { useMediaQuery } from '@/hooks/utils';
 import { useState, useEffect, Suspense, lazy } from 'react';
-import { signUp, resendMagicLink } from './actions';
+import { signUp, resendMagicLink, signInWithPassword, signUpWithPassword } from './actions';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { MailCheck, Clock, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/components/AuthProvider';
@@ -40,7 +40,9 @@ function LoginContent() {
   const [showReferralDialog, setShowReferralDialog] = useState(false);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [mounted, setMounted] = useState(false);
-  const [acceptedTerms, setAcceptedTerms] = useState(false); // GDPR requires explicit opt-in
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [usePasswordMode, setUsePasswordMode] = useState(false);
+  const [passwordSignUpMode, setPasswordSignUpMode] = useState(false);
 
   const { wasLastMethod: wasEmailLastMethod, markAsUsed: markEmailAsUsed } = useAuthMethodTracking('email');
 
@@ -410,6 +412,17 @@ function LoginContent() {
                 required
               />
 
+              {usePasswordMode && (
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Password"
+                  required
+                  minLength={6}
+                />
+              )}
+
               {referralCodeParam && (
                 <div className="bg-card border rounded-xl p-3">
                   <p className="text-xs text-muted-foreground mb-1">{t('referralCode')}</p>
@@ -418,6 +431,7 @@ function LoginContent() {
               )}
 
               {!referralCodeParam && <input type="hidden" name="referralCode" value={referralCode} />}
+
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="gdprConsent"
@@ -426,62 +440,115 @@ function LoginContent() {
                   required
                   className="h-5 w-5"
                 />
-                <label 
-                  htmlFor="gdprConsent" 
+                <label
+                  htmlFor="gdprConsent"
                   className="text-xs text-muted-foreground leading-relaxed cursor-pointer select-none flex-1"
                 >
                   {t.rich('acceptPrivacyTerms', {
-                    privacyPolicy: (chunks) => {
-                      return (
-                        <a 
-                          href="https://www.kortix.com/legal?tab=privacy" 
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline underline-offset-2 text-primary"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {chunks}
-                        </a>
-                      );
-                    },
-                    termsOfService: (chunks) => {
-                      return (
-                        <a 
-                          href="https://www.kortix.com/legal?tab=terms"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline underline-offset-2 text-primary"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {chunks}
-                        </a>
-                      );
-                    }
+                    privacyPolicy: (chunks) => (
+                      <a href="https://www.kortix.com/legal?tab=privacy" target="_blank" rel="noopener noreferrer" className="hover:underline underline-offset-2 text-primary" onClick={(e) => e.stopPropagation()}>{chunks}</a>
+                    ),
+                    termsOfService: (chunks) => (
+                      <a href="https://www.kortix.com/legal?tab=terms" target="_blank" rel="noopener noreferrer" className="hover:underline underline-offset-2 text-primary" onClick={(e) => e.stopPropagation()}>{chunks}</a>
+                    ),
                   })}
                 </label>
               </div>
 
-              <div className="relative">
-                <SubmitButton
-                  formAction={handleAuth}
-                  className="w-full h-10"
-                  pendingText={t('sending')}
-                  disabled={!acceptedTerms}
-                >
-                  {t('sendMagicLink')}
-                </SubmitButton>
-                {wasEmailLastMethod && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background shadow-sm">
-                    <div className="w-full h-full bg-green-500 rounded-full animate-pulse" />
+              <input type="hidden" name="acceptedTerms" value={acceptedTerms.toString()} />
+
+              {!usePasswordMode ? (
+                <>
+                  <div className="relative">
+                    <SubmitButton
+                      formAction={handleAuth}
+                      className="w-full h-10"
+                      pendingText={t('sending')}
+                      disabled={!acceptedTerms}
+                    >
+                      {t('sendMagicLink')}
+                    </SubmitButton>
+                    {wasEmailLastMethod && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background shadow-sm">
+                        <div className="w-full h-full bg-green-500 rounded-full animate-pulse" />
+                      </div>
+                    )}
                   </div>
-                )}
+                  <p className="text-xs text-muted-foreground text-center">{t('magicLinkExplanation')}</p>
+                </>
+              ) : (
+                <>
+                  {!passwordSignUpMode ? (
+                    <>
+                      <SubmitButton
+                        formAction={async (prevState: any, formData: FormData) => {
+                          formData.append('acceptedTerms', acceptedTerms.toString());
+                          const result = await signInWithPassword(prevState, formData);
+                          if (result && typeof result === 'object' && 'message' in result) {
+                            const { toast } = await import('sonner');
+                            toast.error(result.message as string);
+                          }
+                          return result;
+                        }}
+                        className="w-full h-10"
+                        pendingText="Signing in..."
+                        disabled={!acceptedTerms}
+                      >
+                        Sign in with password
+                      </SubmitButton>
+                      <p className="text-xs text-muted-foreground text-center">
+                        No account yet?{' '}
+                        <button type="button" onClick={() => setPasswordSignUpMode(true)} className="text-primary hover:underline font-medium">
+                          Create one
+                        </button>
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <SubmitButton
+                        formAction={async (prevState: any, formData: FormData) => {
+                          formData.append('acceptedTerms', acceptedTerms.toString());
+                          const result = await signUpWithPassword(prevState, formData);
+                          if (result && typeof result === 'object' && 'message' in result && !('success' in result)) {
+                            const { toast } = await import('sonner');
+                            toast.error(result.message as string);
+                          }
+                          return result;
+                        }}
+                        className="w-full h-10"
+                        pendingText="Creating account..."
+                        disabled={!acceptedTerms}
+                      >
+                        Create account
+                      </SubmitButton>
+                      <p className="text-xs text-muted-foreground text-center">
+                        Already have an account?{' '}
+                        <button type="button" onClick={() => setPasswordSignUpMode(false)} className="text-primary hover:underline font-medium">
+                          Sign in
+                        </button>
+                      </p>
+                    </>
+                  )}
+                </>
+              )}
+
+              <div className="relative my-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-background text-muted-foreground">or</span>
+                </div>
               </div>
 
-              {/* Magic Link Explanation */}
-              <p className="text-xs text-muted-foreground text-center">
-                {t('magicLinkExplanation')}
-              </p>
-              
+              <button
+                type="button"
+                onClick={() => { setUsePasswordMode(!usePasswordMode); setPasswordSignUpMode(false); }}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors w-full text-center"
+              >
+                {usePasswordMode ? '✉️ Use magic link instead' : '🔑 Use password instead'}
+              </button>
+
               {/* Minimal Referral Link */}
               {!referralCodeParam && (
                 <button

@@ -176,6 +176,62 @@ export async function resendMagicLink(prevState: any, formData: FormData) {
   };
 }
 
+export async function signInWithPassword(prevState: any, formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  if (!email || !email.includes('@')) {
+    return { message: 'Please enter a valid email address' };
+  }
+  if (!password || password.length < 6) {
+    return { message: 'Password must be at least 6 characters' };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+
+  if (error) {
+    return { message: error.message || 'Invalid email or password' };
+  }
+
+  redirect('/dashboard');
+}
+
+export async function signUpWithPassword(prevState: any, formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const acceptedTerms = formData.get('acceptedTerms') === 'true';
+
+  if (!email || !email.includes('@')) {
+    return { message: 'Please enter a valid email address' };
+  }
+  if (!password || password.length < 6) {
+    return { message: 'Password must be at least 6 characters' };
+  }
+  if (!acceptedTerms) {
+    return { message: 'Please accept the terms and conditions' };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signUp({
+    email: email.trim().toLowerCase(),
+    password,
+    options: { emailRedirectTo: undefined },
+  });
+
+  if (error) {
+    return { message: error.message || 'Could not create account' };
+  }
+
+  // Auto sign in after sign up
+  const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+  if (signInError) {
+    return { success: true, message: 'Account created! Please sign in.' };
+  }
+
+  redirect('/dashboard');
+}
+
 export async function signOut() {
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();

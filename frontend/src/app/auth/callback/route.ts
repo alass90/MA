@@ -70,6 +70,20 @@ export async function GET(request: NextRequest) {
   }
 
   // Handle code exchange (OAuth, magic link)
+  // NOTE: For magic links with PKCE, the code_verifier is in browser localStorage.
+  // We must redirect to a client-side page to complete the exchange, otherwise
+  // the server-side handler can't find the verifier → bad_code_verifier error.
+  // Only skip client-side redirect for OAuth (which stores verifier in cookies via middleware).
+  const isMagicLink = searchParams.get('type') === 'magiclink' || !searchParams.get('provider');
+  if (code && isMagicLink) {
+    // Redirect to client-side exchange page so browser localStorage is accessible
+    const clientExchangeUrl = new URL(`${baseUrl}/auth/exchange`);
+    clientExchangeUrl.searchParams.set('code', code);
+    clientExchangeUrl.searchParams.set('next', next);
+    if (termsAccepted) clientExchangeUrl.searchParams.set('terms_accepted', 'true');
+    return NextResponse.redirect(clientExchangeUrl);
+  }
+
   if (code) {
     try {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)

@@ -190,28 +190,22 @@ export function CompleteToolView({
                         >
                           <FileAttachment
                             filepath={attachment}
-                            onClick={handleFileClick}
+                            onFileClick={handleFileClick}
                             sandboxId={project?.sandbox?.id}
-                            showPreview={true}
+                            showPreview={isImage}
                             className={cn(
                               "w-full",
-                              isImage ? "h-auto min-h-[54px]" :
-                                isPreviewable ? "min-h-[240px] max-h-[400px] overflow-auto" : "h-[54px]"
+                              isImage ? "h-auto min-h-[54px]" : "h-[54px]"
                             )}
                             customStyle={
                               isImage ? {
                                 width: '100%',
                                 height: 'auto',
                                 '--attachment-height': shouldSpanFull ? '240px' : '180px'
-                              } as React.CSSProperties :
-                                isPreviewable ? {
-                                  gridColumn: '1 / -1'
-                                } :
-                                  shouldSpanFull ? {
-                                    gridColumn: '1 / -1'
-                                  } : {
-                                    width: '100%'
-                                  }
+                              } as React.CSSProperties : {
+                                width: '100%',
+                                ...(shouldSpanFull ? { gridColumn: '1 / -1' } : {})
+                              }
                             }
                             collapsed={false}
                             project={project}

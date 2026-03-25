@@ -1330,14 +1330,14 @@ export function SunaModesPanel({
                   <Card
                     key={item.id}
                     className={cn(
-                      "flex flex-col gap-2 cursor-pointer group p-2 hover:bg-primary/5 transition-all duration-200 border rounded-xl relative",
+                      "flex flex-col gap-2 cursor-pointer group p-2 hover:bg-primary/5 transition-all duration-200 rounded-xl relative border-0 shadow-none",
                       selectedTemplateId === item.id
-                        ? "border-primary bg-primary/5"
-                        : "border-border"
+                        ? "bg-primary/5"
+                        : ""
                     )}
                     onClick={() => handleTemplateSelect(item.id)}
                   >
-                    <div className="w-full bg-transparent rounded-lg border border-border/50 group-hover:border-primary/50 group-hover:scale-105 transition-all duration-200 overflow-hidden relative aspect-[4/3]">
+                    <div className="w-full bg-transparent rounded-lg group-hover:scale-105 transition-all duration-200 overflow-hidden relative aspect-[4/3]">
                       {item.image ? (
                         <Image 
                           src={item.image} 

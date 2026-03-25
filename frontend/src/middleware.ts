@@ -23,6 +23,7 @@ const PUBLIC_ROUTES = [
   '/', // Homepage should be public!
   '/auth',
   '/auth/callback',
+  '/auth/exchange', // Client-side PKCE code exchange (needs to be public)
   '/auth/signup',
   '/auth/forgot-password',
   '/auth/reset-password',

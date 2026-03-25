@@ -54,7 +54,7 @@ services:
         condition: service_started
 
   worker:
-    image: ghcr.io/suna-ai/suna-backend:latest
+    image: ghcr.io/suna-ai/suna-worker:latest
     platform: linux/amd64
     build:
       context: ./backend
