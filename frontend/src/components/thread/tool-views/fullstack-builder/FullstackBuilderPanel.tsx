@@ -170,148 +170,154 @@ export function FullstackBuilderPanel({
     ));
   };
 
-  const renderHeader = () => (
-    <div className="flex flex-col w-full shrink-0">
-      {/* Top Row: Navigation and Main Actions (Solid) */}
-      <div className="flex items-center justify-between px-4 py-2 bg-background border-b border-border/40">
-        <div className="flex items-center gap-3">
+  const renderGlobalHeader = () => (
+    <div className="flex items-center justify-between px-4 py-2 shrink-0">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center bg-muted/40 p-0.5 rounded-lg border border-border/30">
           <Button 
             variant={viewMode === 'preview' ? 'secondary' : 'ghost'} 
             size="sm" 
-            className="h-8 gap-2 rounded-lg text-xs font-semibold px-3"
+            className="h-8 gap-2 rounded-md text-xs font-semibold px-3"
             onClick={() => setViewMode('preview')}
           >
-            <Activity className="w-3.5 h-3.5" />
+            <Monitor className="w-3.5 h-3.5" />
             Preview
           </Button>
-          
-          <div className="flex items-center bg-muted/40 p-0.5 rounded-lg border border-border/30">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={() => setViewMode('code')}>
-                    <Code2 className="w-3.5 h-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Code</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
-                    <History className="w-3.5 h-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>History</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
-                    <Database className="w-3.5 h-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Resources</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
-                    <Folder className="w-3.5 h-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Files</TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
-                    <Settings className="w-3.5 h-3.5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Settings</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+          <Button 
+            variant={viewMode === 'code' ? 'secondary' : 'ghost'} 
+            size="sm" 
+            className="h-8 gap-2 rounded-md text-xs font-semibold px-3"
+            onClick={() => setViewMode('code')}
+          >
+            <Code2 className="w-3.5 h-3.5" />
+            Code
+          </Button>
         </div>
-
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground">
-            <MoreHorizontal className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground">
-            <Github className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-lg text-xs font-medium border border-border/40 px-3">
-            <Share2 className="w-3.5 h-3.5" />
-            Share
-          </Button>
-          <Button variant="default" size="sm" className="h-8 gap-2 rounded-lg text-xs font-semibold px-4 bg-zinc-900 hover:bg-zinc-800 text-white border-0">
-            <Publish className="w-3.5 h-3.5" />
-            Publish
-          </Button>
-          <div className="w-px h-4 bg-border/40 mx-1" />
-          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-50" onClick={closePanel}>
-            <X className="w-4 h-4" />
-          </Button>
+        
+        <div className="flex items-center bg-muted/40 p-0.5 rounded-lg border border-border/30">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={() => setViewMode('code')}>
+                  <Code2 className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Code</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
+                  <History className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>History</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
+                  <Database className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Resources</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
+                  <Folder className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Files</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
+                  <Settings className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Settings</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 
-      {/* Second Row: Simulator Controls - Separated/Floating Style */}
-      <div className="flex items-center justify-between px-6 py-3 bg-muted/5 shrink-0 border-b border-border/30">
-        <div className="flex items-center gap-1.5 bg-background shadow-sm p-1 rounded-xl border border-border/40">
-          <Button 
-            variant={responsiveMode === 'desktop' ? 'secondary' : 'ghost'} 
-            size="icon" 
-            className="h-8 w-8 rounded-lg"
-            onClick={() => setResponsiveMode('desktop')}
-          >
-            <Monitor className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant={responsiveMode === 'mobile' ? 'secondary' : 'ghost'} 
-            size="icon" 
-            className="h-8 w-8 rounded-lg"
-            onClick={() => setResponsiveMode('mobile')}
-          >
-            <Smartphone className="w-4 h-4" />
-          </Button>
-        </div>
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground">
+          <MoreHorizontal className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground">
+          <Github className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-lg text-xs font-medium border border-border/40 px-3">
+          <Share2 className="w-3.5 h-3.5" />
+          Share
+        </Button>
+        <Button variant="default" size="sm" className="h-8 gap-2 rounded-lg text-xs font-semibold px-4 bg-zinc-900 hover:bg-zinc-800 text-white border-0">
+          <Publish className="w-3.5 h-3.5" />
+          Publish
+        </Button>
+        <div className="w-px h-4 bg-border/40 mx-1" />
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-50" onClick={closePanel}>
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  );
 
-        <div className="flex items-center gap-3 bg-background shadow-sm hover:ring-1 hover:ring-border transition-all px-4 py-1.5 rounded-full border border-border/40 w-full max-w-lg mx-auto group">
-          <Home className="w-3.5 h-3.5 text-muted-foreground cursor-pointer hover:text-foreground" />
-          <div className="flex-1 flex justify-center text-[11px] font-mono text-muted-foreground/90 overflow-hidden">
-            <span className="truncate">{previewUrl ? new URL(previewUrl).pathname : '/'}</span>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <ExternalLink className="w-3.5 h-3.5 text-muted-foreground cursor-pointer hover:text-foreground" onClick={() => window.open(previewUrl, '_blank')} />
-            <RefreshCw className={`w-3.5 h-3.5 text-muted-foreground cursor-pointer hover:text-foreground ${isLoadingTree ? 'animate-spin' : ''}`} onClick={reloadIframe} />
-          </div>
+  const renderSimulatorBar = () => (
+    <div className="flex items-center justify-between px-4 h-11 border-b border-border/30 bg-background/50">
+      <div className="flex items-center gap-1 bg-muted/30 p-0.5 rounded-lg border border-border/20">
+        <Button 
+          variant={responsiveMode === 'desktop' ? 'secondary' : 'ghost'} 
+          size="icon" 
+          className="h-7 w-7 rounded-md"
+          onClick={() => setResponsiveMode('desktop')}
+        >
+          <Monitor className="w-3.5 h-3.5" />
+        </Button>
+        <Button 
+          variant={responsiveMode === 'mobile' ? 'secondary' : 'ghost'} 
+          size="icon" 
+          className="h-7 w-7 rounded-md"
+          onClick={() => setResponsiveMode('mobile')}
+        >
+          <Smartphone className="w-3.5 h-3.5" />
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-2 bg-muted/40 hover:bg-muted/60 transition-colors px-3 py-1 rounded-full border border-border/40 w-full max-w-md mx-auto group">
+        <Home className="w-3 h-3 text-muted-foreground cursor-pointer hover:text-foreground" />
+        <div className="flex-1 flex justify-center text-[10px] font-mono text-muted-foreground/80 overflow-hidden">
+          <span className="truncate">{previewUrl ? new URL(previewUrl).pathname : '/'}</span>
         </div>
-        
-        <div className="flex items-center gap-3">
-          {isWorking && (
-            <Badge variant="outline" className="h-7 text-[10px] uppercase tracking-wider animate-pulse border-blue-200 text-blue-600 bg-background shadow-sm">
-              <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Working
-            </Badge>
-          )}
-          <div className="flex items-center bg-background shadow-sm rounded-xl border border-border/40 p-0.5">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 gap-2 rounded-lg text-xs font-semibold px-3"
-              onClick={() => setViewMode('code')}
-            >
-              <Code2 className="w-3.5 h-3.5" />
-              Edit
-            </Button>
-            <div className="w-px h-4 bg-border/40" />
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8 rounded-lg text-muted-foreground"
-              onClick={() => window.open(previewUrl, '_blank')}
-            >
-              <Maximize2 className="w-4 h-4" />
-            </Button>
-          </div>
+        <div className="flex items-center gap-2">
+          <ExternalLink className="w-3 h-3 text-muted-foreground cursor-pointer hover:text-foreground" onClick={() => window.open(previewUrl, '_blank')} />
+          <RefreshCw className={`w-3 h-3 text-muted-foreground cursor-pointer hover:text-foreground ${isLoadingTree ? 'animate-spin' : ''}`} onClick={reloadIframe} />
         </div>
+      </div>
+      
+      <div className="flex items-center gap-2">
+        {isWorking && (
+          <Badge variant="outline" className="h-6 text-[9px] uppercase tracking-wider animate-pulse border-blue-100 text-blue-600 bg-blue-50/30">
+            <Loader2 className="w-2.5 h-2.5 mr-1 animate-spin" /> Working
+          </Badge>
+        )}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-7 gap-1.5 rounded-lg text-[10px] font-bold border border-border/40 px-2.5 bg-background shadow-sm"
+          onClick={() => setViewMode('code')}
+        >
+          <Code2 className="w-3 h-3" />
+          Edit
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-7 w-7 rounded-lg text-muted-foreground border border-border/40 bg-background shadow-sm"
+          onClick={() => window.open(previewUrl, '_blank')}
+        >
+          <Maximize2 className="w-3.5 h-3.5" />
+        </Button>
       </div>
     </div>
   );
@@ -319,10 +325,11 @@ export function FullstackBuilderPanel({
   if (!isOpen) return null;
 
   return (
-    <div className="flex flex-col h-full w-full bg-background overflow-hidden relative z-50 rounded-3xl border border-border/50 shadow-2xl mb-1 mt-1">
-      {renderHeader()}
+    <div className="flex flex-col h-full w-full bg-muted/5 overflow-hidden relative z-50">
+      {renderGlobalHeader()}
       
-      <div className="flex-1 flex flex-col w-full bg-background min-h-0" style={{ contain: 'strict' }}>
+      <div className="flex-1 flex flex-col w-full bg-background min-h-0 rounded-3xl border border-border/40 shadow-2xl mb-2 mx-1 mt-1 overflow-hidden" style={{ contain: 'strict' }}>
+        {renderSimulatorBar()}
         <PanelGroup direction="horizontal" className="h-full w-full">
           {viewMode === 'code' && (
             <>
