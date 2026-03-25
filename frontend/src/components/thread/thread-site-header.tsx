@@ -7,11 +7,11 @@ import {
   Monitor, 
   Copy, 
   Check, 
-  Layout, 
   Package, 
   ChevronDown, 
   Pencil, 
-  Trash2 
+  Trash2,
+  Code2
 } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -37,7 +37,7 @@ import { ShareModal } from "@/components/sidebar/share-modal"
 import { useQueryClient } from "@tanstack/react-query";
 import { projectKeys } from "@/hooks/threads/keys";
 import { threadKeys } from "@/hooks/threads/keys";
-import { usePreviewPanelStore } from "@/stores/use-preview-panel-store";
+import { useFullstackBuilderStore } from "@/stores/use-fullstack-builder-store";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 
 interface ThreadSiteHeaderProps {
@@ -74,7 +74,15 @@ export function SiteHeader({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [copied, setCopied] = useState(false);
   const queryClient = useQueryClient();
-  const { togglePanel, deployment } = usePreviewPanelStore();
+  const { isOpen: isFullstackOpen, openPanel: openFullstack, closePanel: closeFullstack } = useFullstackBuilderStore();
+
+  const toggleFullstack = () => {
+    if (isFullstackOpen) {
+      closeFullstack();
+    } else {
+      openFullstack();
+    }
+  };
 
   const isMobile = useIsMobile() || isMobileView
   const updateProjectMutation = useUpdateProject()
@@ -278,23 +286,20 @@ export function SiteHeader({
               <TooltipContent side={isMobile ? "bottom" : "bottom"}>
                 <p>View Files in Task</p>
               </TooltipContent>
-            </Tooltip>
-
-
-
+            </Tooltip>            
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={togglePanel}
+                  onClick={toggleFullstack}
                   className="h-9 w-9 cursor-pointer"
                 >
-                  <Layout className="h-4 w-4" />
+                  <Code2 className={cn("h-4 w-4", isFullstackOpen ? "text-primary" : "")} />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side={isMobile ? "bottom" : "bottom"}>
-                <p>Open Preview Workspace</p>
+                <p>Toggle IDE Workspace</p>
               </TooltipContent>
             </Tooltip>
 

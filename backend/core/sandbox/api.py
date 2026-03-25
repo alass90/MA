@@ -210,9 +210,11 @@ async def list_files(
         
         result = []
         for f in files:
+            # Join requested path with file name to get full path
+            full_path = f"{path.rstrip('/')}/{f.name}"
             result.append(FileInfo(
                 name=f.name,
-                path=f.path,
+                path=full_path,
                 is_dir=f.is_dir,
                 size=f.size,
                 mod_time=f.mod_time,

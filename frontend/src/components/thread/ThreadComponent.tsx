@@ -54,14 +54,12 @@ import { useProjectRealtime } from '@/hooks/threads';
 import { handleGoogleSlidesUpload } from './tool-views/utils/presentation-utils';
 import { useTranslations } from 'next-intl';
 import { backendApi } from '@/lib/api-client';
-import { WebsitePreviewPanel } from '@/components/thread/website-preview-panel';
-import { usePreviewPanelStore } from '@/stores/use-preview-panel-store';
 import { usePresentationPanelStore } from '@/stores/use-presentation-panel-store';
 import { ThreadFilesOverlay } from './thread-files-overlay';
 import { usePresentationDetector } from '@/hooks/use-presentation-detector';
 import { TalosSlidesPanel } from '@/components/artifacts/TalosSlidesPanel';
-import { useDeploymentDetector } from '@/hooks/use-deployment-detector';
-import { useWebFileDetector } from '@/hooks/use-web-file-detector';
+import { useFullstackBuilderStore } from '@/stores/use-fullstack-builder-store';
+import { useFullstackBuilderDetector } from '@/hooks/use-fullstack-builder-detector';
 
 interface ThreadComponentProps {
   projectId: string;
@@ -175,8 +173,9 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
     userClosedPanelRef,
   } = useThreadToolCalls(messages, setLeftSidebarOpen, agentStatus, compact);
 
-  // Auto-detect web file creation and switch to Preview panel (Manus.ai style)
-  useWebFileDetector(messages, sandboxId, setIsSidePanelOpen, agentStatus);
+  // Auto-detect fullstack builder tool calls and switch to IDE panel
+  useFullstackBuilderDetector(messages as UnifiedMessage[], agentStatus);
+  const { isOpen: isFullstackBuilderOpen, closePanel: onCloseFullstackBuilder } = useFullstackBuilderStore();
 
   // Memoized callback for closing side panel to prevent unnecessary re-renders
   const handleSidePanelClose = useCallback(() => {
@@ -232,10 +231,7 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
     userClosedPanelRef,
   });
 
-  // Deployment detector  // Detect deployments to open preview panel
-  useDeploymentDetector(messages, projectId);
-
-  // Detect presentations to open slides panel
+  // Keyboard shortcuts
   const {
     isOpen: isPresentationOpen,
     presentationPath,
@@ -244,9 +240,6 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
   } = usePresentationPanelStore();
 
   usePresentationDetector(messages, sandboxId);
-
-  // Preview panel state
-  const { isOpen: isPreviewPanelOpen, deployment, closePanel } = usePreviewPanelStore();
 
   // Mutations - always call unconditionally
   const addUserMessageMutation = useAddUserMessageMutation();
@@ -1010,6 +1003,8 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         isMobile={isMobile}
         initialLoadCompleted={initialLoadCompleted}
         agentName={agent && agent.name}
+        isFullstackBuilderOpen={isFullstackBuilderOpen}
+        onCloseFullstackBuilder={onCloseFullstackBuilder}
       >
         <ThreadError error={error} />
       </ThreadLayout>
@@ -1051,13 +1046,9 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           compact={true}
           streamingTextContent={isShared ? '' : streamingTextContent}
           streamingToolCall={isShared ? undefined : streamingToolCall}
-          isPreviewPanelOpen={isPreviewPanelOpen}
-          previewUrl={deployment?.url}
-          previewProjectPath={deployment?.projectPath}
-          previewFramework={deployment?.framework}
-          previewProjectName={deployment?.projectName}
-          onClosePreview={closePanel}
           onToggleDeliverables={handleToggleFilesOverlay}
+          isFullstackBuilderOpen={isFullstackBuilderOpen}
+          onCloseFullstackBuilder={onCloseFullstackBuilder}
         >
           {/* Thread Content - Scrollable */}
           <div
@@ -1243,15 +1234,11 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         leftSidebarState={leftSidebarState}
         streamingTextContent={isShared ? '' : streamingTextContent}
         streamingToolCall={isShared ? undefined : streamingToolCall}
-        isPreviewPanelOpen={isPreviewPanelOpen}
-        previewUrl={deployment?.url}
-        previewProjectPath={deployment?.projectPath}
-        previewFramework={deployment?.framework}
-        previewProjectName={deployment?.projectName}
-        onClosePreview={closePanel}
         onToggleDeliverables={handleToggleFilesOverlay}
         isFileViewerPanelOpen={isFileViewerPanelOpen}
         onCloseFileViewerPanel={() => setIsFileViewerPanelOpen(false)}
+        isFullstackBuilderOpen={isFullstackBuilderOpen}
+        onCloseFullstackBuilder={onCloseFullstackBuilder}
       >
         <ThreadContent
           messages={isShared ? playback.playbackState.visibleMessages : messages}

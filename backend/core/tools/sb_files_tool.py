@@ -137,21 +137,6 @@ class SandboxFilesTool(SandboxToolsBase):
 
             message = f"File '{file_path}' created successfully."
 
-            # Auto-deploy detection: Check if this is a deployable web project
-            should_auto_deploy = await self._should_auto_deploy(file_path, full_path)
-
-            if should_auto_deploy:
-                await self._trigger_auto_deploy(file_path)
-            # Legacy fallback: Check if index.html was created (only in root workspace)
-            elif file_path.lower() == 'index.html':
-                try:
-                    website_link = await self.sandbox.get_preview_link(8080)
-                    website_url = website_link.url if hasattr(website_link, 'url') else str(website_link).split("url='")[1].split("'")[0]
-                    message += f"\n\n[Auto-detected index.html - HTTP server available at: {website_url}]"
-                    message += "\n[Note: Use the provided HTTP server URL above instead of starting a new server]"
-                except Exception as e:
-                    logger.warning(f"Failed to get website URL for index.html: {str(e)}")
-
             # Return structured data for frontend detection
             return self.success_response({
                 "message": message,
@@ -268,16 +253,6 @@ class SandboxFilesTool(SandboxToolsBase):
             await self.sandbox.fs.set_file_permissions(full_path, permissions)
             
             message = f"File '{file_path}' completely rewritten successfully."
-            
-            # Check if index.html was rewritten and add 8080 server info (only in root workspace)
-            if file_path.lower() == 'index.html':
-                try:
-                    website_link = await self.sandbox.get_preview_link(8080)
-                    website_url = website_link.url if hasattr(website_link, 'url') else str(website_link).split("url='")[1].split("'")[0]
-                    message += f"\n\n[Auto-detected index.html - HTTP server available at: {website_url}]"
-                    message += "\n[Note: Use the provided HTTP server URL above instead of starting a new server]"
-                except Exception as e:
-                    logger.warning(f"Failed to get website URL for index.html: {str(e)}")
             
             # Auto-validate presentation slides
             slide_pattern = r'^presentations/([^/]+)/slide_(\d+)\.html$'
@@ -652,73 +627,3 @@ class SandboxFilesTool(SandboxToolsBase):
     #         return self.fail_response(f"File '{file_path}' appears to be binary and cannot be read as text")
     #     except Exception as e:
     #         return self.fail_response(f"Error reading file: {str(e)}")
-
-    async def _should_auto_deploy(self, file_path: str, full_path: str) -> bool:
-        """
-        Determine if a file creation should trigger auto-deployment.
-        Detects web projects by checking for key files.
-        """
-        try:
-            # Check if this is a web entry point file
-            web_entry_files = [
-                'index.html',
-                'app.py',          # Flask
-                'main.py',         # FastAPI
-                'package.json',    # Node.js projects
-            ]
-
-            file_name = file_path.lower().split('/')[-1]
-
-            # Direct match
-            if file_name in web_entry_files:
-                return True
-
-            # Check if package.json exists (React/Next.js/etc)
-            if file_name == 'package.json':
-                return True
-
-            # Check for framework-specific files in root
-            if '/' not in file_path:  # Root level file
-                framework_files = ['next.config.js', 'next.config.ts', 'vite.config.js', 'astro.config.mjs']
-                if file_name in framework_files:
-                    return True
-
-            return False
-
-        except Exception as e:
-            logger.warning(f"Error in auto-deploy detection: {e}")
-            return False
-
-    async def _trigger_auto_deploy(self, file_path: str):
-        """
-        Trigger automatic preview deployment.
-        Uses the talos_deploy_tool to create a live preview.
-        """
-        try:
-            # Dynamically import to avoid circular dependency
-            from core.tools.talos_deploy_tool import TalosDeployTool
-
-            # Create deploy tool instance
-            deploy_tool = TalosDeployTool(
-                project_id=self.project_id,
-                thread_manager=self.thread_manager
-            )
-
-            # Trigger preview deployment
-            logger.info(f"🚀 Auto-deploying project after detecting {file_path}")
-
-            result = await deploy_tool.deploy_app(
-                action="preview",
-                project_path=self.workspace_path,
-                framework=None  # Auto-detect
-            )
-
-            if result.success:
-                logger.info(f"✅ Auto-deploy successful: {result.output}")
-            else:
-                logger.warning(f"⚠️ Auto-deploy failed: {result.output}")
-
-        except ImportError:
-            logger.debug("talos_deploy_tool not available, skipping auto-deploy")
-        except Exception as e:
-            logger.warning(f"Error triggering auto-deploy: {e}")
