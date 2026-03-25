@@ -171,9 +171,9 @@ export function FullstackBuilderPanel({
   };
 
   const renderHeader = () => (
-    <div className="flex flex-col w-full bg-background shrink-0">
-      {/* Top Row: Navigation and Main Actions */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-border/40">
+    <div className="flex flex-col w-full shrink-0">
+      {/* Top Row: Navigation and Main Actions (Solid) */}
+      <div className="flex items-center justify-between px-4 py-2 bg-background border-b border-border/40">
         <div className="flex items-center gap-3">
           <Button 
             variant={viewMode === 'preview' ? 'secondary' : 'ghost'} 
@@ -253,61 +253,64 @@ export function FullstackBuilderPanel({
         </div>
       </div>
 
-      {/* Second Row: Device Toggles & URL Bar & Preview Controls */}
-      <div className="flex items-center justify-between px-4 h-11 border-b border-border/30 bg-background/50">
-        <div className="flex items-center gap-1 bg-muted/30 p-0.5 rounded-lg border border-border/20">
+      {/* Second Row: Simulator Controls - Separated/Floating Style */}
+      <div className="flex items-center justify-between px-6 py-3 bg-muted/5 shrink-0 border-b border-border/30">
+        <div className="flex items-center gap-1.5 bg-background shadow-sm p-1 rounded-xl border border-border/40">
           <Button 
             variant={responsiveMode === 'desktop' ? 'secondary' : 'ghost'} 
             size="icon" 
-            className="h-7 w-7 rounded-md"
+            className="h-8 w-8 rounded-lg"
             onClick={() => setResponsiveMode('desktop')}
           >
-            <Monitor className="w-3.5 h-3.5" />
+            <Monitor className="w-4 h-4" />
           </Button>
           <Button 
             variant={responsiveMode === 'mobile' ? 'secondary' : 'ghost'} 
             size="icon" 
-            className="h-7 w-7 rounded-md"
+            className="h-8 w-8 rounded-lg"
             onClick={() => setResponsiveMode('mobile')}
           >
-            <Smartphone className="w-3.5 h-3.5" />
+            <Smartphone className="w-4 h-4" />
           </Button>
         </div>
 
-        <div className="flex items-center gap-2 bg-muted/30 hover:bg-muted/50 transition-colors px-3 py-1 rounded-full border border-border/30 w-full max-w-md mx-auto group">
-          <Home className="w-3 h-3 text-muted-foreground cursor-pointer hover:text-foreground" />
-          <div className="flex-1 flex justify-center text-[11px] font-mono text-muted-foreground/80 overflow-hidden">
+        <div className="flex items-center gap-3 bg-background shadow-sm hover:ring-1 hover:ring-border transition-all px-4 py-1.5 rounded-full border border-border/40 w-full max-w-lg mx-auto group">
+          <Home className="w-3.5 h-3.5 text-muted-foreground cursor-pointer hover:text-foreground" />
+          <div className="flex-1 flex justify-center text-[11px] font-mono text-muted-foreground/90 overflow-hidden">
             <span className="truncate">{previewUrl ? new URL(previewUrl).pathname : '/'}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <ExternalLink className="w-3 h-3 text-muted-foreground cursor-pointer hover:text-foreground" onClick={() => window.open(previewUrl, '_blank')} />
-            <RefreshCw className={`w-3 h-3 text-muted-foreground cursor-pointer hover:text-foreground ${isLoadingTree ? 'animate-spin' : ''}`} onClick={reloadIframe} />
+          <div className="flex items-center gap-2.5">
+            <ExternalLink className="w-3.5 h-3.5 text-muted-foreground cursor-pointer hover:text-foreground" onClick={() => window.open(previewUrl, '_blank')} />
+            <RefreshCw className={`w-3.5 h-3.5 text-muted-foreground cursor-pointer hover:text-foreground ${isLoadingTree ? 'animate-spin' : ''}`} onClick={reloadIframe} />
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {isWorking && (
-            <Badge variant="outline" className="h-6 text-[9px] uppercase tracking-wider animate-pulse border-blue-100 text-blue-600 bg-blue-50/30">
-              <Loader2 className="w-2.5 h-2.5 mr-1 animate-spin" /> Working
+            <Badge variant="outline" className="h-7 text-[10px] uppercase tracking-wider animate-pulse border-blue-200 text-blue-600 bg-background shadow-sm">
+              <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> Working
             </Badge>
           )}
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-7 gap-1.5 rounded-lg text-[11px] font-semibold border border-border/40 px-2.5 bg-background"
-            onClick={() => setViewMode('code')}
-          >
-            <Code2 className="w-3 h-3" />
-            Edit
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-7 w-7 rounded-lg text-muted-foreground border border-border/40 bg-background"
-            onClick={() => window.open(previewUrl, '_blank')}
-          >
-            <Maximize2 className="w-3.5 h-3.5" />
-          </Button>
+          <div className="flex items-center bg-background shadow-sm rounded-xl border border-border/40 p-0.5">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 gap-2 rounded-lg text-xs font-semibold px-3"
+              onClick={() => setViewMode('code')}
+            >
+              <Code2 className="w-3.5 h-3.5" />
+              Edit
+            </Button>
+            <div className="w-px h-4 bg-border/40" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 rounded-lg text-muted-foreground"
+              onClick={() => window.open(previewUrl, '_blank')}
+            >
+              <Maximize2 className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
