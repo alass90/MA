@@ -87,55 +87,76 @@ export function safeJsonParse<T>(
 export const getToolIcon = (toolName: string): ElementType => {
   switch (toolName?.toLowerCase()) {
     case 'browser-navigate-to':
+    case 'browser_navigate_to':
     case 'browser-act':
+    case 'browser_act':
     case 'browser-extract-content':
+    case 'browser_extract_content':
     case 'browser-screenshot':
+    case 'browser_screenshot':
       return Globe;
 
     // File operations
     case 'create-file':
+    case 'create_file':
       return FileEdit;
     case 'str-replace':
+    case 'str_replace':
       return FileSearch;
     case 'full-file-rewrite':
+    case 'full_file_rewrite':
       return FilePlus;
     case 'read-file':
+    case 'read_file':
       return FileText;
     case 'edit-file':
+    case 'edit_file':
       return FileEdit;
 
     // Task operations
     case 'create-tasks':
+    case 'create_tasks':
       return List;
     case 'update-tasks':
+    case 'update_tasks':
       return ListTodo;
 
     // Shell commands
     case 'execute-command':
+    case 'execute_command':
       return Terminal;
     case 'check-command-output':
+    case 'check_command_output':
       return Terminal;
     case 'terminate-command':
+    case 'terminate_command':
       return Terminal;
 
     // Port operations
     case 'expose-port':
+    case 'expose_port':
       return Computer;
 
     // Web operations
     case 'web-search':
+    case 'web_search':
       return Search;
     case 'crawl-webpage':
+    case 'crawl_webpage':
       return Globe;
     case 'scrape-webpage':
+    case 'scrape_webpage':
         return Globe;
 
     // API and data operations
     case 'call-data-provider':
+    case 'call_data_provider':
       return ExternalLink;
     case 'get-data-provider-endpoints':
+    case 'get_data_provider_endpoints':
       return Network;
     case 'execute-data-provider-call':
+    case 'execute_data_provider_call':
       return Network;
 
     // Sheets tools
@@ -149,11 +170,13 @@ export const getToolIcon = (toolName: string): ElementType => {
 
     // Code operations
     case 'delete-file':
+    case 'delete_file':
       return FileX;
 
 
     // Tools and utilities
     case 'execute-code':
+    case 'execute_code':
       return Code;
 
     // VAPI Call

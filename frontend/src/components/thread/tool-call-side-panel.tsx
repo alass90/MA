@@ -325,7 +325,7 @@ const NavigationControls = memo(function NavigationControls({
   }
 
   return (
-    <div className="mt-auto flex w-full items-center gap-2 px-4 h-[44px] relative bg-[var(--background-menu-white)]">
+    <div className="mt-auto flex w-full items-center gap-2 px-4 h-[44px] relative bg-[var(--background-menu-white)] border-t border-[var(--border-main)]">
       <div className="flex items-center" dir="ltr">
         <button
           type="button"
@@ -947,7 +947,7 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
               />
             )}
             
-            <div className="flex-1 overflow-hidden flex flex-col sm:px-4 sm:py-3">
+            <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4">
               <div className="flex-1 bg-[var(--background-gray-main)] border border-[var(--border-dark)] dark:border-black/30 shadow-[0px_4px_32px_0px_rgba(0,0,0,0.04)] rounded-[12px] overflow-hidden flex flex-col">
                 <div className="h-[36px] flex items-center px-3 w-full bg-[var(--background-gray-main)] border-b border-[var(--border-main)] rounded-t-lg shadow-[inset_0px_1px_0px_0px_#FFFFFF] dark:shadow-[inset_0px_1px_0px_0px_#FFFFFF15]">
                   <div className="flex-1 flex items-center justify-center">
@@ -1082,7 +1082,7 @@ export const ToolCallSidePanel = memo(function ToolCallSidePanel({
           />
         )}
 
-        <div className="flex-1 overflow-hidden flex flex-col sm:px-4 sm:py-3">
+        <div className="flex-1 overflow-hidden flex flex-col sm:pl-3 sm:py-3 sm:pr-4">
           <div className="flex-1 bg-[var(--background-gray-main)] border border-[var(--border-dark)] dark:border-black/30 shadow-[0px_4px_32px_0px_rgba(0,0,0,0.04)] rounded-[12px] overflow-hidden flex flex-col">
             {capsuleHeader}
             <div className="flex-1 overflow-hidden flex flex-col">
