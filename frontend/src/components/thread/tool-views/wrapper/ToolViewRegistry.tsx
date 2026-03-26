@@ -4,7 +4,6 @@ import { GenericToolView } from '../GenericToolView';
 import { BrowserToolView } from '../BrowserToolView';
 import { CommandToolView } from '../command-tool/CommandToolView';
 import { CheckCommandOutputToolView } from '../command-tool/CheckCommandOutputToolView';
-import { ExposePortToolView } from '../expose-port-tool/ExposePortToolView';
 import { FileOperationToolView } from '../file-operation/FileOperationToolView';
 import { StrReplaceToolView } from '../str-replace/StrReplaceToolView';
 import { WebCrawlToolView } from '../WebCrawlToolView';
@@ -14,18 +13,6 @@ import { PeopleSearchToolView } from '../people-search-tool/PeopleSearchToolView
 import { CompanySearchToolView } from '../company-search-tool/CompanySearchToolView';
 import { DocumentParserToolView } from '../document-parser-tool/DocumentParserToolView';
 import { SeeImageToolView } from '../see-image-tool/SeeImageToolView';
-import { TerminateCommandToolView } from '../command-tool/TerminateCommandToolView';
-import { WaitToolView } from '../wait-tool/WaitToolView';
-import { ExecuteDataProviderCallToolView } from '../data-provider-tool/ExecuteDataProviderCallToolView';
-import { DataProviderEndpointsToolView } from '../data-provider-tool/DataProviderEndpointsToolView';
-import { SearchMcpServersToolView } from '../search-mcp-servers/search-mcp-servers';
-import { GetAppDetailsToolView } from '../get-app-details/get-app-details';
-import { CreateCredentialProfileToolView } from '../create-credential-profile/create-credential-profile';
-import { ConnectCredentialProfileToolView } from '../connect-credential-profile/connect-credential-profile';
-import { CheckProfileConnectionToolView } from '../check-profile-connection/check-profile-connection';
-import { ConfigureProfileForAgentToolView } from '../configure-profile-for-agent/configure-profile-for-agent';
-import { GetCredentialProfilesToolView } from '../get-credential-profiles/get-credential-profiles';
-import { GetCurrentAgentConfigToolView } from '../get-current-agent-config/get-current-agent-config';
 import { TaskListToolView } from '../task-list/TaskListToolView';
 import { ListPresentationTemplatesToolView } from '../presentation-tools/ListPresentationTemplatesToolView';
 import { PresentationViewer } from '../presentation-tools/PresentationViewer';
@@ -37,28 +24,10 @@ import { ExportToPptxToolView, ExportToPdfToolView } from '../presentation-tools
 import { SheetsToolView } from '../sheets-tools/sheets-tool-view';
 import { GetProjectStructureView } from '../web-dev/GetProjectStructureView';
 import { ImageEditGenerateToolView } from '../image-edit-generate-tool/ImageEditGenerateToolView';
-import { DesignerToolView } from '../designer-tool/DesignerToolView';
 import { UploadFileToolView } from '../UploadFileToolView';
 import { DocsToolView, ListDocumentsToolView, DeleteDocumentToolView } from '../docs-tool';
-import { CreateNewAgentToolView } from '../create-new-agent/create-new-agent';
-import { UpdateAgentToolView } from '../update-agent/update-agent';
-import { SearchMcpServersForAgentToolView } from '../search-mcp-servers-for-agent/search-mcp-servers-for-agent';
-import { CreateCredentialProfileForAgentToolView } from '../create-credential-profile-for-agent/create-credential-profile-for-agent';
-import { DiscoverMcpToolsForAgentToolView } from '../discover-mcp-tools-for-agent/discover-mcp-tools-for-agent';
-import { DiscoverUserMcpServersToolView } from '../discover-user-mcp-servers/discover-user-mcp-servers';
-import { ListAppEventTriggersToolView } from '../list-app-event-triggers/list-app-event-triggers';
-import { CreateEventTriggerToolView } from '../create-event-trigger/create-event-trigger';
-import { ConfigureAgentIntegrationToolView } from '../configure-agent-integration/configure-agent-integration';
-import CreateAgentScheduledTriggerToolView from '../create-agent-scheduled-trigger/create-agent-scheduled-trigger';
-import { MakeCallToolView } from '../vapi-call/MakeCallToolView';
-import { CallStatusToolView } from '../vapi-call/CallStatusToolView';
-import { EndCallToolView } from '../vapi-call/EndCallToolView';
-import { ListCallsToolView } from '../vapi-call/ListCallsToolView';
-import { MonitorCallToolView } from '../vapi-call/MonitorCallToolView';
-import { WaitForCallCompletionToolView } from '../vapi-call/WaitForCallCompletionToolView';
 import { createPresentationViewerToolContent, parsePresentationSlidePath } from '../utils/presentation-utils';
 import { KbToolView } from '../KbToolView';
-import { ExpandMessageToolView } from '../expand-message-tool/ExpandMessageToolView';
 
 
 export type ToolViewComponent = React.ComponentType<ToolViewProps>;
@@ -73,7 +42,7 @@ const defaultRegistry: ToolViewRegistryType = {
 
   'execute-command': CommandToolView,
   'check-command-output': CheckCommandOutputToolView,
-  'terminate-command': TerminateCommandToolView,
+  'terminate-command': GenericToolView,
   'list-commands': GenericToolView,
 
   'create-file': FileOperationToolView,
@@ -93,17 +62,17 @@ const defaultRegistry: ToolViewRegistryType = {
   'scrape-webpage': WebScrapeToolView,
   'image-search': WebSearchToolView,
 
-  'execute-data-provider-call': ExecuteDataProviderCallToolView,
-  'get-data-provider-endpoints': DataProviderEndpointsToolView,
+  'execute-data-provider-call': GenericToolView,
+  'get-data-provider-endpoints': GenericToolView,
 
-  'search-mcp-servers': SearchMcpServersToolView,
-  'get-app-details': GetAppDetailsToolView,
-  'create-credential-profile': CreateCredentialProfileToolView,
-  'connect-credential-profile': ConnectCredentialProfileToolView,
-  'check-profile-connection': CheckProfileConnectionToolView,
-  'configure-profile-for-agent': ConfigureProfileForAgentToolView,
-  'get-credential-profiles': GetCredentialProfilesToolView,
-  'get-current-agent-config': GetCurrentAgentConfigToolView,
+  'search-mcp-servers': GenericToolView,
+  'get-app-details': GenericToolView,
+  'create-credential-profile': GenericToolView,
+  'connect-credential-profile': GenericToolView,
+  'check-profile-connection': GenericToolView,
+  'configure-profile-for-agent': GenericToolView,
+  'get-credential-profiles': GenericToolView,
+  'get-current-agent-config': GenericToolView,
   'create-tasks': TaskListToolView,
   'view-tasks': TaskListToolView,
   'update-tasks': TaskListToolView,
@@ -111,17 +80,17 @@ const defaultRegistry: ToolViewRegistryType = {
   'clear-all': TaskListToolView,
 
 
-  'expose-port': ExposePortToolView,
+  'expose-port': GenericToolView,
 
   'load-image': SeeImageToolView,
   'clear-images-from-context': SeeImageToolView,
   'image-edit-or-generate': ImageEditGenerateToolView,
-  'designer-create-or-edit': DesignerToolView,
-  'designer_create_or_edit': DesignerToolView,
+  'designer-create-or-edit': GenericToolView,
+  'designer_create_or_edit': GenericToolView,
 
-  'wait': WaitToolView,
-  'expand_message': ExpandMessageToolView,
-  'expand-message': ExpandMessageToolView,
+  'wait': GenericToolView,
+  'expand_message': GenericToolView,
+  'expand-message': GenericToolView,
 
 
   'list-templates': ListPresentationTemplatesToolView,
@@ -189,29 +158,29 @@ const defaultRegistry: ToolViewRegistryType = {
 
   'default': GenericToolView,
 
-  'create-new-agent': CreateNewAgentToolView,
-  'update-agent': UpdateAgentToolView,
-  'search-mcp-servers-for-agent': SearchMcpServersForAgentToolView,
-  'create-credential-profile-for-agent': CreateCredentialProfileForAgentToolView,
-  'discover-mcp-tools-for-agent': DiscoverMcpToolsForAgentToolView,
-  'discover-user-mcp-servers': DiscoverUserMcpServersToolView,
-  'list-app-event-triggers': ListAppEventTriggersToolView,
-  'create-event-trigger': CreateEventTriggerToolView,
-  'configure-agent-integration': ConfigureAgentIntegrationToolView,
-  'create-agent-scheduled-trigger': CreateAgentScheduledTriggerToolView,
+  'create-new-agent': GenericToolView,
+  'update-agent': GenericToolView,
+  'search-mcp-servers-for-agent': GenericToolView,
+  'create-credential-profile-for-agent': GenericToolView,
+  'discover-mcp-tools-for-agent': GenericToolView,
+  'discover-user-mcp-servers': GenericToolView,
+  'list-app-event-triggers': GenericToolView,
+  'create-event-trigger': GenericToolView,
+  'configure-agent-integration': GenericToolView,
+  'create-agent-scheduled-trigger': GenericToolView,
 
-  'make_phone_call': MakeCallToolView,
-  'make-phone-call': MakeCallToolView,
-  'end_call': EndCallToolView,
-  'end-call': EndCallToolView,
-  'get_call_details': CallStatusToolView,
-  'get-call-details': CallStatusToolView,
-  'list_calls': ListCallsToolView,
-  'list-calls': ListCallsToolView,
-  'monitor_call': MonitorCallToolView,
-  'monitor-call': MonitorCallToolView,
-  'wait_for_call_completion': WaitForCallCompletionToolView,
-  'wait-for-call-completion': WaitForCallCompletionToolView,
+  'make_phone_call': GenericToolView,
+  'make-phone-call': GenericToolView,
+  'end_call': GenericToolView,
+  'end-call': GenericToolView,
+  'get_call_details': GenericToolView,
+  'get-call-details': GenericToolView,
+  'list_calls': GenericToolView,
+  'list-calls': GenericToolView,
+  'monitor_call': GenericToolView,
+  'monitor-call': GenericToolView,
+  'wait_for_call_completion': GenericToolView,
+  'wait-for-call-completion': GenericToolView,
 };
 
 class ToolViewRegistry {

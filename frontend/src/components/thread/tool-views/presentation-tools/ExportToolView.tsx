@@ -21,7 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Markdown } from '@/components/ui/markdown';
 import { FileAttachment } from '../../file-attachment';
 import { useAuth } from '@/components/AuthProvider';
-
+import { cn } from '@/lib/utils';
 interface ExportToolViewProps extends ToolViewProps {
   onFileClick?: (filePath: string) => void;
 }

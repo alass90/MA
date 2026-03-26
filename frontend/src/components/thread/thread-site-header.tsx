@@ -11,7 +11,8 @@ import {
   ChevronDown, 
   Pencil, 
   Trash2,
-  Code2
+  Code2,
+  Palette
 } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -38,6 +39,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { projectKeys } from "@/hooks/threads/keys";
 import { threadKeys } from "@/hooks/threads/keys";
 import { useFullstackBuilderStore } from "@/stores/use-fullstack-builder-store";
+import { useDesignerStore } from "@/stores/use-designer-store";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 
 interface ThreadSiteHeaderProps {
@@ -75,6 +77,7 @@ export function SiteHeader({
   const [copied, setCopied] = useState(false);
   const queryClient = useQueryClient();
   const { isOpen: isFullstackOpen, openPanel: openFullstack, closePanel: closeFullstack } = useFullstackBuilderStore();
+  const { isOpen: isDesignerOpen, togglePanel: toggleDesigner } = useDesignerStore();
 
   const toggleFullstack = () => {
     if (isFullstackOpen) {
@@ -287,6 +290,23 @@ export function SiteHeader({
                 <p>View Files in Task</p>
               </TooltipContent>
             </Tooltip>            
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleDesigner}
+                  className="h-9 w-9 cursor-pointer"
+                >
+                  <Palette className={cn("h-4 w-4", isDesignerOpen ? "text-purple-500" : "")} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side={isMobile ? "bottom" : "bottom"}>
+                <p>Toggle Designer Canvas</p>
+              </TooltipContent>
+            </Tooltip>
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

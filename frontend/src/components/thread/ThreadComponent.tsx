@@ -60,6 +60,8 @@ import { usePresentationDetector } from '@/hooks/use-presentation-detector';
 import { TalosSlidesPanel } from '@/components/artifacts/TalosSlidesPanel';
 import { useFullstackBuilderStore } from '@/stores/use-fullstack-builder-store';
 import { useFullstackBuilderDetector } from '@/hooks/use-fullstack-builder-detector';
+import { useDesignerStore } from '@/stores/use-designer-store';
+import { useDesignerDetector } from '@/hooks/use-designer-detector';
 
 interface ThreadComponentProps {
   projectId: string;
@@ -181,6 +183,13 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
     pendingChatMessage,
     clearPendingChatMessage,
   } = useFullstackBuilderStore();
+  
+  // Auto-detect designer tool calls and switch to Designer panel
+  useDesignerDetector(messages as UnifiedMessage[], sandboxId);
+  const { 
+    isOpen: isDesignerOpen, 
+    closePanel: onCloseDesigner 
+  } = useDesignerStore();
 
   // When the Database viewer injects a prompt, fill the chat input and clear the pending message
   useEffect(() => {
@@ -1068,6 +1077,8 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           onToggleDeliverables={handleToggleFilesOverlay}
           isFullstackBuilderOpen={isFullstackBuilderOpen}
           onCloseFullstackBuilder={onCloseFullstackBuilder}
+          isDesignerOpen={isDesignerOpen}
+          onCloseDesigner={onCloseDesigner}
         >
           {/* Thread Content - Scrollable */}
           <div
@@ -1258,6 +1269,8 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         onCloseFileViewerPanel={() => setIsFileViewerPanelOpen(false)}
         isFullstackBuilderOpen={isFullstackBuilderOpen}
         onCloseFullstackBuilder={onCloseFullstackBuilder}
+        isDesignerOpen={isDesignerOpen}
+        onCloseDesigner={onCloseDesigner}
       >
         <ThreadContent
           messages={isShared ? playback.playbackState.visibleMessages : messages}
