@@ -26,10 +26,12 @@ import {
 } from 'lucide-react';
 import { CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useFullstackBuilderStore } from '@/stores/use-fullstack-builder-store';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { GithubPushModal } from './GithubPushModal';
+import { DatabaseViewer } from './DatabaseViewer';
+import { useFullstackBuilderStore } from '@/stores/use-fullstack-builder-store';
 
 interface FullstackBuilderPanelProps {
   sandboxId?: string;
@@ -54,8 +56,9 @@ export function FullstackBuilderPanel({
   const [isLoadingTree, setIsLoadingTree] = useState(false);
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set(['/workspace']));
-  const [viewMode, setViewMode] = useState<'preview' | 'code'>('preview');
+  const [viewMode, setViewMode] = useState<'preview' | 'code' | 'database'>('preview');
   const [responsiveMode, setResponsiveMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [isGithubModalOpen, setIsGithubModalOpen] = useState(false);
 
   const isWorking = agentStatus === 'running';
 
@@ -198,7 +201,12 @@ export function FullstackBuilderPanel({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={() => setViewMode('code')}>
+                <Button 
+                  variant={viewMode === 'code' ? 'secondary' : 'ghost'} 
+                  size="icon" 
+                  className="h-7 w-7 rounded-md" 
+                  onClick={() => setViewMode('code')}
+                >
                   <Code2 className="w-3.5 h-3.5" />
                 </Button>
               </TooltipTrigger>
@@ -214,11 +222,16 @@ export function FullstackBuilderPanel({
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
+                <Button 
+                  variant={viewMode === 'database' ? 'secondary' : 'ghost'} 
+                  size="icon" 
+                  className="h-7 w-7 rounded-md"
+                  onClick={() => setViewMode('database')}
+                >
                   <Database className="w-3.5 h-3.5" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Resources</TooltipContent>
+              <TooltipContent>Database</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -244,14 +257,14 @@ export function FullstackBuilderPanel({
         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground">
           <MoreHorizontal className="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground">
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground" onClick={() => setIsGithubModalOpen(true)}>
           <Github className="w-4 h-4" />
         </Button>
         <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-lg text-xs font-medium border border-border/40 px-3">
           <Share2 className="w-3.5 h-3.5" />
           Share
         </Button>
-        <Button variant="default" size="sm" className="h-8 gap-2 rounded-lg text-xs font-semibold px-4 bg-zinc-900 hover:bg-zinc-800 text-white border-0">
+        <Button variant="default" size="sm" className="h-8 gap-2 rounded-lg text-xs font-semibold px-4 bg-zinc-900 hover:bg-zinc-800 text-white border-0" onClick={() => setIsGithubModalOpen(true)}>
           <Publish className="w-3.5 h-3.5" />
           Publish
         </Button>
@@ -329,7 +342,7 @@ export function FullstackBuilderPanel({
       {renderGlobalHeader()}
       
       <div className="flex-1 flex flex-col w-full bg-background min-h-0 rounded-3xl border border-border/40 shadow-2xl mb-2 mx-1 mt-1 overflow-hidden" style={{ contain: 'strict' }}>
-        {renderSimulatorBar()}
+        {viewMode !== 'database' && renderSimulatorBar()}
         <PanelGroup direction="horizontal" className="h-full w-full">
           {viewMode === 'code' && (
             <>
@@ -408,8 +421,21 @@ export function FullstackBuilderPanel({
               </div>
             </Panel>
           )}
+
+          {viewMode === 'database' && (
+            <Panel defaultSize={100} minSize={20} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <DatabaseViewer projectId={sandboxId} />
+            </Panel>
+          )}
         </PanelGroup>
       </div>
+
+      <GithubPushModal 
+        isOpen={isGithubModalOpen} 
+        onOpenChange={setIsGithubModalOpen} 
+        sandboxId={sandboxId}
+        defaultRepoName={projectName || 'talos-ai-project'}
+      />
     </div>
   );
 }

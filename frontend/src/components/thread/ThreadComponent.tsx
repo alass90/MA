@@ -175,7 +175,26 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
 
   // Auto-detect fullstack builder tool calls and switch to IDE panel
   useFullstackBuilderDetector(messages as UnifiedMessage[], agentStatus);
-  const { isOpen: isFullstackBuilderOpen, closePanel: onCloseFullstackBuilder } = useFullstackBuilderStore();
+  const { 
+    isOpen: isFullstackBuilderOpen, 
+    closePanel: onCloseFullstackBuilder,
+    pendingChatMessage,
+    clearPendingChatMessage,
+  } = useFullstackBuilderStore();
+
+  // When the Database viewer injects a prompt, fill the chat input and clear the pending message
+  useEffect(() => {
+    if (pendingChatMessage) {
+      setChatInputValue(pendingChatMessage);
+      clearPendingChatMessage();
+      // Focus the chat input textarea for instant typing
+      setTimeout(() => {
+        const textarea = document.querySelector<HTMLTextAreaElement>('.chat-input-textarea');
+        textarea?.focus();
+        textarea?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 100);
+    }
+  }, [pendingChatMessage, clearPendingChatMessage]);
 
   // Memoized callback for closing side panel to prevent unnecessary re-renders
   const handleSidePanelClose = useCallback(() => {

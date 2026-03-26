@@ -373,6 +373,10 @@ class Configuration:
     # Freestyle deployment configuration
     FREESTYLE_API_KEY: Optional[str] = None
     
+    # GitHub Integration
+    GITHUB_CLIENT_ID: Optional[str] = None
+    GITHUB_CLIENT_SECRET: Optional[str] = None
+    
     # Stripe configuration
     STRIPE_SECRET_KEY: Optional[str] = None
     STRIPE_WEBHOOK_SECRET: Optional[str] = None

@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from core.utils.logger import logger
 from core.utils.config import config
 from core.utils.config import Configuration
+from typing import Optional
 import asyncio
 
 load_dotenv()
@@ -79,7 +80,7 @@ async def start_supervisord_session(sandbox: AsyncSandbox):
         # Don't fail if supervisord already running
         logger.warning(f"Could not start supervisord: {str(e)}")
 
-async def create_sandbox(password: str, project_id: str = None) -> AsyncSandbox:
+async def create_sandbox(password: str, project_id: Optional[str] = None) -> AsyncSandbox:
     """Create a new sandbox with all required services configured and running."""
     
     logger.info("Creating new Daytona sandbox environment")
@@ -105,7 +106,11 @@ async def create_sandbox(password: str, project_id: str = None) -> AsyncSandbox:
             "CHROME_USER_DATA": "",
             "CHROME_DEBUGGING_PORT": "9222",
             "CHROME_DEBUGGING_HOST": "localhost",
-            "CHROME_CDP": ""
+            "CHROME_CDP": "",
+            # Supabase creds for frontend .env file generation (ANON key only — safe)
+            # The SERVICE_ROLE_KEY is NEVER injected here (stays backend-only)
+            "SUPABASE_URL": config.SUPABASE_URL or "",
+            "SUPABASE_ANON_KEY": config.SUPABASE_ANON_KEY or "",
         },
         # resources=Resources(
         #     cpu=2,

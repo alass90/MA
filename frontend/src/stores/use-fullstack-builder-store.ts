@@ -15,6 +15,10 @@ interface FullstackBuilderState {
   }) => void;
   closePanel: () => void;
   setPreviewUrl: (url: string) => void;
+  // Used to inject a prompt into the chat input from the IDE panel
+  pendingChatMessage: string | null;
+  setPendingChatMessage: (msg: string) => void;
+  clearPendingChatMessage: () => void;
 }
 
 export const useFullstackBuilderStore = create<FullstackBuilderState>((set) => ({
@@ -40,4 +44,8 @@ export const useFullstackBuilderStore = create<FullstackBuilderState>((set) => (
     }),
 
   setPreviewUrl: (url) => set({ previewUrl: url }),
+
+  pendingChatMessage: null,
+  setPendingChatMessage: (msg) => set({ pendingChatMessage: msg }),
+  clearPendingChatMessage: () => set({ pendingChatMessage: null }),
 }));

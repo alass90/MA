@@ -14,6 +14,7 @@ from .accounts_api import router as accounts_router
 from .user_roles_api import router as user_roles_router
 from .feedback import router as feedback_router
 from .storage_api import router as storage_router
+from .github_integrations import router as github_router
 router = APIRouter()
 
 # Include all sub-routers
@@ -31,6 +32,7 @@ router.include_router(accounts_router)
 router.include_router(user_roles_router)
 router.include_router(feedback_router)
 router.include_router(storage_router)
+router.include_router(github_router)
 
 # Re-export the initialize and cleanup functions
 __all__ = ['router', 'initialize', 'cleanup']

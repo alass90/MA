@@ -290,6 +290,87 @@ Images consume SIGNIFICANT context tokens (1000+ tokens per image). With a stric
 - **IMPORTANT**: ALWAYS provide the preview URL in your final message to the user! The TalosAI frontend will automatically detect this URL and render a split-pane IDE view (Monaco Editor + Live Preview) just like Bolt.new or Lovable.
 - Do NOT use the port 8080 instructions from 2.3.7 if you are building a fullstack Next.js or Vite app. Port 8080 is ONLY for simple static HTML files.
 
+### 2.3.8.1 DATABASE INTEGRATION (TalosAI — TiDB Cloud per Project)
+
+When a user asks you to **"add a database"**, **"create a database"**, or similar requests while working on a fullstack project, you MUST follow this **TiDB Cloud-first** workflow. Each project gets its own **dedicated, isolated TiDB Cloud Serverless cluster** — completely separate from TalosAI's internal database.
+
+**⚠️ SECURITY RULES (non-negotiable):**
+- ⛔ NEVER use `SUPABASE_SERVICE_ROLE_KEY` — it is not in the sandbox
+- ⛔ NEVER mix the project's data with TalosAI's internal Supabase
+- ✅ ALWAYS provision a fresh TiDB Cloud cluster for each project via the proxy endpoint
+
+---
+
+**STEP 1: Provision a dedicated TiDB Cloud Serverless cluster**
+Call the TalosAI backend to create an isolated DB for this project:
+```bash
+# Replace my-project with the actual project name
+RESPONSE=$(curl -s -X POST "http://localhost:8000/api/github/db/provision" \\
+  -H "Authorization: Bearer $AGENT_JWT_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{{"project_name": "my-project"}}')
+
+# Extract env vars from the response
+echo $RESPONSE | python3 -c "import sys,json; d=json.load(sys.stdin)['env_vars']; [print(f\\"{{k}}={{v}}\\") for k,v in d.items()]"
+```
+The response includes: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DATABASE_URL`
+
+**STEP 2: Create the project's .env file with the connection details**
+```bash
+# For Vite/React:
+cat > app/.env << 'EOF'
+VITE_DB_HOST=${{DB_HOST}}
+VITE_DB_PORT=${{DB_PORT}}
+DATABASE_URL=${{DATABASE_URL}}
+EOF
+# For Next.js: use app/.env.local with NEXT_PUBLIC_ prefix for browser vars
+```
+
+**STEP 3: Install database client for the project's language/framework**
+```bash
+# For Node.js (MySQL2 — TiDB is MySQL-compatible):
+cd app && npm install mysql2
+# Or for Prisma ORM (recommended):
+cd app && npm install prisma @prisma/client && npx prisma init --datasource-provider mysql
+```
+
+**STEP 4: Create tables via the TalosAI migration proxy**
+```bash
+curl -s -X POST "http://localhost:8000/api/github/db/migrate" \\
+  -H "Authorization: Bearer $AGENT_JWT_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{{"sql": "CREATE TABLE IF NOT EXISTS users (id BIGINT PRIMARY KEY AUTO_INCREMENT, email VARCHAR(255) UNIQUE NOT NULL, name VARCHAR(255), created_at TIMESTAMP DEFAULT NOW()); CREATE TABLE IF NOT EXISTS posts (id BIGINT PRIMARY KEY AUTO_INCREMENT, user_id BIGINT REFERENCES users(id), title VARCHAR(255) NOT NULL, content TEXT, created_at TIMESTAMP DEFAULT NOW());"}}' 
+```
+Note: TiDB uses MySQL syntax — use `BIGINT AUTO_INCREMENT` instead of UUID, `VARCHAR` instead of `text`.
+
+**STEP 5: Create a DB client helper**
+```javascript
+// app/src/lib/db.js (Node.js / MySQL2)
+import mysql from 'mysql2/promise';
+
+export const db = mysql.createPool({{
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT || 4000,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME || 'test',
+  ssl: {{ rejectUnauthorized: true }},
+}});
+```
+
+**STEP 6: Restart dev server and confirm**
+```bash
+manage_fullstack_project(action="restart_server")
+```
+Then tell the user: "✅ Your project now has its own dedicated TiDB Cloud database (isolated from all other projects). Click the **Database** tab to explore your tables."
+
+**KEY DIFFERENCES FROM SUPABASE:**
+- TiDB uses **MySQL syntax** (not PostgreSQL): `AUTO_INCREMENT`, `VARCHAR`, `INT` instead of `SERIAL`/`uuid_generate_v4()`
+- Connection is on **port 4000** (MySQL protocol)
+- No RLS — use application-level auth instead
+- Perfect for full-stack apps that need a real isolated database per project
+b in TalosAI will show new tables after migrations succeed
+
 ### 2.3.9 PROFESSIONAL DESIGN CREATION & EDITING (DESIGNER TOOL)
 - Use the 'designer_create_or_edit' tool for creating professional, high-quality designs optimized for social media, advertising, and marketing
   
