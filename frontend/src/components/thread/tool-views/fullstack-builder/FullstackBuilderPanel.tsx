@@ -33,6 +33,12 @@ import { GithubPushModal } from './GithubPushModal';
 import { DatabaseViewer } from './DatabaseViewer';
 import { useFullstackBuilderStore } from '@/stores/use-fullstack-builder-store';
 
+const ShareIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 1024 1024" fill="currentColor" className={className}>
+    <path d="M386.218667 247.850667c0-102.4 120.405333-157.397333 197.76-90.282667l304.426666 264.32a119.466667 119.466667 0 0 1 1.365334 179.285333l-304.469334 272.170667c-76.970667 68.778667-199.082667 14.122667-199.082666-89.088v-89.173333c-33.024 2.261333-59.306667 6.826667-83.2 15.36-30.592 10.88-61.866667 29.952-98.602667 67.712a76.8 76.8 0 0 1-131.84-53.504c0-98.645333 24.106667-190.976 83.712-261.888 55.253333-65.792 133.973333-104.789333 229.930667-117.845334V247.850667z m147.413333-32.256c-27.648-23.978667-70.613333-4.352-70.613333 32.256v126.208l-0.256 4.309333c-2.218667 21.504-20.437333 38.186667-42.410667 40.021333l-17.194667 1.706667c-173.994667 20.949333-253.824 136.405333-253.824 304.554667 86.997333-89.557333 163.925333-105.386667 270.933334-107.861334a42.026667 42.026667 0 0 1 42.752 42.24v125.226667c0 34.56 38.272 53.845333 65.706666 35.925333l5.376-4.096 304.426667-272.213333a42.666667 42.666667 0 0 0 2.986667-60.714667l-3.413334-3.285333-304.469333-264.277333z" />
+  </svg>
+);
+
 interface FullstackBuilderPanelProps {
   sandboxId?: string;
   agentStatus?: string;
@@ -176,20 +182,26 @@ export function FullstackBuilderPanel({
   const renderGlobalHeader = () => (
     <div className="flex items-center justify-between px-4 py-2 shrink-0">
       <div className="flex items-center gap-3">
-        <div className="flex items-center bg-muted/40 p-0.5 rounded-lg border border-border/30">
+        <div className="flex items-center bg-muted/30 p-0.5 rounded-lg border border-border/20 shadow-sm">
           <Button 
-            variant={viewMode === 'preview' ? 'secondary' : 'ghost'} 
+            variant="ghost" 
             size="sm" 
-            className="h-8 gap-2 rounded-md text-xs font-semibold px-3"
+            className={cn(
+              "h-8 gap-2 rounded-md text-[11px] font-bold px-3 transition-all",
+              viewMode === 'preview' ? "bg-white text-foreground shadow-sm ring-1 ring-border/10" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+            )}
             onClick={() => setViewMode('preview')}
           >
             <Monitor className="w-3.5 h-3.5" />
             Preview
           </Button>
           <Button 
-            variant={viewMode === 'code' ? 'secondary' : 'ghost'} 
+            variant="ghost" 
             size="sm" 
-            className="h-8 gap-2 rounded-md text-xs font-semibold px-3"
+            className={cn(
+              "h-8 gap-2 rounded-md text-[11px] font-bold px-3 transition-all",
+              viewMode === 'code' ? "bg-white text-foreground shadow-sm ring-1 ring-border/10" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+            )}
             onClick={() => setViewMode('code')}
           >
             <Code2 className="w-3.5 h-3.5" />
@@ -197,14 +209,17 @@ export function FullstackBuilderPanel({
           </Button>
         </div>
         
-        <div className="flex items-center bg-muted/40 p-0.5 rounded-lg border border-border/30">
+        <div className="flex items-center bg-muted/30 p-0.5 rounded-lg border border-border/20 shadow-sm">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
-                  variant={viewMode === 'code' ? 'secondary' : 'ghost'} 
+                  variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 rounded-md" 
+                  className={cn(
+                    "h-7 w-7 rounded-md transition-all",
+                    viewMode === 'code' ? "bg-white text-foreground shadow-sm ring-1 ring-border/10" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  )}
                   onClick={() => setViewMode('code')}
                 >
                   <Code2 className="w-3.5 h-3.5" />
@@ -212,9 +227,10 @@ export function FullstackBuilderPanel({
               </TooltipTrigger>
               <TooltipContent>Code</TooltipContent>
             </Tooltip>
+            {/* History, Folder, Settings buttons with neutral hover */}
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all">
                   <History className="w-3.5 h-3.5" />
                 </Button>
               </TooltipTrigger>
@@ -223,9 +239,12 @@ export function FullstackBuilderPanel({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
-                  variant={viewMode === 'database' ? 'secondary' : 'ghost'} 
+                  variant="ghost" 
                   size="icon" 
-                  className="h-7 w-7 rounded-md"
+                  className={cn(
+                    "h-7 w-7 rounded-md transition-all",
+                    viewMode === 'database' ? "bg-white text-foreground shadow-sm ring-1 ring-border/10" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  )}
                   onClick={() => setViewMode('database')}
                 >
                   <Database className="w-3.5 h-3.5" />
@@ -235,7 +254,7 @@ export function FullstackBuilderPanel({
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all">
                   <Folder className="w-3.5 h-3.5" />
                 </Button>
               </TooltipTrigger>
@@ -243,7 +262,7 @@ export function FullstackBuilderPanel({
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md">
+                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all">
                   <Settings className="w-3.5 h-3.5" />
                 </Button>
               </TooltipTrigger>
@@ -261,11 +280,10 @@ export function FullstackBuilderPanel({
           <Github className="w-4 h-4" />
         </Button>
         <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-lg text-xs font-medium border border-border/40 px-3">
-          <Share2 className="w-3.5 h-3.5" />
+          <ShareIcon className="w-3.5 h-3.5" />
           Share
         </Button>
-        <Button variant="default" size="sm" className="h-8 gap-2 rounded-lg text-xs font-semibold px-4 bg-zinc-900 hover:bg-zinc-800 text-white border-0" onClick={() => setIsGithubModalOpen(true)}>
-          <Publish className="w-3.5 h-3.5" />
+        <Button variant="default" size="sm" className="h-8 rounded-lg text-xs font-semibold px-4 bg-zinc-900 hover:bg-zinc-800 text-white border-0" onClick={() => setIsGithubModalOpen(true)}>
           Publish
         </Button>
         <div className="w-px h-4 bg-border/40 mx-1" />
@@ -278,19 +296,25 @@ export function FullstackBuilderPanel({
 
   const renderSimulatorBar = () => (
     <div className="flex items-center justify-between px-4 h-11 border-b border-border/30 bg-background/50">
-      <div className="flex items-center gap-1 bg-muted/30 p-0.5 rounded-lg border border-border/20">
+      <div className="flex items-center gap-1 bg-muted/30 p-0.5 rounded-lg border border-border/20 shadow-sm">
         <Button 
-          variant={responsiveMode === 'desktop' ? 'secondary' : 'ghost'} 
+          variant="ghost" 
           size="icon" 
-          className="h-7 w-7 rounded-md"
+          className={cn(
+            "h-7 w-7 rounded-md transition-all",
+            responsiveMode === 'desktop' ? "bg-white text-foreground shadow-sm ring-1 ring-border/10" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          )}
           onClick={() => setResponsiveMode('desktop')}
         >
           <Monitor className="w-3.5 h-3.5" />
         </Button>
         <Button 
-          variant={responsiveMode === 'mobile' ? 'secondary' : 'ghost'} 
+          variant="ghost" 
           size="icon" 
-          className="h-7 w-7 rounded-md"
+          className={cn(
+            "h-7 w-7 rounded-md transition-all",
+            responsiveMode === 'mobile' ? "bg-white text-foreground shadow-sm ring-1 ring-border/10" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          )}
           onClick={() => setResponsiveMode('mobile')}
         >
           <Smartphone className="w-3.5 h-3.5" />

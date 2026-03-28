@@ -27,11 +27,10 @@ import { useFileSnapshot } from '@/hooks/use-file-snapshot';
 
 // Define basic file types
 export type FileType =
-    | 'image' | 'code' | 'text' | 'pdf'
-    | 'audio' | 'video' | 'spreadsheet'
-    | 'archive' | 'database' | 'markdown'
-    | 'csv'
-    | 'other';
+    | 'image' | 'code' | 'document' | 'pdf'
+    | 'audio' | 'video' | 'sheet'
+    | 'archive' | 'database' | 'link'
+    | 'default';
 
 // Helper function to check if a filepath is a presentation attachment
 function isPresentationAttachment(filepath: string): boolean {
@@ -62,36 +61,73 @@ function extractSlideNumber(filepath: string): number | null {
 function getFileType(filename: string): FileType {
     const ext = filename.split('.').pop()?.toLowerCase() || '';
 
-    if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'].includes(ext)) return 'image';
-    if (['js', 'jsx', 'ts', 'tsx', 'html', 'css', 'json', 'py', 'java', 'c', 'cpp'].includes(ext)) return 'code';
-    if (['txt', 'log', 'env'].includes(ext)) return 'text';
-    if (['md', 'markdown'].includes(ext)) return 'markdown';
-    if (ext === 'pdf') return 'pdf';
+    if (['pdf'].includes(ext)) return 'pdf';
+    if (['doc', 'docx', 'odt', 'txt', 'md', 'env', 'log'].includes(ext)) return 'document';
+    if (['xls', 'xlsx', 'csv', 'tsv'].includes(ext)) return 'sheet';
+    if (['js', 'ts', 'tsx', 'jsx', 'py', 'rb', 'go', 'rs', 'cpp', 'c', 'java', 'html', 'css', 'json'].includes(ext)) return 'code';
+    if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp'].includes(ext)) return 'image';
+    if (['zip', 'rar', 'tar', 'gz'].includes(ext)) return 'archive';
     if (['mp3', 'wav', 'ogg', 'flac'].includes(ext)) return 'audio';
     if (['mp4', 'webm', 'mov', 'avi'].includes(ext)) return 'video';
-    if (['csv', 'tsv'].includes(ext)) return 'csv';
-    if (['xls', 'xlsx'].includes(ext)) return 'spreadsheet';
-    if (['zip', 'rar', 'tar', 'gz'].includes(ext)) return 'archive';
     if (['db', 'sqlite', 'sql'].includes(ext)) return 'database';
 
-    return 'other';
+    return 'default';
 }
+
+// Custom Filled Icons for a premium look
+const FileFilled = ({ color, bgColor, size }: { color: string, bgColor: string, size: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" fill={color}/>
+        <path d="M14 2v5a1 1 0 0 0 1 1h5" stroke={bgColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
+
+const FileTextFilled = ({ color, bgColor, size }: { color: string, bgColor: string, size: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" fill={color}/>
+        <path d="M14 2v5a1 1 0 0 0 1 1h5" stroke={bgColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M10 9H8M16 13H8M16 17H8" stroke={bgColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
+
+const FileCodeFilled = ({ color, bgColor, size }: { color: string, bgColor: string, size: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" fill={color}/>
+        <path d="M14 2v5a1 1 0 0 0 1 1h5" stroke={bgColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M8 12l2 2 4-4" stroke={bgColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
+
+const FileSheetFilled = ({ color, bgColor, size }: { color: string, bgColor: string, size: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" fill={color}/>
+        <path d="M14 2v5a1 1 0 0 0 1 1h5" stroke={bgColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M8 10h8M8 14h8M12 10v8" stroke={bgColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
+
+const FilePdfFilled = ({ color, bgColor, size }: { color: string, bgColor: string, size: number }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" fill={color}/>
+        <path d="M14 2v5a1 1 0 0 0 1 1h5" stroke={bgColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M9 12h6M9 16h6" stroke={bgColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
 
 // Get appropriate icon for file type
 function getFileIcon(type: FileType): React.ElementType {
     const icons: Record<FileType, React.ElementType> = {
         image: FileImage,
-        code: FileCode,
-        text: FileText,
-        markdown: FileText,
-        pdf: FileType,
+        code: FileCodeFilled,
+        document: FileTextFilled,
+        pdf: FilePdfFilled,
         audio: FileAudio,
         video: FileVideo,
-        spreadsheet: FileSpreadsheet,
-        csv: FileSpreadsheet,
+        sheet: FileSheetFilled,
         archive: Archive,
         database: Database,
-        other: File
+        link: ExternalLink,
+        default: FileFilled
     };
 
     return icons[type];
@@ -106,16 +142,15 @@ function getTypeLabel(type: FileType, extension?: string): string {
     const labels: Record<FileType, string> = {
         image: 'Image',
         code: 'Code',
-        text: 'Text',
-        markdown: 'Markdown',
+        document: 'Document',
         pdf: 'PDF',
         audio: 'Audio',
         video: 'Video',
-        spreadsheet: 'Spreadsheet',
-        csv: 'CSV',
+        sheet: 'Sheet',
         archive: 'Archive',
         database: 'Database',
-        other: 'File'
+        link: 'Link',
+        default: 'File'
     };
 
     return labels[type];
@@ -132,14 +167,13 @@ function getFileSize(filepath: string, type: FileType): string {
         video: 20.0,
         audio: 10.0,
         code: 0.5,
-        text: 0.3,
-        markdown: 0.3,
+        document: 0.3,
         pdf: 8.0,
-        spreadsheet: 3.0,
-        csv: 2.0,
+        sheet: 3.0,
         archive: 5.0,
         database: 4.0,
-        other: 1.0
+        link: 1.0,
+        default: 1.0
     };
 
     const size = base * multipliers[type];
@@ -148,6 +182,17 @@ function getFileSize(filepath: string, type: FileType): string {
     if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
     return `${(size / (1024 * 1024)).toFixed(1)} MB`;
 }
+
+// Icon color mapping with background (pastel) and color (saturated)
+const iconColors = {
+    pdf:      { bg: "#FADDD9", color: "#E05C4B" },
+    document: { bg: "#D6E8F7", color: "#4D81E8" },
+    sheet:    { bg: "#D4EDDF", color: "#3B8A5A" },
+    code:     { bg: "#D6E8F7", color: "#4999E9" },
+    image:    { bg: "#E8DCF5", color: "#9B6FD4" },
+    link:     { bg: "#EDE9FE", color: "#7C3AED" },
+    default:  { bg: "#E8E8E8", color: "#888780" },
+};
 
 // Get the API URL for file content
 function getFileUrl(sandboxId: string | undefined, path: string): string {
@@ -244,6 +289,7 @@ export function FileAttachment({
     const typeLabel = getTypeLabel(fileType, extension);
     const fileSize = getFileSize(filepath, fileType);
     const IconComponent = getFileIcon(fileType);
+    const colors = iconColors[fileType as keyof typeof iconColors] || iconColors.default;
 
     // Display flags
     const isImage = fileType === 'image';
@@ -318,7 +364,7 @@ export function FileAttachment({
     React.useEffect(() => {
         const anyError = fileContentError || imageError || pdfError || xlsxError;
         const isStillRetrying = imageRetryAttempt < 15 || fileRetryAttempt < 15;
-        
+
         if (anyError && !isStillRetrying) {
             // Only show error after retries exhausted
             // Check if it's a sandbox deleted error
@@ -547,7 +593,7 @@ export function FileAttachment({
                         )}
                     </div>
                 )}
-                
+
                 <img
                     src={currentUrl || (sandboxId && session?.access_token ? imageUrl : (fileUrl || ''))}
                     alt={filename}
@@ -605,7 +651,7 @@ export function FileAttachment({
 
                         setHasError(true);
                         setImageLoaded(true); // Consider it "loaded" even on error
-                        
+
                         // Try signed URL refresh on error
                         handleLoadError();
 
@@ -634,7 +680,7 @@ export function FileAttachment({
     // Only show preview if we have actual content or it's loading
     const hasContent = fileContent || pdfBlobUrl || xlsxBlobUrl;
     const isLoadingContent = fileContentLoading || pdfLoading || xlsxLoading;
-    
+
     if (shouldShowPreview && isGridLayout && (hasContent || isLoadingContent || hasError || isSandboxDeleted)) {
         // Determine the renderer component
         const Renderer = rendererMap[extension as keyof typeof rendererMap];
@@ -860,20 +906,30 @@ export function FileAttachment({
             style={safeStyle}
             title={`${filename} - Sandbox no longer available`}
         >
-            {/* Icon container */}
-            <div className="w-[54px] h-full flex items-center justify-center flex-shrink-0 bg-muted/50">
-                <IconComponent className="h-5 w-5 text-muted-foreground" />
+            {/* Icon container - Filled style */}
+            <div 
+                className="rounded-[10px] flex items-center justify-center flex-shrink-0 ml-3"
+                style={{ 
+                    width: 38, 
+                    height: 38, 
+                    background: colors.bg
+                }}
+            >
+                {/* Check if it's one of our custom filled icons which need bgColor */}
+                {['code', 'document', 'pdf', 'sheet', 'default'].includes(fileType) ? (
+                    <IconComponent size={24} color={colors.color} bgColor={colors.bg} />
+                ) : (
+                    <IconComponent size={24} color={colors.color} fill={colors.color} />
+                )}
             </div>
 
             {/* Text content */}
-            <div className="flex-1 min-w-0 flex flex-col justify-center px-3 py-2 overflow-hidden">
-                <div className="text-sm font-medium text-muted-foreground truncate">
+            <div className="flex-1 min-w-0 flex flex-col justify-center px-3 py-2 overflow-hidden text-muted-foreground/50">
+                <div className="text-[14px] font-medium truncate">
                     {filename}
                 </div>
-                <div className="text-xs text-muted-foreground flex items-center gap-1 truncate">
-                    <span className="truncate">Unavailable</span>
-                    <span className="flex-shrink-0">·</span>
-                    <span className="flex-shrink-0">Sandbox deleted</span>
+                <div className="text-[13px] truncate">
+                    {filename === 'Unavailable' ? 'Sandbox deleted' : `${typeLabel} · ${fileSize}`}
                 </div>
             </div>
         </div>
@@ -881,30 +937,43 @@ export function FileAttachment({
         <button
             onClick={handleClick}
             className={cn(
-                "group flex items-center rounded-xl transition-all duration-200 overflow-hidden cursor-pointer",
+                "group flex items-center gap-1 rounded-xl transition-all duration-200 overflow-hidden cursor-pointer",
                 "border border-black/10 dark:border-white/10",
                 "bg-sidebar hover:bg-accent/5",
                 "text-left",
-                "h-[54px] w-fit min-w-[200px] max-w-[300px]",
+                "h-[60px] w-full min-w-[180px]",
                 className
             )}
             style={safeStyle}
             title={filename}
         >
-            {/* Icon container */}
-            <div className="w-[54px] h-full flex items-center justify-center flex-shrink-0 bg-black/5 dark:bg-white/5">
-                <IconComponent className="h-5 w-5 text-black/60 dark:text-white/60" />
+            {/* Icon container - Filled style */}
+            <div 
+                className="rounded-[10px] flex items-center justify-center flex-shrink-0 ml-3"
+                style={{ 
+                    width: 38, 
+                    height: 38, 
+                    background: colors.bg,
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "center"
+                }}
+            >
+                {/* Check if it's one of our custom filled icons which need bgColor */}
+                {['code', 'document', 'pdf', 'sheet', 'default'].includes(fileType) ? (
+                    <IconComponent size={24} color={colors.color} bgColor={colors.bg} />
+                ) : (
+                    <IconComponent size={24} color={colors.color} fill={colors.color} />
+                )}
             </div>
 
             {/* Text content */}
             <div className="flex-1 min-w-0 flex flex-col justify-center px-3 py-2 overflow-hidden">
-                <div className="text-sm font-medium text-foreground truncate">
+                <div className="text-[14px] font-medium text-foreground truncate">
                     {filename}
                 </div>
-                <div className="text-xs text-muted-foreground flex items-center gap-1 truncate">
-                    <span className="truncate">{typeLabel}</span>
-                    <span className="flex-shrink-0">·</span>
-                    <span className="flex-shrink-0">{fileSize}</span>
+                <div className="text-[13px] text-muted-foreground truncate">
+                    {typeLabel} · {fileSize}
                 </div>
             </div>
         </button>
@@ -961,7 +1030,7 @@ export function FileAttachmentGrid({
     // When there are multiple files, use smaller max heights to prevent taking up too much screen space
     const getGridImageHeight = () => {
         if (!standalone) return 200; // Default for non-standalone
-        
+
         const fileCount = attachments.length;
         if (fileCount === 1) return 600; // Large for single file - preserves aspect ratio better
         if (fileCount === 2) return 400; // Medium for 2 files

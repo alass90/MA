@@ -42,6 +42,12 @@ import { useFullstackBuilderStore } from "@/stores/use-fullstack-builder-store";
 import { useDesignerStore } from "@/stores/use-designer-store";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 
+const ShareIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 1024 1024" fill="currentColor" className="h-4 w-4">
+    <path d="M386.218667 247.850667c0-102.4 120.405333-157.397333 197.76-90.282667l304.426666 264.32a119.466667 119.466667 0 0 1 1.365334 179.285333l-304.469334 272.170667c-76.970667 68.778667-199.082667 14.122667-199.082666-89.088v-89.173333c-33.024 2.261333-59.306667 6.826667-83.2 15.36-30.592 10.88-61.866667 29.952-98.602667 67.712a76.8 76.8 0 0 1-131.84-53.504c0-98.645333 24.106667-190.976 83.712-261.888 55.253333-65.792 133.973333-104.789333 229.930667-117.845334V247.850667z m147.413333-32.256c-27.648-23.978667-70.613333-4.352-70.613333 32.256v126.208l-0.256 4.309333c-2.218667 21.504-20.437333 38.186667-42.410667 40.021333l-17.194667 1.706667c-173.994667 20.949333-253.824 136.405333-253.824 304.554667 86.997333-89.557333 163.925333-105.386667 270.933334-107.861334a42.026667 42.026667 0 0 1 42.752 42.24v125.226667c0 34.56 38.272 53.845333 65.706666 35.925333l5.376-4.096 304.426667-272.213333a42.666667 42.666667 0 0 0 2.986667-60.714667l-3.413334-3.285333-304.469333-264.277333z" />
+  </svg>
+);
+
 interface ThreadSiteHeaderProps {
   threadId?: string;
   projectId?: string;
@@ -270,7 +276,7 @@ export function SiteHeader({
                 onClick={openShareModal}
                 className="h-9 px-3 cursor-pointer gap-2"
               >
-                <Upload className="h-4 w-4" />
+                <ShareIcon />
                 <span>Share</span>
               </Button>
             )}

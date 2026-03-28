@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Plus, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { FileAttachment } from './file-attachment';
 import { cn } from '@/lib/utils';
@@ -67,9 +67,9 @@ export function AttachmentGroup({
     const [currentIndex, setCurrentIndex] = useState(0);
 
     // Constants for height calculation - each row is about 66px (54px height + 12px gap)
-    const ROW_HEIGHT = 54; // Height of a single file
-    const GAP = 12; // Gap between rows (gap-3 = 0.75rem = 12px)
-    const TWO_ROWS_HEIGHT = (ROW_HEIGHT * 2) + GAP; // Height of 2 rows plus gap
+    const ROW_HEIGHT = 60; // Height of a single file (increased for Manus style)
+    const GAP = 8; // Gap between rows (gap-2 = 0.5rem = 8px)
+    const TWO_ROWS_HEIGHT = (ROW_HEIGHT * 2) + GAP;
 
     // Check for mobile on mount and window resize
     useEffect(() => {
@@ -143,16 +143,16 @@ export function AttachmentGroup({
 
     // Pre-compute any conditional values used in rendering
     // This ensures hooks aren't conditionally called
-    const maxVisibleFiles = isMobile ? 2 : 5;
+    const maxVisibleFiles = isMobile ? 2 : 2; // Limit to 2 for Manus style
     let visibleCount = Math.min(maxVisibleFiles, uniqueFiles.length);
 
     // Use standalone mode to optimize grid layout for all file types
     let moreCount = uniqueFiles.length - visibleCount;
 
     // If there's just a single file more on desktop, show it
-    if (!isMobile && moreCount === 1) {
-        visibleCount = uniqueFiles.length;
-        moreCount = 0;
+    if (!isMobile && moreCount === 1 && !standalone) {
+        // visibleCount = uniqueFiles.length;
+        // moreCount = 0;
     }
 
     // Pre-process files for rendering to avoid conditional logic in JSX
@@ -353,15 +353,12 @@ export function AttachmentGroup({
             // Regular grid for fewer attachments
             return (
                 <div className={cn(
-                    "grid gap-3 auto-rows-max items-start",
-                    // Responsive grid columns based on file count
-                    uniqueFiles.length === 1 ? "grid-cols-1" :
-                        uniqueFiles.length === 2 ? "grid-cols-1 sm:grid-cols-2" :
-                            uniqueFiles.length === 3 ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3" :
-                                "grid-cols-1 sm:grid-cols-2",
+                    "grid gap-2 auto-rows-max items-start",
+                    // Manus style: 2 columns
+                    "grid-cols-2",
                     className
                 )}>
-                    {sortedFilesWithMeta.map((item, index) => (
+                    {sortedFilesWithMeta.slice(0, visibleCount).map((item, index) => (
                         <div
                             key={index}
                             className={cn(
@@ -428,6 +425,27 @@ export function AttachmentGroup({
                             )}
                         </div>
                     ))}
+
+                    {/* Manus style "View all" button */}
+                    {moreCount > 0 && (
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className={cn(
+                                "h-[60px] rounded-xl cursor-pointer",
+                                "border border-black/10 dark:border-white/10",
+                                "bg-sidebar hover:bg-accent/5 transition-all duration-200",
+                                "flex items-center justify-center gap-2 px-3",
+                                "w-full"
+                            )}
+                        >
+                            <div className="w-[42px] h-[42px] rounded-[10px] flex items-center justify-center flex-shrink-0 bg-black/5 dark:bg-white/5">
+                                <FileText className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <span className="text-[14px] font-medium text-muted-foreground truncate">
+                                View all files in this task
+                            </span>
+                        </button>
+                    )}
                 </div>
             );
         } else {
@@ -631,7 +649,7 @@ export function AttachmentGroup({
                                 >
                                     <FileAttachment
                                         filepath={item.path}
-                                        onClick={(path) => {
+                                        onFileClick={(path) => {
                                             handleFileClick(path);
                                             setIsModalOpen(false);
                                         }}

@@ -348,7 +348,8 @@ class PromptManager:
                                   client=None,
                                   tool_registry=None,
                                   xml_tool_calling: bool = False,
-                                  user_id: Optional[str] = None) -> dict:
+                                  user_id: Optional[str] = None,
+                                  project_id: Optional[str] = None) -> dict:
         
         default_system_content = get_system_prompt()
         
@@ -377,10 +378,41 @@ class PromptManager:
                 builder_prompt = get_agent_builder_prompt()
                 system_content += f"\n\n{builder_prompt}"
         
-        # OPTIMIZED: Run KB and locale queries in parallel to reduce latency
+        # Start KB and project queries in parallel to reduce latency
         kb_task = None
+        project_task = None
         locale_task = None
         
+        # Start Project query if project_id provided
+        if project_id and client:
+            async def fetch_project_context():
+                try:
+                    logger.debug(f"Retrieving project context for project {project_id}")
+                    project_result = await client.table('projects').select('custom_instructions, knowledge_folder_id').eq('project_id', project_id).maybe_single().execute()
+                    if not project_result.data:
+                        return None
+                    
+                    data = project_result.data
+                    instructions = data.get('custom_instructions', '')
+                    folder_id = data.get('knowledge_folder_id')
+                    
+                    kb_content = ""
+                    if folder_id:
+                        kb_result = await client.table('knowledge_base_entries').select('filename, content').eq('folder_id', folder_id).eq('is_active', True).execute()
+                        if kb_result.data:
+                            for entry in kb_result.data:
+                                kb_content += f"\n\n## File: {entry['filename']}\n{entry['content']}"
+                    
+                    return {
+                        'instructions': instructions,
+                        'kb_content': kb_content
+                    }
+                except Exception as e:
+                    logger.error(f"Error retrieving project context for {project_id}: {e}")
+                    return None
+            
+            project_task = asyncio.create_task(fetch_project_context())
+
         # Start KB query if needed
         if agent_config and client and 'agent_id' in agent_config:
             async def fetch_kb():
@@ -434,6 +466,19 @@ class PromptManager:
                     logger.debug("No knowledge base context found for this agent")
             except Exception as e:
                 logger.error(f"Error processing knowledge base context: {e}")
+
+        # Wait for Project context to complete
+        if project_task:
+            try:
+                project_context = await project_task
+                if project_context:
+                    if project_context['instructions'] and project_context['instructions'].strip():
+                        system_content += f"\n\n=== PROJECT CUSTOM INSTRUCTIONS ===\n{project_context['instructions']}\n=== END PROJECT CUSTOM INSTRUCTIONS ===\n"
+                    
+                    if project_context['kb_content'] and project_context['kb_content'].strip():
+                        system_content += f"\n\n=== PROJECT KNOWLEDGE BASE ===\n{project_context['kb_content']}\n=== END PROJECT KNOWLEDGE BASE ===\n"
+            except Exception as e:
+                logger.error(f"Error processing project context: {e}")
         
         if agent_config and (agent_config.get('configured_mcps') or agent_config.get('custom_mcps')) and mcp_wrapper_instance and mcp_wrapper_instance._initialized:
             mcp_info = "\n\n--- MCP Tools Available ---\n"
@@ -620,7 +665,7 @@ class AgentRunner:
                 logger.debug(f"⏱️ [TIMING] ⚡ Project from cache: {(time.time() - q_start) * 1000:.1f}ms")
             else:
                 # Cache miss - query DB and cache result
-                project = await self.client.table('projects').select('project_id, sandbox').eq('project_id', self.config.project_id).execute()
+                project = await self.client.table('projects').select('project_id, sandbox, custom_instructions, knowledge_folder_id').eq('project_id', self.config.project_id).execute()
                 
                 if not project.data or len(project.data) == 0:
                     raise ValueError(f"Project {self.config.project_id} not found")
@@ -638,7 +683,7 @@ class AgentRunner:
             from core.runtime_cache import get_cached_project_metadata, set_cached_project_metadata
             
             thread_query = self.client.table('threads').select('account_id').eq('thread_id', self.config.thread_id).execute()
-            project_query = self.client.table('projects').select('project_id, sandbox').eq('project_id', self.config.project_id).execute()
+            project_query = self.client.table('projects').select('project_id, sandbox, custom_instructions, knowledge_folder_id').eq('project_id', self.config.project_id).execute()
             
             response, project = await asyncio.gather(thread_query, project_query)
             logger.debug(f"⏱️ [TIMING] Parallel DB queries (thread + project): {(time.time() - parallel_start) * 1000:.1f}ms")
