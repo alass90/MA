@@ -62,6 +62,8 @@ import { useFullstackBuilderStore } from '@/stores/use-fullstack-builder-store';
 import { useFullstackBuilderDetector } from '@/hooks/use-fullstack-builder-detector';
 import { useDesignerStore } from '@/stores/use-designer-store';
 import { useDesignerDetector } from '@/hooks/use-designer-detector';
+import { useMobileBuilderStore } from '@/stores/use-mobile-builder-store';
+import { useMobileBuilderDetector } from '@/hooks/use-mobile-builder-detector';
 
 interface ThreadComponentProps {
   projectId: string;
@@ -190,6 +192,13 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
     isOpen: isDesignerOpen, 
     closePanel: onCloseDesigner 
   } = useDesignerStore();
+
+  // Auto-detect mobile builder tool calls and switch to Mobile Builder panel
+  useMobileBuilderDetector(messages as UnifiedMessage[], agentStatus);
+  const {
+    isOpen: isMobileBuilderOpen,
+    closePanel: onCloseMobileBuilder,
+  } = useMobileBuilderStore();
 
   // When the Database viewer injects a prompt, fill the chat input and clear the pending message
   useEffect(() => {
@@ -1033,6 +1042,8 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         agentName={agent && agent.name}
         isFullstackBuilderOpen={isFullstackBuilderOpen}
         onCloseFullstackBuilder={onCloseFullstackBuilder}
+        isMobileBuilderOpen={isMobileBuilderOpen}
+        onCloseMobileBuilder={onCloseMobileBuilder}
       >
         <ThreadError error={error} />
       </ThreadLayout>
@@ -1079,6 +1090,8 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
           onCloseFullstackBuilder={onCloseFullstackBuilder}
           isDesignerOpen={isDesignerOpen}
           onCloseDesigner={onCloseDesigner}
+          isMobileBuilderOpen={isMobileBuilderOpen}
+          onCloseMobileBuilder={onCloseMobileBuilder}
         >
           {/* Thread Content - Scrollable */}
           <div
@@ -1271,6 +1284,8 @@ export function ThreadComponent({ projectId, threadId, compact = false, configur
         onCloseFullstackBuilder={onCloseFullstackBuilder}
         isDesignerOpen={isDesignerOpen}
         onCloseDesigner={onCloseDesigner}
+        isMobileBuilderOpen={isMobileBuilderOpen}
+        onCloseMobileBuilder={onCloseMobileBuilder}
       >
         <ThreadContent
           messages={isShared ? playback.playbackState.visibleMessages : messages}

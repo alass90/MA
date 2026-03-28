@@ -40,7 +40,9 @@ import { projectKeys } from "@/hooks/threads/keys";
 import { threadKeys } from "@/hooks/threads/keys";
 import { useFullstackBuilderStore } from "@/stores/use-fullstack-builder-store";
 import { useDesignerStore } from "@/stores/use-designer-store";
+import { useMobileBuilderStore } from "@/stores/use-mobile-builder-store";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
+import { Smartphone } from "lucide-react";
 
 const ShareIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 1024 1024" fill="currentColor" className="h-4 w-4">
@@ -84,12 +86,21 @@ export function SiteHeader({
   const queryClient = useQueryClient();
   const { isOpen: isFullstackOpen, openPanel: openFullstack, closePanel: closeFullstack } = useFullstackBuilderStore();
   const { isOpen: isDesignerOpen, togglePanel: toggleDesigner } = useDesignerStore();
+  const { isOpen: isMobileOpen, openPanel: openMobile, closePanel: closeMobile } = useMobileBuilderStore();
 
   const toggleFullstack = () => {
     if (isFullstackOpen) {
       closeFullstack();
     } else {
       openFullstack();
+    }
+  };
+
+  const toggleMobileBuilder = () => {
+    if (isMobileOpen) {
+      closeMobile();
+    } else {
+      openMobile();
     }
   };
 
@@ -310,6 +321,22 @@ export function SiteHeader({
               </TooltipTrigger>
               <TooltipContent side={isMobile ? "bottom" : "bottom"}>
                 <p>Toggle Designer Canvas</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleMobileBuilder}
+                  className="h-9 w-9 cursor-pointer"
+                >
+                  <Smartphone className={cn("h-4 w-4", isMobileOpen ? "text-emerald-500" : "")} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side={isMobile ? "bottom" : "bottom"}>
+                <p>Toggle Mobile Preview</p>
               </TooltipContent>
             </Tooltip>
 

@@ -6,6 +6,7 @@ import { ToolCallSidePanel } from '@/components/thread/tool-call-side-panel';
 import { FileViewerPanel } from '@/components/thread/FileViewerPanel';
 import { FullstackBuilderPanel } from '@/components/thread/tool-views/fullstack-builder/FullstackBuilderPanel';
 import { DesignerPanel } from '@/components/thread/tool-views/designer-tool/DesignerPanel';
+import { MobileBuilderPanel } from '@/components/thread/tool-views/mobile-builder/MobileBuilderPanel';
 import { Project } from '@/lib/api/threads';
 import { ApiMessageType } from '@/components/thread/types';
 import { ToolCallInput } from '@/components/thread/tool-call-side-panel';
@@ -63,6 +64,9 @@ interface ThreadLayoutProps {
   // Designer props
   isDesignerOpen?: boolean;
   onCloseDesigner?: () => void;
+  // Mobile Builder props
+  isMobileBuilderOpen?: boolean;
+  onCloseMobileBuilder?: () => void;
 }
 
 export const ThreadLayout = memo(function ThreadLayout({
@@ -108,11 +112,13 @@ export const ThreadLayout = memo(function ThreadLayout({
   onCloseFullstackBuilder,
   isDesignerOpen = false,
   onCloseDesigner,
+  isMobileBuilderOpen = false,
+  onCloseMobileBuilder,
 }: ThreadLayoutProps) {
   const isActuallyMobile = useIsMobile();
 
   // Track when panel should be visible
-  const shouldShowPanel = (isSidePanelOpen || isFileViewerPanelOpen || isFullstackBuilderOpen || isDesignerOpen) && initialLoadCompleted;
+  const shouldShowPanel = (isSidePanelOpen || isFileViewerPanelOpen || isFullstackBuilderOpen || isDesignerOpen || isMobileBuilderOpen) && initialLoadCompleted;
 
   // Extract streaming tool arguments as JSON string (what FileOperationToolView expects)
   const streamingToolArgsJson = React.useMemo(() => {
@@ -145,7 +151,7 @@ export const ThreadLayout = memo(function ThreadLayout({
   useEffect(() => {
     if (shouldShowPanel) {
       // Open panel smoothly - use larger size for Builder or File Viewer/Designer
-      const targetSize = (isFullstackBuilderOpen || isDesignerOpen) ? 70 : isFileViewerPanelOpen ? 65 : 40;
+      const targetSize = (isFullstackBuilderOpen || isDesignerOpen || isMobileBuilderOpen) ? 70 : isFileViewerPanelOpen ? 65 : 40;
       const mainSize = 100 - targetSize;
       
       requestAnimationFrame(() => {
@@ -160,7 +166,7 @@ export const ThreadLayout = memo(function ThreadLayout({
       }, 0);
       return () => clearTimeout(timeout);
     }
-  }, [shouldShowPanel, isFileViewerPanelOpen, isFullstackBuilderOpen, isDesignerOpen]);
+  }, [shouldShowPanel, isFileViewerPanelOpen, isFullstackBuilderOpen, isDesignerOpen, isMobileBuilderOpen]);
 
   // Compact mode for embedded use
   if (compact) {
@@ -183,6 +189,13 @@ export const ThreadLayout = memo(function ThreadLayout({
           ) : isDesignerOpen && onCloseDesigner ? (
             <div className="absolute inset-0 bg-background z-40">
               <DesignerPanel
+                sandboxId={sandboxId || undefined}
+                agentStatus={agentStatus}
+              />
+            </div>
+          ) : isMobileBuilderOpen && onCloseMobileBuilder ? (
+            <div className="absolute inset-0 bg-background z-40">
+              <MobileBuilderPanel
                 sandboxId={sandboxId || undefined}
                 agentStatus={agentStatus}
               />
@@ -319,6 +332,15 @@ export const ThreadLayout = memo(function ThreadLayout({
           </div>
         )}
 
+        {isMobileBuilderOpen && onCloseMobileBuilder && (
+          <div className="absolute inset-0 bg-background z-[100]">
+            <MobileBuilderPanel
+              sandboxId={sandboxId || undefined}
+              agentStatus={agentStatus}
+            />
+          </div>
+        )}
+
         {isFileViewerPanelOpen && (
           <div className="absolute inset-0 bg-background z-[100]">
             <FileViewerPanel
@@ -383,7 +405,7 @@ export const ThreadLayout = memo(function ThreadLayout({
         {/* Side panel - always render but control size */}
         <ResizablePanel
           ref={sidePanelRef}
-          defaultSize={shouldShowPanel ? ((isFullstackBuilderOpen || isDesignerOpen) ? 70 : isFileViewerPanelOpen ? 65 : 40) : 0}
+          defaultSize={shouldShowPanel ? ((isFullstackBuilderOpen || isDesignerOpen || isMobileBuilderOpen) ? 70 : isFileViewerPanelOpen ? 65 : 40) : 0}
           minSize={shouldShowPanel ? 20 : 0}
           maxSize={shouldShowPanel ? 85 : 0}
           collapsible={true}
@@ -391,7 +413,7 @@ export const ThreadLayout = memo(function ThreadLayout({
             "relative bg-background",
             // Match ChatInput horizontal spacing: px-4
             shouldShowPanel ? (
-            (isFullstackBuilderOpen || isDesignerOpen) ? "p-3 pl-0" : 
+            (isFullstackBuilderOpen || isDesignerOpen || isMobileBuilderOpen) ? "p-3 pl-0" : 
               isFileViewerPanelOpen ? "p-0" : "p-3 pl-0"
             ) : "px-0",
             !shouldShowPanel ? "hidden" : ""
@@ -404,6 +426,11 @@ export const ThreadLayout = memo(function ThreadLayout({
             />
           ) : isDesignerOpen && onCloseDesigner ? (
             <DesignerPanel
+              sandboxId={sandboxId || undefined}
+              agentStatus={agentStatus}
+            />
+          ) : isMobileBuilderOpen && onCloseMobileBuilder ? (
+            <MobileBuilderPanel
               sandboxId={sandboxId || undefined}
               agentStatus={agentStatus}
             />

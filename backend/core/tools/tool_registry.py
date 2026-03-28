@@ -33,6 +33,7 @@ SANDBOX_TOOLS = [
     ('sb_upload_file_tool', 'core.tools.sb_upload_file_tool', 'SandboxUploadFileTool'),
     # ('sb_docs_tool', 'core.tools.sb_docs_tool', 'SandboxDocsTool'),
     ('sb_fullstack_tool', 'core.tools.sb_fullstack_tool', 'SandboxFullstackTool'),
+    ('sb_mobile_tool', 'core.tools.sb_mobile_tool', 'SandboxMobileTool'),
 ]
 
 # Search and research tools
