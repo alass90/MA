@@ -44,7 +44,7 @@ class SandboxWebSearchTool(SandboxToolsBase):
     @openapi_schema({
         "type": "function",
         "function": {
-            "name": "web_search",
+            "name": "tlstools-web_search",
             "description": "Search the web for up-to-date information using the Tavily API. This tool supports both single and batch queries for efficient research. You can search for multiple topics simultaneously by providing an array of queries, which executes searches concurrently for faster results. Use batch mode when researching multiple related topics, gathering comprehensive information, or performing parallel searches. Results include titles, URLs, publication dates, direct answers, and images. Use this tool for discovering relevant web pages before potentially crawling them for complete content.",
             "parameters": {
                 "type": "object",
@@ -60,7 +60,7 @@ class SandboxWebSearchTool(SandboxToolsBase):
                                 "items": {
                                     "type": "string"
                                 },
-                                "description": "Multiple search queries to execute concurrently. Use this for batch searching when you need to research multiple related topics simultaneously. Each query will be processed in parallel for faster results. Example: [\"topic overview\", \"use cases\", \"user demographics\"]"
+                                "description": "Multiple search queries to execute concurrently. Use this for batch searching when you need to research multiple related topics simultaneously. Each query will be processed in parallel for faster results. Example: ['topic overview', 'use cases', 'user demographics']"
                             }
                         ],
                         "description": "Either a single search query (string) or multiple queries (array of strings) to execute concurrently. Use batch mode (array) for faster research when investigating multiple aspects of a topic."
@@ -250,7 +250,7 @@ class SandboxWebSearchTool(SandboxToolsBase):
     @openapi_schema({
         "type": "function",
         "function": {
-            "name": "scrape_webpage",
+            "name": "tlstools-scrape_webpage",
             "description": "Extract full text content from multiple webpages in a single operation. IMPORTANT: You should ALWAYS collect multiple relevant URLs from web-search results and scrape them all in a single call for efficiency. This tool saves time by processing multiple pages simultaneously rather than one at a time. The extracted text includes the main content of each page without HTML markup by default, but can optionally include full HTML if needed for structure analysis.",
             "parameters": {
                 "type": "object",

@@ -1,44 +1,46 @@
-#!/usr/bin/env python3
-"""Test Qwen model via Dashscope API"""
-
+import asyncio
 import os
-import requests
+from dotenv import load_dotenv
 
-# Configuration
-DASHSCOPE_API_KEY = "sk-bb7ac782c319478e923f63b9924d8958"
-DASHSCOPE_API_BASE = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+# Load env from backend/.env
+load_dotenv("backend/.env")
 
-# Test avec Qwen Plus
-url = f"{DASHSCOPE_API_BASE}/chat/completions"
-headers = {
-    "Authorization": f"Bearer {DASHSCOPE_API_KEY}",
-    "Content-Type": "application/json"
-}
+# Mock the environment to ensure we can import core without issues
+import sys
+sys.path.append(os.path.join(os.getcwd(), "backend"))
 
-data = {
-    "model": "qwen-plus",
-    "messages": [
-        {"role": "user", "content": "Bonjour! Réponds juste 'OK' si tu fonctionnes bien."}
-    ],
-    "max_tokens": 50
-}
+from core.ai_models.registry import registry
+from core.ai_models.manager import ModelManager
+import litellm
 
-print("=== Test de Qwen Plus via Dashscope ===")
-print(f"URL: {url}")
-print(f"Model: qwen-plus\n")
+async def test_qwen():
+    print("--- Testing Qwen Integration ---")
+    
+    # Check current registry for basic model
+    basic_model_id = registry.get_litellm_model_id("kortix/basic")
+    print(f"Default basic model is resolved to: {basic_model_id}")
+    
+    if "dashscope" not in basic_model_id:
+        print("ERROR: Basic model is not pointing to dashscope!")
+        return
 
-try:
-    response = requests.post(url, headers=headers, json=data, timeout=30)
-    print(f"Status Code: {response.status_code}")
+    print(f"API Base: {os.getenv('DASHSCOPE_API_BASE')}")
+    print(f"API Key: {os.getenv('DASHSCOPE_API_KEY')[:10]}...")
 
-    if response.status_code == 200:
-        result = response.json()
-        print("[OK] Succes!")
-        print(f"\nReponse du modele:")
-        print(result['choices'][0]['message']['content'])
-    else:
-        print(f"[ERROR] Erreur {response.status_code}")
-        print(response.text)
+    try:
+        print("Sending request to DashScope...")
+        response = await litellm.acompletion(
+            model=basic_model_id,
+            messages=[{"role": "user", "content": "Say hello!"}],
+            api_key=os.getenv("DASHSCOPE_API_KEY"),
+            api_base=os.getenv("DASHSCOPE_API_BASE")
+        )
+        print("\n--- Response Received ---")
+        print(response.choices[0].message.content)
+        print("--------------------------")
+        print("SUCCESS: Qwen API is responding!")
+    except Exception as e:
+        print(f"\nFAILED: Error calling Qwen API: {e}")
 
-except Exception as e:
-    print(f"[ERROR] Exception: {e}")
+if __name__ == "__main__":
+    asyncio.run(test_qwen())

@@ -1,0 +1,18 @@
+# This is a config for E2B sandbox template.
+# You can use template ID (8vdjbmyr4kohlzih87wf) or template name (talos-sandbox-v1) to create a sandbox:
+
+# Python SDK
+# from e2b import Sandbox, AsyncSandbox
+# sandbox = Sandbox.create("talos-sandbox-v1") # Sync sandbox
+# sandbox = await AsyncSandbox.create("talos-sandbox-v1") # Async sandbox
+
+# JS SDK
+# import { Sandbox } from 'e2b'
+# const sandbox = await Sandbox.create('talos-sandbox-v1')
+
+team_id = "1b4200bb-58e3-4717-ad2e-5846cf88c605"
+memory_mb = 8_192
+cpu_count = 8
+dockerfile = "Dockerfile"
+template_name = "talos-sandbox-v1"
+template_id = "8vdjbmyr4kohlzih87wf"

@@ -9,14 +9,14 @@ class MarketplaceFilters:
         self,
         search: Optional[str] = None,
         tags: Optional[List[str]] = None,
-        is_kortix_team: Optional[bool] = None,
+        is_talos_team: Optional[bool] = None,
         creator_id: Optional[str] = None,
         sort_by: str = "download_count",
         sort_order: str = "desc"
     ):
         self.search = search
         self.tags = tags or []
-        self.is_kortix_team = is_kortix_team
+        self.is_talos_team = is_talos_team
         self.creator_id = creator_id
         self.sort_by = sort_by
         self.sort_order = sort_order
@@ -46,7 +46,7 @@ class MarketplaceService:
             offset = (pagination_params.page - 1) * pagination_params.page_size
             
             templates = await template_service.get_public_templates(
-                is_kortix_team=filters.is_kortix_team,
+                is_talos_team=filters.is_talos_team,
                 limit=limit,
                 offset=offset,
                 search=filters.search,
@@ -62,7 +62,7 @@ class MarketplaceService:
                 templates = [t for t in templates if t.creator_id == filters.creator_id]
                 if filters.creator_id:
                     all_templates = await template_service.get_public_templates(
-                        is_kortix_team=filters.is_kortix_team,
+                        is_talos_team=filters.is_talos_team,
                         search=filters.search,
                         tags=filters.tags
                     )
@@ -185,8 +185,8 @@ class MarketplaceService:
             search_term = f"%{filters.search}%"
             query = query.ilike("name", search_term)
         
-        if filters.is_kortix_team is not None:
-            query = query.eq('is_kortix_team', filters.is_kortix_team)
+        if filters.is_talos_team is not None:
+            query = query.eq('is_talos_team', filters.is_talos_team)
             
         if filters.creator_id is not None:
             query = query.eq('creator_id', filters.creator_id)
@@ -215,8 +215,8 @@ class MarketplaceService:
             search_term = f"%{filters.search}%"
             query = query.ilike("name", search_term)
         
-        if filters.is_kortix_team is not None:
-            query = query.eq('is_kortix_team', filters.is_kortix_team)
+        if filters.is_talos_team is not None:
+            query = query.eq('is_talos_team', filters.is_talos_team)
             
         if filters.creator_id is not None:
             query = query.eq('creator_id', filters.creator_id)

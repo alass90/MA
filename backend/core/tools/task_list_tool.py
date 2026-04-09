@@ -157,7 +157,7 @@ class TaskListTool(SandboxToolsBase):
     @openapi_schema({
         "type": "function",
         "function": {
-            "name": "view_tasks",
+            "name": "tlstools-view_tasks",
             "description": "View all tasks and sections. Use this to see current tasks, check progress, or review completed work. IMPORTANT: This tool helps you identify the next task to execute in the sequential workflow. Always execute tasks in the exact order they appear, completing one task fully before moving to the next. Use this to determine which task is currently pending and should be tackled next.",
             "parameters": {
                 "type": "object",
@@ -182,14 +182,14 @@ class TaskListTool(SandboxToolsBase):
     @openapi_schema({
         "type": "function",
         "function": {
-            "name": "create_tasks",
+            "name": "tlstools-create_tasks",
             "description": "Create tasks organized by sections. Supports both single section and multi-section batch creation. Creates sections automatically if they don't exist. IMPORTANT: Create tasks in the exact order they will be executed. Each task should represent a single, specific operation that can be completed independently. Break down complex operations into individual, sequential tasks to maintain the one-task-at-a-time execution principle. You MUST specify either 'sections' array OR both 'task_contents' and ('section_title' OR 'section_id'). CRITICAL: The 'sections' parameter MUST be passed as an array of objects, NOT as a JSON string. Pass the actual array structure, not a stringified version.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "sections": {
                         "type": "array",
-                        "description": "List of sections with their tasks for batch creation. CRITICAL: This MUST be an array of objects (not a JSON string). Each element should be an object with 'title' (string) and 'tasks' (array of strings). Example: [{\"title\": \"Section 1\", \"tasks\": [\"task 1\", \"task 2\"]}, {\"title\": \"Section 2\", \"tasks\": [\"task 3\"]}]",
+                        "description": "List of sections with their tasks for batch creation. CRITICAL: This MUST be an array of objects (not a JSON string). Each element should be an object with 'title' (string) and 'tasks' (array of strings). Example: [{'title': 'Section 1', 'tasks': ['task 1', 'task 2']}, {'title': 'Section 2', 'tasks': ['task 3']}]",
                         "items": {
                             "type": "object",
                             "properties": {
@@ -217,7 +217,7 @@ class TaskListTool(SandboxToolsBase):
                     },
                     "task_contents": {
                         "type": "array",
-                        "description": "Task contents for single section creation (use with section_title or section_id). CRITICAL: This MUST be an array of strings, not a JSON string. Example: [\"task 1\", \"task 2\", \"task 3\"]",
+                        "description": "Task contents for single section creation (use with section_title or section_id). CRITICAL: This MUST be an array of strings, not a JSON string. Example: ['task 1', 'task 2', 'task 3']",
                         "items": {"type": "string"}
                     }
                 },
@@ -356,7 +356,7 @@ class TaskListTool(SandboxToolsBase):
     @openapi_schema({
         "type": "function",
         "function": {
-            "name": "update_tasks",
+            "name": "tlstools-update_tasks",
                 "description": "Update one or more tasks. EFFICIENT BATCHING: Before calling this tool, think about what tasks you have completed and batch them into a single update call. This is more efficient than making multiple consecutive update calls. Always execute tasks in the exact sequence they appear, but batch your updates when possible. Update task status to 'completed' after finishing each task, and consider batching multiple completed tasks into one call rather than updating them individually.",
             "parameters": {
                 "type": "object",
@@ -366,7 +366,7 @@ class TaskListTool(SandboxToolsBase):
                             {"type": "string"},
                             {"type": "array", "items": {"type": "string"}, "minItems": 1}
                         ],
-                        "description": "Task ID (string) or array of task IDs to update. EFFICIENT APPROACH: Batch multiple completed tasks into a single call rather than making multiple consecutive update calls. Always maintain sequential execution order. CRITICAL: If passing an array, it MUST be an actual array of strings (not a JSON string). Example: [\"id1\", \"id2\", \"id3\"]"
+                        "description": "Task ID (string) or array of task IDs to update. EFFICIENT APPROACH: Batch multiple completed tasks into a single call rather than making multiple consecutive update calls. Always maintain sequential execution order. CRITICAL: If passing an array, it MUST be an actual array of strings (not a JSON string). Example: ['id1', 'id2', 'id3']"
                     },
                     "content": {
                         "type": "string",
@@ -452,7 +452,7 @@ class TaskListTool(SandboxToolsBase):
     @openapi_schema({
         "type": "function",
         "function": {
-            "name": "delete_tasks",
+            "name": "tlstools-delete_tasks",
             "description": "Delete one or more tasks and/or sections. Can delete tasks by their IDs or sections by their IDs (which will also delete all tasks in those sections).",
             "parameters": {
                 "type": "object",
@@ -462,14 +462,14 @@ class TaskListTool(SandboxToolsBase):
                             {"type": "string"},
                             {"type": "array", "items": {"type": "string"}, "minItems": 1}
                         ],
-                        "description": "Task ID (string) or array of task IDs to delete (optional). CRITICAL: If passing an array, it MUST be an actual array of strings (not a JSON string). Example: [\"id1\", \"id2\", \"id3\"]"
+                        "description": "Task ID (string) or array of task IDs to delete (optional). CRITICAL: If passing an array, it MUST be an actual array of strings (not a JSON string). Example: ['id1', 'id2', 'id3']"
                     },
                     "section_ids": {
                         "oneOf": [
                             {"type": "string"},
                             {"type": "array", "items": {"type": "string"}, "minItems": 1}
                         ],
-                        "description": "Section ID (string) or array of section IDs to delete (will also delete all tasks in these sections) (optional). CRITICAL: If passing an array, it MUST be an actual array of strings (not a JSON string). Example: [\"id1\", \"id2\"]"
+                        "description": "Section ID (string) or array of section IDs to delete (will also delete all tasks in these sections) (optional). CRITICAL: If passing an array, it MUST be an actual array of strings (not a JSON string). Example: ['id1', 'id2']"
                     },
                     "confirm": {
                         "type": "boolean",
@@ -570,7 +570,7 @@ class TaskListTool(SandboxToolsBase):
     @openapi_schema({
         "type": "function",
         "function": {
-            "name": "clear_all",
+            "name": "tlstools-clear_all",
             "description": "Clear all tasks and sections (creates completely empty state).",
             "parameters": {
                 "type": "object",

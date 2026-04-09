@@ -20,7 +20,7 @@ def _constant_time_compare(a: str, b: str) -> bool:
 
 
 async def verify_admin_api_key(x_admin_api_key: Optional[str] = Header(None)):
-    if not config.KORTIX_ADMIN_API_KEY:
+    if not config.TALOS_ADMIN_API_KEY:
         raise HTTPException(
             status_code=500,
             detail="Admin API key not configured on server"
@@ -33,7 +33,7 @@ async def verify_admin_api_key(x_admin_api_key: Optional[str] = Header(None)):
         )
     
     # Use constant-time comparison to prevent timing attacks
-    if not _constant_time_compare(x_admin_api_key, config.KORTIX_ADMIN_API_KEY):
+    if not _constant_time_compare(x_admin_api_key, config.TALOS_ADMIN_API_KEY):
         raise HTTPException(
             status_code=403,
             detail="Invalid admin API key"

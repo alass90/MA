@@ -325,8 +325,8 @@ class Configuration:
     OPENAI_COMPATIBLE_API_KEY: Optional[str] = None
     OPENAI_COMPATIBLE_API_BASE: Optional[str] = None
     MOONSHOT_API_BASE: Optional[str] = None
-    OR_SITE_URL: Optional[str] = "https://kortix.ai"
-    OR_APP_NAME: Optional[str] = "Kortix AI"
+    OR_SITE_URL: Optional[str] = "https://talos.ai"
+    OR_APP_NAME: Optional[str] = "Talos AI"
     DASHSCOPE_API_KEY: Optional[str] = None
     DASHSCOPE_API_BASE: Optional[str] = None
     
@@ -351,10 +351,9 @@ class Configuration:
     REDIS_DRAMATIQ_MAX_CONNECTIONS: Optional[int] = 5  # Max connections for Dramatiq broker per process (default 5)
     REDIS_SSL: Optional[bool] = True
     
-    # Daytona sandbox configuration (optional - sandbox features disabled if not configured)
-    DAYTONA_API_KEY: Optional[str] = None
-    DAYTONA_SERVER_URL: Optional[str] = None
-    DAYTONA_TARGET: Optional[str] = None
+    # ─── E2B Sandbox configuration ───────────────────────────────────────────
+    E2B_API_KEY: Optional[str] = None
+    E2B_TEMPLATE_ID: Optional[str] = "base"  # E2B sandbox template to use
     
     # Search and other API keys (all optional tools)
     TAVILY_API_KEY: Optional[str] = None
@@ -391,8 +390,8 @@ class Configuration:
     STRIPE_PRODUCT_ID_STAGING: Optional[str] = 'prod_SCgIj3G7yPOAWY'
     
     # Sandbox configuration
-    SANDBOX_IMAGE_NAME = "kortix/suna:0.1.3.25"
-    SANDBOX_SNAPSHOT_NAME = "kortix/suna:0.1.3.25"
+    SANDBOX_IMAGE_NAME = "talos/talos:0.1.3.25"   # kept for reference
+    SANDBOX_SNAPSHOT_NAME = "talos/talos:0.1.3.25" # kept for reference
     SANDBOX_ENTRYPOINT = "/usr/bin/supervisord -n -c /etc/supervisor/conf.d/supervisord.conf"
     
     # Debug configuration
@@ -416,7 +415,7 @@ class Configuration:
     LANGFUSE_HOST: Optional[str] = "https://cloud.langfuse.com"
 
     # Admin API key for server-side operations
-    KORTIX_ADMIN_API_KEY: Optional[str] = None
+    TALOS_ADMIN_API_KEY: Optional[str] = None
 
     # API Keys system configuration
     API_KEY_SECRET: Optional[str] = "default-secret-key-change-in-production"
@@ -525,8 +524,8 @@ class Configuration:
         Get the frontend URL based on environment.
         
         Returns:
-        - Production: 'https://kortix.com' (or FRONTEND_URL_ENV if set)
-        - Staging: 'https://staging.kortix.com' (or FRONTEND_URL_ENV if set)
+        - Production: 'https://talos.com' (or FRONTEND_URL_ENV if set)
+        - Staging: 'https://staging.talos.com' (or FRONTEND_URL_ENV if set)
         - Local: FRONTEND_URL_ENV or 'http://localhost:3000'
         """
         # Check for environment variable override first
@@ -535,15 +534,15 @@ class Configuration:
         
         # Environment-based defaults
         if self.ENV_MODE == EnvMode.PRODUCTION:
-            return 'https://kortix.com'
+            return 'https://talos.com'
         elif self.ENV_MODE == EnvMode.STAGING:
             return 'http://localhost:3000'
-            # return 'https://staging.suna.so'
+            # return 'https://staging.talos.so'
         else:
             return 'http://localhost:3000'
     
     def _generate_admin_api_key(self) -> str:
-        """Generate a secure admin API key for Kortix administrative functions."""
+        """Generate a secure admin API key for Talos administrative functions."""
         # Generate 32 random bytes and encode as hex for a readable API key
         key_bytes = secrets.token_bytes(32)
         return key_bytes.hex()
@@ -567,9 +566,9 @@ class Configuration:
         self._load_from_env()
         
         # Auto-generate admin API key if not present
-        if not self.KORTIX_ADMIN_API_KEY:
-            self.KORTIX_ADMIN_API_KEY = self._generate_admin_api_key()
-            logger.info("Auto-generated KORTIX_ADMIN_API_KEY for administrative functions")
+        if not self.TALOS_ADMIN_API_KEY:
+            self.TALOS_ADMIN_API_KEY = self._generate_admin_api_key()
+            logger.info("Auto-generated TALOS_ADMIN_API_KEY for administrative functions")
         
         # Perform validation
         self._validate()

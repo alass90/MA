@@ -17,7 +17,7 @@ interface HistoryItem {
 
 export function TalosTerminal({ sandboxId, theme }: TalosTerminalProps) {
   const [history, setHistory] = useState<HistoryItem[]>([
-    { type: 'out', content: 'Connected to Daytona Sandbox. Welcome to Talos OS.', timestamp: new Date() }
+    { type: 'out', content: 'Connected to E2B Sandbox. Welcome to Talos OS.', timestamp: new Date() }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);

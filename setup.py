@@ -123,8 +123,8 @@ def load_existing_env_vars():
             ),
             "SUPABASE_JWT_SECRET": backend_env.get("SUPABASE_JWT_SECRET", ""),
         },
-        "daytona": {
-            "DAYTONA_API_KEY": backend_env.get("DAYTONA_API_KEY", ""),
+        "e2b_sandbox": {
+            "E2B_API_KEY": backend_env.get("E2B_API_KEY", ""),
             "DAYTONA_SERVER_URL": backend_env.get("DAYTONA_SERVER_URL", ""),
             "DAYTONA_TARGET": backend_env.get("DAYTONA_TARGET", ""),
         },
@@ -297,7 +297,7 @@ class SetupWizard:
             "setup_method": None,
             "supabase_setup_method": None,
             "supabase": existing_env_vars["supabase"],
-            "daytona": existing_env_vars["daytona"],
+            "e2b_sandbox": existing_env_vars["e2b_sandbox"],
             "llm": existing_env_vars["llm"],
             "search": existing_env_vars["search"],
             "rapidapi": existing_env_vars["rapidapi"],
@@ -343,11 +343,11 @@ class SetupWizard:
         else:
             config_items.append(f"{Colors.YELLOW}○{Colors.ENDC} Supabase")
 
-        # Check Daytona
-        if self.env_vars["daytona"]["DAYTONA_API_KEY"]:
-            config_items.append(f"{Colors.GREEN}✓{Colors.ENDC} Daytona")
+        # Check E2B
+        if self.env_vars["e2b_sandbox"]["E2B_API_KEY"]:
+            config_items.append(f"{Colors.GREEN}✓{Colors.ENDC} E2B")
         else:
-            config_items.append(f"{Colors.YELLOW}○{Colors.ENDC} Daytona")
+            config_items.append(f"{Colors.YELLOW}○{Colors.ENDC} E2B")
 
         # Check LLM providers
         llm_keys = [
@@ -520,7 +520,7 @@ class SetupWizard:
             self.run_step(1, self.choose_setup_method)
             self.run_step(2, self.check_requirements)
             self.run_step(3, self.collect_supabase_info)
-            self.run_step(4, self.collect_daytona_info)
+            self.run_step(4, self.collect_e2b_sandbox_info)
             self.run_step(5, self.collect_llm_api_keys)
             # Optional tools - users can skip these
             self.run_step_optional(6, self.collect_morph_api_key, "Morph API Key (Optional)")
@@ -989,60 +989,60 @@ class SetupWizard:
         
         print_success("Supabase information saved.")
 
-    def collect_daytona_info(self):
-        """Collects Daytona API key."""
-        print_step(4, self.total_steps, "Collecting Daytona Information")
+    def collect_e2b_sandbox_info(self):
+        """Collects E2B API key."""
+        print_step(4, self.total_steps, "Collecting E2B Information")
 
         # Check if we already have values configured
-        has_existing = bool(self.env_vars["daytona"]["DAYTONA_API_KEY"])
+        has_existing = bool(self.env_vars["e2b_sandbox"]["E2B_API_KEY"])
         if has_existing:
             print_info(
-                "Found existing Daytona configuration. Press Enter to keep current values or type new ones."
+                "Found existing E2B configuration. Press Enter to keep current values or type new ones."
             )
         else:
             print_info(
-                "Suna REQUIRES Daytona for sandboxing functionality. Without this key, sandbox features will fail.")
+                "Suna REQUIRES E2B for sandboxing functionality. Without this key, sandbox features will fail.")
             print_info(
-                "Visit https://app.daytona.io/ to create an account.")
+                "Visit https://app.e2b_sandbox.io/ to create an account.")
             print_info("Then, generate an API key from the 'Keys' menu.")
             input("Press Enter to continue once you have your API key...")
 
-        self.env_vars["daytona"]["DAYTONA_API_KEY"] = self._get_input(
-            "Enter your Daytona API key: ",
+        self.env_vars["e2b_sandbox"]["E2B_API_KEY"] = self._get_input(
+            "Enter your E2B API key: ",
             validate_api_key,
             "Invalid API key format. It should be at least 10 characters long.",
-            default_value=self.env_vars["daytona"]["DAYTONA_API_KEY"],
+            default_value=self.env_vars["e2b_sandbox"]["E2B_API_KEY"],
         )
 
         # Set defaults if not already configured
-        if not self.env_vars["daytona"]["DAYTONA_SERVER_URL"]:
-            self.env_vars["daytona"][
+        if not self.env_vars["e2b_sandbox"]["DAYTONA_SERVER_URL"]:
+            self.env_vars["e2b_sandbox"][
                 "DAYTONA_SERVER_URL"
-            ] = "https://app.daytona.io/api"
-        if not self.env_vars["daytona"]["DAYTONA_TARGET"]:
-            self.env_vars["daytona"]["DAYTONA_TARGET"] = "us"
+            ] = "https://app.e2b_sandbox.io/api"
+        if not self.env_vars["e2b_sandbox"]["DAYTONA_TARGET"]:
+            self.env_vars["e2b_sandbox"]["DAYTONA_TARGET"] = "us"
 
-        # Daytona is optional - sandbox features will be disabled if not configured
-        configured_daytona = []
-        if self.env_vars["daytona"]["DAYTONA_API_KEY"]:
-            configured_daytona.append("API Key")
-        if self.env_vars["daytona"]["DAYTONA_SERVER_URL"]:
-            configured_daytona.append("Server URL")
-        if self.env_vars["daytona"]["DAYTONA_TARGET"]:
-            configured_daytona.append("Target")
+        # E2B is optional - sandbox features will be disabled if not configured
+        configured_e2b_sandbox = []
+        if self.env_vars["e2b_sandbox"]["E2B_API_KEY"]:
+            configured_e2b_sandbox.append("API Key")
+        if self.env_vars["e2b_sandbox"]["DAYTONA_SERVER_URL"]:
+            configured_e2b_sandbox.append("Server URL")
+        if self.env_vars["e2b_sandbox"]["DAYTONA_TARGET"]:
+            configured_e2b_sandbox.append("Target")
         
-        if configured_daytona:
-            print_success(f"Daytona configured: {', '.join(configured_daytona)}")
+        if configured_e2b_sandbox:
+            print_success(f"E2B configured: {', '.join(configured_e2b_sandbox)}")
         else:
-            print_info("Daytona not configured - sandbox features will be disabled.")
+            print_info("E2B not configured - sandbox features will be disabled.")
 
-        print_success("Daytona information saved.")
+        print_success("E2B information saved.")
 
         print_warning(
-            "IMPORTANT: You must create a Suna snapshot in Daytona for it to work properly."
+            "IMPORTANT: You must create a Suna snapshot in E2B for it to work properly."
         )
         print_info(
-            f"Visit {Colors.GREEN}https://app.daytona.io/dashboard/snapshots{Colors.ENDC}{Colors.CYAN} to create a snapshot."
+            f"Visit {Colors.GREEN}https://app.e2b_sandbox.io/dashboard/snapshots{Colors.ENDC}{Colors.CYAN} to create a snapshot."
         )
         print_info("Create a snapshot with these exact settings:")
         print_info(
@@ -1520,7 +1520,7 @@ class SetupWizard:
             **self.env_vars["webhook"],
             **self.env_vars["mcp"],
             **self.env_vars["composio"],
-            **self.env_vars["daytona"],
+            **self.env_vars["e2b_sandbox"],
             **self.env_vars["kortix"],
             **self.env_vars.get("vapi", {}),
             **self.env_vars.get("stripe", {}),

@@ -40,7 +40,7 @@ class AgentTemplate:
     tags: List[str] = field(default_factory=list)
     categories: List[str] = field(default_factory=list)
     is_public: bool = False
-    is_kortix_team: bool = False
+    is_talos_team: bool = False
     marketplace_published_at: Optional[datetime] = None
     download_count: int = 0
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
@@ -171,7 +171,7 @@ class TemplateNotFoundError(Exception):
 class TemplateAccessDeniedError(Exception):
     pass
 
-class SunaDefaultAgentTemplateError(Exception):
+class TalosDefaultAgentTemplateError(Exception):
     pass
 
 class TemplateService:
@@ -195,8 +195,8 @@ class TemplateService:
         if agent['account_id'] != creator_id:
             raise TemplateAccessDeniedError("You can only create templates from your own agents")
         
-        if self._is_suna_default_agent(agent):
-            raise SunaDefaultAgentTemplateError("Cannot create template from Suna default agent")
+        if self._is_talos_default_agent(agent):
+            raise TalosDefaultAgentTemplateError("Cannot create template from Talos default agent")
         
         version_config = await self._get_agent_version_config(agent)
         if not version_config:
@@ -294,7 +294,7 @@ class TemplateService:
     
     async def get_public_templates(
         self,
-        is_kortix_team: Optional[bool] = None,
+        is_talos_team: Optional[bool] = None,
         limit: Optional[int] = None,
         offset: int = 0,
         search: Optional[str] = None,
@@ -304,8 +304,8 @@ class TemplateService:
         
         query = client.table('agent_templates').select('*').eq('is_public', True)
         
-        if is_kortix_team is not None:
-            query = query.eq('is_kortix_team', is_kortix_team)
+        if is_talos_team is not None:
+            query = query.eq('is_talos_team', is_talos_team)
         
         if search:
             query = query.ilike("name", f"%{search}%")
@@ -611,9 +611,9 @@ class TemplateService:
         
         return sanitized
     
-    def _is_suna_default_agent(self, agent: Dict[str, Any]) -> bool:
+    def _is_talos_default_agent(self, agent: Dict[str, Any]) -> bool:
         metadata = agent.get('metadata', {})
-        return metadata.get('is_suna_default', False)
+        return metadata.get('is_talos_default', False)
     
     async def _save_template(self, template: AgentTemplate) -> None:
         client = await self._db.client
@@ -654,7 +654,7 @@ class TemplateService:
             tags=data.get('tags', []),
             categories=data.get('categories', []),
             is_public=data.get('is_public', False),
-            is_kortix_team=data.get('is_kortix_team', False),
+            is_talos_team=data.get('is_talos_team', False),
             marketplace_published_at=datetime.fromisoformat(data['marketplace_published_at'].replace('Z', '+00:00')) if data.get('marketplace_published_at') else None,
             download_count=data.get('download_count', 0),
             created_at=datetime.fromisoformat(data['created_at'].replace('Z', '+00:00')),

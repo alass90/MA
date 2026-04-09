@@ -8,13 +8,13 @@ from core.utils.logger import logger
 SHOULD_USE_ANTHROPIC = config.ENV_MODE == EnvMode.LOCAL and bool(config.ANTHROPIC_API_KEY)
 
 # Actual model IDs for LiteLLM
-# MODIFICATION: Use Moonshot (Kimi) K2 Preview as default instead of Qwen when no Anthropic key
-_BASIC_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "moonshot/kimi-k2-0905-preview"
-_POWER_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "moonshot/kimi-k2-0905-preview"
+# MODIFICATION: Use DashScope (Qwen 3.5 122B) as default
+_BASIC_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "dashscope/qwen3.5-122b-a10b"
+_POWER_MODEL_ID = "anthropic/claude-sonnet-4-5-20250929" if SHOULD_USE_ANTHROPIC else "dashscope/qwen3.5-122b-a10b"
 
 # Default model IDs (these are aliases that resolve to actual IDs)
-FREE_MODEL_ID = "kortix/basic"
-PREMIUM_MODEL_ID = "kortix/power"
+FREE_MODEL_ID = "talos/basic"
+PREMIUM_MODEL_ID = "talos/power"
 
 
 is_local = config.ENV_MODE == EnvMode.LOCAL
@@ -27,14 +27,14 @@ class ModelRegistry:
         self._aliases: Dict[str, str] = {}
         self._initialize_models()
     
-    # KORTIX BASIC & POWER – Same underlying model, different configs
+    # TALOS BASIC & POWER – Same underlying model, different configs
     def _initialize_models(self):
-        # Kortix Basic
+        # Talos Basic
         self.register(Model(
-            id="kortix/basic",
-            name="Kortix Basic",
+            id="talos/basic",
+            name="Talos Basic",
             provider=ModelProvider.ANTHROPIC,
-            aliases=["kortix-basic", "Kortix Basic"],
+            aliases=["talos-basic", "Talos Basic"],
             context_window=1_000_000,
             capabilities=[
                 ModelCapability.CHAT,
@@ -59,12 +59,12 @@ class ModelRegistry:
             )
         ))
         
-        # Kortix Power - extended context & thinking
+        # Talos Power - extended context & thinking
         self.register(Model(
-            id="kortix/power",
-            name="Kortix POWER Mode",
+            id="talos/power",
+            name="Talos POWER Mode",
             provider=ModelProvider.ANTHROPIC,
-            aliases=["kortix-power", "Kortix POWER Mode", "Kortix Power"],
+            aliases=["talos-power", "Talos POWER Mode", "Talos Power"],
             context_window=1_000_000,
             capabilities=[
                 ModelCapability.CHAT,
@@ -350,22 +350,44 @@ class ModelRegistry:
         ))
         
         self.register(Model(
-            id="dashscope/qwen-plus",
-            name="Qwen Plus",
+            id="dashscope/qwen3.5-122b-a10b",
+            name="Qwen 3.5 122B",
             provider=ModelProvider.DASHSCOPE,
-            aliases=["qwen-plus"],
-            context_window=128_000,
+            aliases=["qwen3.5-122b-a10b", "qwen-3.5-122b"],
+            context_window=1_000_000,
             capabilities=[
                 ModelCapability.CHAT, 
                 ModelCapability.FUNCTION_CALLING,
-                ModelCapability.VISION
+                ModelCapability.VISION,
+                ModelCapability.THINKING,
             ],
             pricing=ModelPricing(
-                input_cost_per_million_tokens=0.01,
-                output_cost_per_million_tokens=0.03
+                input_cost_per_million_tokens=0.02,
+                output_cost_per_million_tokens=0.06
             ),
             tier_availability=["free", "paid"],
-            priority=94,
+            priority=100,
+            enabled=True
+        ))
+
+        self.register(Model(
+            id="dashscope/qvq-max-2025-03-25",
+            name="QVQ Max (Reasoning)",
+            provider=ModelProvider.DASHSCOPE,
+            aliases=["qvq-max", "qvq-max-0325"],
+            context_window=32_000,
+            capabilities=[
+                ModelCapability.CHAT, 
+                ModelCapability.FUNCTION_CALLING,
+                ModelCapability.VISION,
+                ModelCapability.THINKING,
+            ],
+            pricing=ModelPricing(
+                input_cost_per_million_tokens=0.20,
+                output_cost_per_million_tokens=0.60
+            ),
+            tier_availability=["free", "paid"],
+            priority=100,
             enabled=True
         ))
         
@@ -413,17 +435,17 @@ class ModelRegistry:
     def get_litellm_model_id(self, model_id: str) -> str:
         """Get the actual model ID to pass to LiteLLM.
         
-        Resolves kortix/basic and kortix/power to actual provider model IDs.
+        Resolves talos/basic and talos/power to actual provider model IDs.
         """
-        # Map kortix model IDs to actual LiteLLM model IDs
-        if model_id in ("kortix/basic", "kortix/power"):
+        # Map talos model IDs to actual LiteLLM model IDs
+        if model_id in ("talos/basic", "talos/power"):
             return _BASIC_MODEL_ID  # Both use the same underlying model
         
         # For other models, check if it's an alias and resolve
         model = self.get(model_id)
         if model:
             # Check if this model's ID needs resolution
-            if model.id in ("kortix/basic", "kortix/power"):
+            if model.id in ("talos/basic", "talos/power"):
                 return _BASIC_MODEL_ID
             return model.id
         
@@ -439,9 +461,9 @@ class ModelRegistry:
             litellm_model_id: The actual model ID used by LiteLLM (e.g. Bedrock ARN)
             
         Returns:
-            The registry model ID (e.g. 'kortix/basic') or the input if not found
+            The registry model ID (e.g. 'talos/basic') or the input if not found
         """
-        # Check if this is the Bedrock ARN that maps to kortix models
+        # Check if this is the Bedrock ARN that maps to talos models
         # Strip common prefixes for comparison
         normalized_id = litellm_model_id
         for prefix in ['bedrock/converse/', 'bedrock/', 'converse/']:
@@ -456,13 +478,13 @@ class ModelRegistry:
                 basic_model_normalized = basic_model_normalized[len(prefix):]
                 break
         
-        # If the normalized ID matches the basic model ARN, return kortix/basic
+        # If the normalized ID matches the basic model ARN, return talos/basic
         if normalized_id == basic_model_normalized or litellm_model_id == _BASIC_MODEL_ID:
-            return "kortix/basic"
+            return "talos/basic"
         
         # Also check if the full ID matches
         if litellm_model_id == _BASIC_MODEL_ID:
-            return "kortix/basic"
+            return "talos/basic"
         
         # Check if this model exists directly in registry
         if self.get(litellm_model_id):
@@ -496,7 +518,7 @@ class ModelRegistry:
     def get_pricing(self, model_id: str) -> Optional[ModelPricing]:
         """Get pricing for a model, with reverse lookup for LiteLLM model IDs.
         
-        Handles both registry model IDs (kortix/basic) and LiteLLM model IDs (Bedrock ARNs).
+        Handles both registry model IDs (talos/basic) and LiteLLM model IDs (Bedrock ARNs).
         """
         # First try direct lookup
         model = self.get(model_id)

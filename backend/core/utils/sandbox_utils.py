@@ -3,7 +3,7 @@
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
-from daytona_sdk import AsyncSandbox
+from e2b_code_interpreter import AsyncSandbox
 from core.utils.logger import logger
 
 
@@ -29,7 +29,7 @@ async def generate_unique_filename(sandbox: AsyncSandbox, base_path: str, origin
     
     try:
         # Check if file exists by trying to list it
-        files = await sandbox.fs.list_files(base_path)
+        files = await sandbox.filesystem.list(base_path)
         existing_files = {f.name for f in files}
         
         if original_filename not in existing_files:

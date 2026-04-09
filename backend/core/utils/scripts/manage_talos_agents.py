@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """
-Suna Default Agent Management Script (Simplified)
+Talos Default Agent Management Script (Simplified)
 
-This script provides administrative functions for managing Suna default agents across all users.
+This script provides administrative functions for managing Talos default agents across all users.
 
 Usage:
     # 🚀 MAIN COMMANDS
-    python manage_suna_agents.py install-all          # Install Suna for all users who don't have it
-    python manage_suna_agents.py stats                # Show Suna agent statistics
-    python manage_suna_agents.py install-user <id>    # Install Suna for specific user
+    python manage_talos_agents.py install-all          # Install Talos for all users who don't have it
+    python manage_talos_agents.py stats                # Show Talos agent statistics
+    python manage_talos_agents.py install-user <id>    # Install Talos for specific user
 
 Examples:
-    python manage_suna_agents.py install-all
-    python manage_suna_agents.py stats
-    python manage_suna_agents.py install-user 123e4567-e89b-12d3-a456-426614174000
+    python manage_talos_agents.py install-all
+    python manage_talos_agents.py stats
+    python manage_talos_agents.py install-user 123e4567-e89b-12d3-a456-426614174000
 
-Note: Sync is no longer needed - Suna agents automatically use the current configuration from config.py
+Note: Sync is no longer needed - Talos agents automatically use the current configuration from config.py
 """
 
 import asyncio
@@ -28,18 +28,18 @@ from pathlib import Path
 backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
-from core.utils.suna_default_agent_service import SunaDefaultAgentService
+from core.utils.talos_default_agent_service import TalosDefaultAgentService
 from core.services.supabase import DBConnection
 from core.utils.logger import logger
 
 
-class SunaAgentManager:
+class TalosAgentManager:
     def __init__(self):
-        self.service = SunaDefaultAgentService()
+        self.service = TalosDefaultAgentService()
     
     async def install_all_users(self):
-        """Install Suna agent for all users who don't have it"""
-        print("🚀 Installing Suna default agent for all users who don't have it...")
+        """Install Talos agent for all users who don't have it"""
+        print("🚀 Installing Talos default agent for all users who don't have it...")
         
         result = await self.service.install_for_all_users()
         
@@ -54,46 +54,46 @@ class SunaAgentManager:
                     print(f"   - User {detail['account_id']}: {detail.get('error', 'Unknown error')}")
         
         if result['installed_count'] > 0:
-            print(f"\n✅ Successfully installed Suna for {result['installed_count']} users")
+            print(f"\n✅ Successfully installed Talos for {result['installed_count']} users")
             
     async def update_config_info(self):
-        """Show information about Suna configuration (no sync needed)"""
-        print("ℹ️  Suna Configuration Information")
+        """Show information about Talos configuration (no sync needed)"""
+        print("ℹ️  Talos Configuration Information")
         print("=" * 50)
-        print("🔧 Suna agents automatically use the current configuration from config.py")
+        print("🔧 Talos agents automatically use the current configuration from config.py")
         print("📝 No sync needed - changes are applied immediately when agents run")
-        print("💡 To update Suna behavior, simply modify backend/agent/suna/config.py")
-        print("\n✅ All Suna agents are always up-to-date with your latest configuration!")
+        print("💡 To update Talos behavior, simply modify backend/agent/talos/config.py")
+        print("\n✅ All Talos agents are always up-to-date with your latest configuration!")
     
     async def install_user(self, account_id):
-        """Install Suna agent for specific user"""
-        print(f"🚀 Installing Suna default agent for user {account_id}...")
+        """Install Talos agent for specific user"""
+        print(f"🚀 Installing Talos default agent for user {account_id}...")
         
-        agent_id = await self.service.install_suna_agent_for_user(account_id)
+        agent_id = await self.service.install_talos_agent_for_user(account_id)
         
         if agent_id:
-            print(f"✅ Successfully installed Suna agent {agent_id} for user {account_id}")
+            print(f"✅ Successfully installed Talos agent {agent_id} for user {account_id}")
         else:
-            print(f"❌ Failed to install Suna agent for user {account_id}")
+            print(f"❌ Failed to install Talos agent for user {account_id}")
     
     async def replace_user_agent(self, account_id):
-        """Replace Suna agent for specific user (in case of corruption)"""
-        print(f"🔄 Replacing Suna agent for user {account_id}...")
+        """Replace Talos agent for specific user (in case of corruption)"""
+        print(f"🔄 Replacing Talos agent for user {account_id}...")
         
         # Install/replace the agent with latest config
-        agent_id = await self.service.install_suna_agent_for_user(account_id, replace_existing=True)
+        agent_id = await self.service.install_talos_agent_for_user(account_id, replace_existing=True)
         
         if agent_id:
-            print(f"✅ Successfully replaced Suna agent {agent_id} for user {account_id}")
+            print(f"✅ Successfully replaced Talos agent {agent_id} for user {account_id}")
         else:
-            print(f"❌ Failed to replace Suna agent for user {account_id}")
+            print(f"❌ Failed to replace Talos agent for user {account_id}")
     
     async def show_stats(self):
-        """Show Suna agent statistics"""
-        print("📊 Suna Default Agent Statistics")
+        """Show Talos agent statistics"""
+        print("📊 Talos Default Agent Statistics")
         print("=" * 50)
         
-        stats = await self.service.get_suna_agent_stats()
+        stats = await self.service.get_talos_agent_stats()
         
         if 'error' in stats:
             print(f"❌ Error getting stats: {stats['error']}")
@@ -118,7 +118,7 @@ class SunaAgentManager:
 
 async def main():
     parser = argparse.ArgumentParser(
-        description="Manage Suna default agents across all users (Simplified)",
+        description="Manage Talos default agents across all users (Simplified)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__
     )
@@ -126,16 +126,16 @@ async def main():
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
     # Main commands
-    subparsers.add_parser('install-all', help='Install Suna agent for all users who don\'t have it')
-    subparsers.add_parser('stats', help='Show Suna agent statistics')
-    subparsers.add_parser('config-info', help='Show information about Suna configuration')
+    subparsers.add_parser('install-all', help='Install Talos agent for all users who don\'t have it')
+    subparsers.add_parser('stats', help='Show Talos agent statistics')
+    subparsers.add_parser('config-info', help='Show information about Talos configuration')
     
     # User-specific commands
-    install_user_parser = subparsers.add_parser('install-user', help='Install Suna agent for specific user')
-    install_user_parser.add_argument('account_id', help='Account ID to install Suna for')
+    install_user_parser = subparsers.add_parser('install-user', help='Install Talos agent for specific user')
+    install_user_parser.add_argument('account_id', help='Account ID to install Talos for')
     
-    replace_user_parser = subparsers.add_parser('replace-user', help='Replace Suna agent for specific user (if corrupted)')
-    replace_user_parser.add_argument('account_id', help='Account ID to replace Suna for')
+    replace_user_parser = subparsers.add_parser('replace-user', help='Replace Talos agent for specific user (if corrupted)')
+    replace_user_parser.add_argument('account_id', help='Account ID to replace Talos for')
     
     args = parser.parse_args()
     
@@ -143,7 +143,7 @@ async def main():
         parser.print_help()
         return
     
-    manager = SunaAgentManager()
+    manager = TalosAgentManager()
     
     try:
         if args.command == 'install-all':

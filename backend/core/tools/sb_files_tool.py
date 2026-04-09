@@ -22,7 +22,7 @@ from typing import Optional
     visible=True
 )
 class SandboxFilesTool(SandboxToolsBase):
-    """Tool for executing file system operations in a Daytona sandbox. All operations are performed relative to the /workspace directory."""
+    """Tool for executing file system operations in an E2B sandbox. All operations are performed relative to the /workspace directory."""
 
     def __init__(self, project_id: str, thread_manager: ThreadManager):
         super().__init__(project_id, thread_manager)
@@ -39,42 +39,38 @@ class SandboxFilesTool(SandboxToolsBase):
     async def _file_exists(self, path: str) -> bool:
         """Check if a file exists in the sandbox"""
         try:
-            await self.sandbox.fs.get_file_info(path)
+            await self.sandbox.filesystem.list(path)
             return True
         except Exception:
-            return False
+            # Try reading the file directly — list raises for files not dirs
+            try:
+                await self.sandbox.filesystem.read(path)
+                return True
+            except Exception:
+                return False
 
     async def get_workspace_state(self) -> dict:
         """Get the current workspace state by reading all files"""
         files_state = {}
         try:
-            # Ensure sandbox is initialized
             await self._ensure_sandbox()
-            
-            files = await self.sandbox.fs.list_files(self.workspace_path)
+            files = await self.sandbox.filesystem.list(self.workspace_path)
             for file_info in files:
                 rel_path = file_info.name
-                
-                # Skip excluded files and directories
                 if self._should_exclude_file(rel_path) or file_info.is_dir:
                     continue
-
                 try:
                     full_path = f"{self.workspace_path}/{rel_path}"
-                    content = (await self.sandbox.fs.download_file(full_path)).decode()
+                    content = await self.sandbox.filesystem.read(full_path)
+                    if isinstance(content, bytes):
+                        content = content.decode('utf-8', errors='replace')
                     files_state[rel_path] = {
                         "content": content,
                         "is_dir": file_info.is_dir,
-                        "size": file_info.size,
-                        "modified": file_info.mod_time
                     }
                 except Exception as e:
                     print(f"Error reading file {rel_path}: {e}")
-                except UnicodeDecodeError:
-                    print(f"Skipping binary file: {rel_path}")
-
             return files_state
-        
         except Exception as e:
             print(f"Error getting workspace state: {str(e)}")
             return {}
@@ -114,34 +110,24 @@ class SandboxFilesTool(SandboxToolsBase):
     })
     async def create_file(self, file_path: str, file_contents: str, permissions: str = "644") -> ToolResult:
         try:
-            # Ensure sandbox is initialized
             await self._ensure_sandbox()
-
             file_path = self.clean_path(file_path)
             full_path = f"{self.workspace_path}/{file_path}"
-            if await self._file_exists(full_path):
-                return self.fail_response(f"File '{file_path}' already exists. Use update_file to modify existing files.")
 
-            # Create parent directories if needed
-            parent_dir = '/'.join(full_path.split('/')[:-1])
-            if parent_dir:
-                await self.sandbox.fs.create_folder(parent_dir, "755")
-
-            # convert to json string if file_contents is a dict
             if isinstance(file_contents, dict):
                 file_contents = json.dumps(file_contents, indent=4)
 
-            # Write the file content
-            await self.sandbox.fs.upload_file(file_contents.encode(), full_path)
-            await self.sandbox.fs.set_file_permissions(full_path, permissions)
+            # Create parent directories then write
+            parent_dir = '/'.join(full_path.split('/')[:-1])
+            if parent_dir:
+                await self.sandbox.commands.run(f"mkdir -p {parent_dir}")
 
-            message = f"File '{file_path}' created successfully."
+            await self.sandbox.filesystem.write(full_path, file_contents)
 
-            # Return structured data for frontend detection
             return self.success_response({
-                "message": message,
+                "message": f"File '{file_path}' created successfully.",
                 "file_path": file_path,
-                "full_path": full_path
+                "full_path": full_path,
             })
         except Exception as e:
             return self.fail_response(f"Error creating file: {str(e)}")
@@ -173,43 +159,26 @@ class SandboxFilesTool(SandboxToolsBase):
     })
     async def str_replace(self, file_path: str, old_str: str, new_str: str) -> ToolResult:
         try:
-            # Ensure sandbox is initialized
             await self._ensure_sandbox()
-            
             file_path = self.clean_path(file_path)
             full_path = f"{self.workspace_path}/{file_path}"
-            if not await self._file_exists(full_path):
-                return self.fail_response(f"File '{file_path}' does not exist")
-            
-            content = (await self.sandbox.fs.download_file(full_path)).decode()
+
+            content = await self.sandbox.filesystem.read(full_path)
+            if isinstance(content, bytes):
+                content = content.decode('utf-8', errors='replace')
+
             old_str = old_str.expandtabs()
             new_str = new_str.expandtabs()
-            
             occurrences = content.count(old_str)
             if occurrences == 0:
-                return self.fail_response(f"String '{old_str}' not found in file")
+                return self.fail_response(f"String not found in file")
             if occurrences > 1:
                 lines = [i+1 for i, line in enumerate(content.split('\n')) if old_str in line]
                 return self.fail_response(f"Multiple occurrences found in lines {lines}. Please ensure string is unique")
-            
-            # Perform replacement
+
             new_content = content.replace(old_str, new_str)
-            await self.sandbox.fs.upload_file(new_content.encode(), full_path)
-            
-            # Show snippet around the edit
-            replacement_line = content.split(old_str)[0].count('\n')
-            start_line = max(0, replacement_line - self.SNIPPET_LINES)
-            end_line = replacement_line + self.SNIPPET_LINES + new_str.count('\n')
-            snippet = '\n'.join(new_content.split('\n')[start_line:end_line + 1])
-            
-            # Get preview URL if it's an HTML file
-            # preview_url = self._get_preview_url(file_path)
-            message = f"Replacement successful."
-            # if preview_url:
-            #     message += f"\n\nYou can preview this HTML file at: {preview_url}"
-            
-            return self.success_response(message)
-            
+            await self.sandbox.filesystem.write(full_path, new_content)
+            return self.success_response("Replacement successful.")
         except Exception as e:
             return self.fail_response(f"Error replacing string: {str(e)}")
 
@@ -241,53 +210,35 @@ class SandboxFilesTool(SandboxToolsBase):
     })
     async def full_file_rewrite(self, file_path: str, file_contents: str, permissions: str = "644") -> ToolResult:
         try:
-            # Ensure sandbox is initialized
             await self._ensure_sandbox()
-            
             file_path = self.clean_path(file_path)
             full_path = f"{self.workspace_path}/{file_path}"
-            if not await self._file_exists(full_path):
-                return self.fail_response(f"File '{file_path}' does not exist. Use create_file to create a new file.")
 
-            await self.sandbox.fs.upload_file(file_contents.encode(), full_path)
-            await self.sandbox.fs.set_file_permissions(full_path, permissions)
-            
+            await self.sandbox.filesystem.write(full_path, file_contents)
+
             message = f"File '{file_path}' completely rewritten successfully."
-            
+
             # Auto-validate presentation slides
             slide_pattern = r'^presentations/([^/]+)/slide_(\d+)\.html$'
             slide_match = re.match(slide_pattern, file_path)
             if slide_match:
                 presentation_name = slide_match.group(1)
                 slide_number = int(slide_match.group(2))
-                
                 try:
-                    # Import and instantiate the presentation tool to access validate_slide
                     from core.tools.sb_presentation_tool import SandboxPresentationTool
                     presentation_tool = SandboxPresentationTool(self.project_id, self.thread_manager)
-                    
-                    # Call validate_slide
                     validation_result = await presentation_tool.validate_slide(presentation_name, slide_number)
-                    
-                    # Append validation message to response
                     if validation_result.success and validation_result.output:
-                        # output can be a dict or string
                         if isinstance(validation_result.output, dict):
                             validation_message = validation_result.output.get("message", "")
                             if validation_message:
                                 message += f"\n\n{validation_message}"
                         elif isinstance(validation_result.output, str):
                             message += f"\n\n{validation_result.output}"
-                    elif not validation_result.success:
-                        # If validation failed to run, append a warning but don't fail the rewrite
-                        logger.warning(f"Slide validation failed to execute: {validation_result.output}")
-                        message += f"\n\n⚠️ Note: Slide validation could not be completed."
-                        
                 except Exception as e:
-                    # Log the error but don't fail the file rewrite
                     logger.warning(f"Failed to auto-validate slide: {str(e)}")
                     message += f"\n\n⚠️ Note: Slide validation could not be completed."
-            
+
             return self.success_response(message)
         except Exception as e:
             return self.fail_response(f"Error rewriting file: {str(e)}")
@@ -311,15 +262,10 @@ class SandboxFilesTool(SandboxToolsBase):
     })
     async def delete_file(self, file_path: str) -> ToolResult:
         try:
-            # Ensure sandbox is initialized
             await self._ensure_sandbox()
-            
             file_path = self.clean_path(file_path)
             full_path = f"{self.workspace_path}/{file_path}"
-            if not await self._file_exists(full_path):
-                return self.fail_response(f"File '{file_path}' does not exist")
-            
-            await self.sandbox.fs.delete_file(full_path)
+            await self.sandbox.filesystem.remove(full_path)
             return self.success_response(f"File '{file_path}' deleted successfully.")
         except Exception as e:
             return self.fail_response(f"Error deleting file: {str(e)}")
@@ -427,7 +373,11 @@ class SandboxFilesTool(SandboxToolsBase):
             if not await self._file_exists(full_path):
                 return self.fail_response(f"File '{target_file}' does not exist")
             
-            original_content = (await self.sandbox.fs.download_file(full_path)).decode()
+            content = await self.sandbox.filesystem.read(full_path)
+            if isinstance(content, bytes):
+                original_content = content.decode('utf-8', errors='replace')
+            else:
+                original_content = content
             
             is_tiptap_doc = False
             original_wrapper = None
@@ -499,7 +449,7 @@ class SandboxFilesTool(SandboxToolsBase):
                     "updated_content": original_content
                 }))
 
-            await self.sandbox.fs.upload_file(new_content.encode(), full_path)
+            await self.sandbox.filesystem.write(full_path, new_content)
             
             return ToolResult(success=True, output=json.dumps({
                 "message": f"File '{target_file}' edited successfully.",
@@ -515,7 +465,9 @@ class SandboxFilesTool(SandboxToolsBase):
             try:
                 full_path_on_error = f"{self.workspace_path}/{self.clean_path(target_file)}"
                 if await self._file_exists(full_path_on_error):
-                    original_content_on_error = (await self.sandbox.fs.download_file(full_path_on_error)).decode()
+                    original_content_on_error = await self.sandbox.filesystem.read(full_path_on_error)
+                    if isinstance(original_content_on_error, bytes):
+                        original_content_on_error = original_content_on_error.decode('utf-8', errors='replace')
             except:
                 pass
             

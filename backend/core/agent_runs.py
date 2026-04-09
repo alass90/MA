@@ -66,34 +66,34 @@ async def _get_agent_run_with_access_check(client, agent_run_id: str, user_id: s
 # Helper Functions for Unified Agent Start
 # ============================================================================
 
-async def _find_shared_suna_agent(client):
-    """Find a shared Suna agent to use as fallback when user has no agents."""
+async def _find_shared_talos_agent(client):
+    """Find a shared Talos agent to use as fallback when user has no agents."""
     from .agent_loader import get_agent_loader
     from core.utils.config import config
     
     admin_user_id = config.SYSTEM_ADMIN_USER_ID
     
     if admin_user_id:
-        admin_suna = await client.table('agents').select('agent_id').eq('account_id', admin_user_id).eq('metadata->>is_suna_default', 'true').maybe_single().execute()
+        admin_talos = await client.table('agents').select('agent_id').eq('account_id', admin_user_id).eq('metadata->>is_talos_default', 'true').maybe_single().execute()
         
-        if admin_suna and admin_suna.data:
+        if admin_talos and admin_talos.data:
             loader = await get_agent_loader()
-            agent_data = await loader.load_agent(admin_suna.data['agent_id'], admin_user_id, load_config=True)
-            logger.info(f"✅ Using system Suna agent from admin user: {agent_data.name} ({agent_data.agent_id})")
+            agent_data = await loader.load_agent(admin_talos.data['agent_id'], admin_user_id, load_config=True)
+            logger.info(f"✅ Using system Talos agent from admin user: {agent_data.name} ({agent_data.agent_id})")
             return agent_data
         else:
-            logger.warning(f"⚠️ SYSTEM_ADMIN_USER_ID configured but no Suna agent found for user {admin_user_id}")
+            logger.warning(f"⚠️ SYSTEM_ADMIN_USER_ID configured but no Talos agent found for user {admin_user_id}")
     
-    # Fallback: search for any Suna agent
-    any_suna = await client.table('agents').select('agent_id, account_id').eq('metadata->>is_suna_default', 'true').limit(1).maybe_single().execute()
+    # Fallback: search for any Talos agent
+    any_talos = await client.table('agents').select('agent_id, account_id').eq('metadata->>is_talos_default', 'true').limit(1).maybe_single().execute()
     
-    if any_suna and any_suna.data:
+    if any_talos and any_talos.data:
         loader = await get_agent_loader()
-        agent_data = await loader.load_agent(any_suna.data['agent_id'], any_suna.data['account_id'], load_config=True)
-        logger.info(f"Using shared Suna agent: {agent_data.name} ({agent_data.agent_id})")
+        agent_data = await loader.load_agent(any_talos.data['agent_id'], any_talos.data['account_id'], load_config=True)
+        logger.info(f"Using shared Talos agent: {agent_data.name} ({agent_data.agent_id})")
         return agent_data
     
-    logger.error("❌ No Suna agent found! Set SYSTEM_ADMIN_USER_ID in .env")
+    logger.error("❌ No Talos agent found! Set SYSTEM_ADMIN_USER_ID in .env")
     return None
 
 
@@ -109,21 +109,21 @@ async def _load_agent_config(client, agent_id: Optional[str], account_id: str, u
     logger.debug(f"[AGENT LOAD] Loading agent: {agent_id or 'default'}")
 
     if agent_id:
-        # OPTIMIZED: For Suna agents, use fast path (static config + cached MCPs)
+        # OPTIMIZED: For Talos agents, use fast path (static config + cached MCPs)
         # This avoids DB queries entirely when cache is warm
-        from core.runtime_cache import get_static_suna_config, get_cached_user_mcps
+        from core.runtime_cache import get_static_talos_config, get_cached_user_mcps
         
-        static_config = get_static_suna_config()
+        static_config = get_static_talos_config()
         cached_mcps = await get_cached_user_mcps(agent_id)
         
-        # Fast path: If we have static config AND cached MCPs, assume it's Suna
-        # (cached MCPs only exist for Suna agents)
+        # Fast path: If we have static config AND cached MCPs, assume it's Talos
+        # (cached MCPs only exist for Talos agents)
         if static_config and cached_mcps is not None:
             # Fast path: Use static config + cached MCPs (zero DB calls!)
             from core.agent_loader import AgentData
             agent_data = AgentData(
                 agent_id=agent_id,
-                name="Suna",
+                name="Talos",
                 description=None,
                 account_id=account_id,
                 is_default=True,
@@ -136,19 +136,19 @@ async def _load_agent_config(client, agent_id: Optional[str], account_id: str, u
                 updated_at="",
                 current_version_id=None,
                 version_count=1,
-                metadata={'is_suna_default': True},
+                metadata={'is_talos_default': True},
                 system_prompt=static_config['system_prompt'],
                 model=static_config['model'],
                 agentpress_tools=static_config['agentpress_tools'],
                 configured_mcps=cached_mcps.get('configured_mcps', []),
                 custom_mcps=cached_mcps.get('custom_mcps', []),
                 triggers=cached_mcps.get('triggers', []),
-                is_suna_default=True,
+                is_talos_default=True,
                 centrally_managed=True,
                 config_loaded=True,
                 restrictions=static_config['restrictions']
             )
-            logger.info(f"⚡ [FAST PATH] Suna config from memory + Redis MCPs: {(time.time() - t_start)*1000:.1f}ms (zero DB calls)")
+            logger.info(f"⚡ [FAST PATH] Talos config from memory + Redis MCPs: {(time.time() - t_start)*1000:.1f}ms (zero DB calls)")
         else:
             # Fall back to normal loader (handles cache misses and custom agents)
             t_loader = time.time()
@@ -159,17 +159,17 @@ async def _load_agent_config(client, agent_id: Optional[str], account_id: str, u
         logger.debug(f"[AGENT LOAD] Loading default agent")
         
         if is_new_thread:
-            from core.utils.ensure_suna import ensure_suna_installed
-            await ensure_suna_installed(account_id)
+            from core.utils.ensure_talos import ensure_talos_installed
+            await ensure_talos_installed(account_id)
         
-        default_agent = await client.table('agents').select('agent_id').eq('account_id', account_id).eq('metadata->>is_suna_default', 'true').maybe_single().execute()
+        default_agent = await client.table('agents').select('agent_id').eq('account_id', account_id).eq('metadata->>is_talos_default', 'true').maybe_single().execute()
         
         if default_agent and default_agent.data:
             agent_data = await loader.load_agent(default_agent.data['agent_id'], user_id, load_config=True)
             logger.debug(f"Using default agent: {agent_data.name} ({agent_data.agent_id}) version {agent_data.version_name}")
         else:
-            logger.warning(f"[AGENT LOAD] No default agent found for account {account_id}, searching for shared Suna")
-            agent_data = await _find_shared_suna_agent(client)
+            logger.warning(f"[AGENT LOAD] No default agent found for account {account_id}, searching for shared Talos")
+            agent_data = await _find_shared_talos_agent(client)
             
             if not agent_data:
                 any_agent = await client.table('agents').select('agent_id').eq('account_id', account_id).limit(1).maybe_single().execute()

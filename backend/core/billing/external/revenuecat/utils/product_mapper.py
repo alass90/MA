@@ -6,14 +6,14 @@ from ....shared.config import get_tier_by_name
 
 class ProductMapper:
     PRODUCT_MAPPING = {
-        'kortix_plus_monthly': 'tier_2_20',
-        'kortix_plus_yearly': 'tier_2_20',
+        'talos_plus_monthly': 'tier_2_20',
+        'talos_plus_yearly': 'tier_2_20',
 
-        'kortix_pro_monthly': 'tier_6_50',
-        'kortix_pro_yearly': 'tier_6_50',
+        'talos_pro_monthly': 'tier_6_50',
+        'talos_pro_yearly': 'tier_6_50',
         
-        'kortix_ultra_monthly': 'tier_25_200',
-        'kortix_ultra_yearly': 'tier_25_200',
+        'talos_ultra_monthly': 'tier_25_200',
+        'talos_ultra_yearly': 'tier_25_200',
     }
     
     VALID_PRODUCT_IDS = set(PRODUCT_MAPPING.keys())

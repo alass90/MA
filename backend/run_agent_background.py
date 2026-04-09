@@ -95,10 +95,10 @@ async def initialize():
     warm_up_tools_cache()
     
     try:
-        from core.runtime_cache import warm_up_suna_config_cache
-        await warm_up_suna_config_cache()
+        from core.runtime_cache import warm_up_talos_config_cache
+        await warm_up_talos_config_cache()
     except Exception as e:
-        logger.warning(f"Failed to pre-cache Suna configs (non-fatal): {e}")
+        logger.warning(f"Failed to pre-cache Talos configs (non-fatal): {e}")
 
     _initialized = True
     logger.info(f"✅ Worker async resources initialized successfully (instance: {instance_id})")
@@ -155,12 +155,12 @@ async def load_agent_config(agent_id: Optional[str], account_id: Optional[str]) 
     t = time.time()
     try:
         from core.runtime_cache import (
-            get_static_suna_config, 
+            get_static_talos_config, 
             get_cached_user_mcps,
             get_cached_agent_config
         )
         
-        static_config = get_static_suna_config()
+        static_config = get_static_talos_config()
         cached_mcps = await get_cached_user_mcps(agent_id)
         
         if static_config and cached_mcps is not None:
@@ -170,13 +170,13 @@ async def load_agent_config(agent_id: Optional[str], account_id: Optional[str]) 
                 'model': static_config['model'],
                 'agentpress_tools': static_config['agentpress_tools'],
                 'centrally_managed': static_config['centrally_managed'],
-                'is_suna_default': static_config['is_suna_default'],
+                'is_talos_default': static_config['is_talos_default'],
                 'restrictions': static_config['restrictions'],
                 'configured_mcps': cached_mcps.get('configured_mcps', []),
                 'custom_mcps': cached_mcps.get('custom_mcps', []),
                 'triggers': cached_mcps.get('triggers', []),
             }
-            logger.info(f"⏱️ [TIMING] ⚡ Suna config from memory + Redis MCPs: {(time.time() - t) * 1000:.1f}ms")
+            logger.info(f"⏱️ [TIMING] ⚡ Talos config from memory + Redis MCPs: {(time.time() - t) * 1000:.1f}ms")
         else:
             cached_config = await get_cached_agent_config(agent_id)
             

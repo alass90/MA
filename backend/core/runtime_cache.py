@@ -2,7 +2,7 @@
 Runtime caching layer for latency optimization.
 
 This module provides Redis-based caching for frequently accessed data:
-- Agent configs (Suna static + user MCPs, custom agent configs)
+- Agent configs (Talos static + user MCPs, custom agent configs)
 - Project metadata (sandbox info)
 - Running runs count (concurrent limit checks)
 - Thread count (thread limit checks)
@@ -15,37 +15,37 @@ from typing import Dict, Any, Optional
 from core.utils.logger import logger
 
 # ============================================================================
-# STATIC SUNA CONFIG - Loaded once at startup, never expires
+# STATIC TALOS CONFIG - Loaded once at startup, never expires
 # This is Python code that's identical across all workers - safe to keep in memory
 # ============================================================================
-_SUNA_STATIC_CONFIG: Optional[Dict[str, Any]] = None
-_SUNA_STATIC_LOADED = False
+_TALOS_STATIC_CONFIG: Optional[Dict[str, Any]] = None
+_TALOS_STATIC_LOADED = False
 
-def get_static_suna_config() -> Optional[Dict[str, Any]]:
-    """Get the static Suna config (loaded once at startup)."""
-    return _SUNA_STATIC_CONFIG
+def get_static_talos_config() -> Optional[Dict[str, Any]]:
+    """Get the static Talos config (loaded once at startup)."""
+    return _TALOS_STATIC_CONFIG
 
-def load_static_suna_config() -> Dict[str, Any]:
+def load_static_talos_config() -> Dict[str, Any]:
     """
-    Load Suna's static config into memory ONCE.
+    Load Talos's static config into memory ONCE.
     This includes: system_prompt, model, agentpress_tools, restrictions.
     
     This is safe to cache in memory because it's Python code - identical across all workers.
     """
-    global _SUNA_STATIC_CONFIG, _SUNA_STATIC_LOADED
+    global _TALOS_STATIC_CONFIG, _TALOS_STATIC_LOADED
     
-    if _SUNA_STATIC_LOADED:
-        return _SUNA_STATIC_CONFIG
+    if _TALOS_STATIC_LOADED:
+        return _TALOS_STATIC_CONFIG
     
-    from core.suna_config import SUNA_CONFIG
+    from core.talos_config import TALOS_CONFIG
     from core.config_helper import _extract_agentpress_tools_for_run
     
-    _SUNA_STATIC_CONFIG = {
-        'system_prompt': SUNA_CONFIG['system_prompt'],
-        'model': SUNA_CONFIG['model'],
-        'agentpress_tools': _extract_agentpress_tools_for_run(SUNA_CONFIG['agentpress_tools']),
+    _TALOS_STATIC_CONFIG = {
+        'system_prompt': TALOS_CONFIG['system_prompt'],
+        'model': TALOS_CONFIG['model'],
+        'agentpress_tools': _extract_agentpress_tools_for_run(TALOS_CONFIG['agentpress_tools']),
         'centrally_managed': True,
-        'is_suna_default': True,
+        'is_talos_default': True,
         'restrictions': {
             'system_prompt_editable': False,
             'tools_editable': False,
@@ -55,9 +55,9 @@ def load_static_suna_config() -> Dict[str, Any]:
         }
     }
     
-    _SUNA_STATIC_LOADED = True
-    logger.info(f"✅ Loaded static Suna config into memory (prompt: {len(_SUNA_STATIC_CONFIG['system_prompt'])} chars)")
-    return _SUNA_STATIC_CONFIG
+    _TALOS_STATIC_LOADED = True
+    logger.info(f"✅ Loaded static Talos config into memory (prompt: {len(_TALOS_STATIC_CONFIG['system_prompt'])} chars)")
+    return _TALOS_STATIC_CONFIG
 
 # ============================================================================
 # AGENT CONFIG CACHE - Redis, invalidated on version changes
@@ -126,7 +126,7 @@ async def get_cached_agent_config(
     """
     Get agent config from Redis cache.
     
-    For custom agents only - Suna uses get_static_suna_config() + get_cached_user_mcps().
+    For custom agents only - Talos uses get_static_talos_config() + get_cached_user_mcps().
     """
     cache_key = _get_cache_key(agent_id, version_id)
     
@@ -148,11 +148,11 @@ async def set_cached_agent_config(
     agent_id: str,
     config: Dict[str, Any],
     version_id: Optional[str] = None,
-    is_suna_default: bool = False
+    is_talos_default: bool = False
 ) -> None:
     """Cache full agent config in Redis."""
-    if is_suna_default:
-        # For Suna, only cache the MCPs (static config is in memory from Python code)
+    if is_talos_default:
+        # For Talos, only cache the MCPs (static config is in memory from Python code)
         await set_cached_user_mcps(
             agent_id,
             config.get('configured_mcps', []),
@@ -182,20 +182,20 @@ async def invalidate_agent_config_cache(agent_id: str) -> None:
         logger.warning(f"Failed to invalidate cache: {e}")
 
 
-async def warm_up_suna_config_cache() -> None:
+async def warm_up_talos_config_cache() -> None:
     """
-    Load static Suna config into memory at worker startup.
+    Load static Talos config into memory at worker startup.
     
-    This is instant since it just reads from SUNA_CONFIG (Python code).
+    This is instant since it just reads from TALOS_CONFIG (Python code).
     No DB calls needed for the static parts.
     """
     t_start = time.time()
     
-    # Load static Suna config (system prompt, model, tools) - instant
-    load_static_suna_config()
+    # Load static Talos config (system prompt, model, tools) - instant
+    load_static_talos_config()
     
     elapsed = (time.time() - t_start) * 1000
-    logger.info(f"✅ Suna static config loaded in {elapsed:.1f}ms (zero DB calls)")
+    logger.info(f"✅ Talos static config loaded in {elapsed:.1f}ms (zero DB calls)")
 
 
 # ============================================================================

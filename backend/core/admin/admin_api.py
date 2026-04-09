@@ -12,7 +12,7 @@ from core.services.supabase import DBConnection
 from core.utils.logger import logger
 from core.utils.pagination import PaginationService, PaginationParams, PaginatedResponse
 from core.utils.auth_utils import verify_admin_api_key
-from core.utils.suna_default_agent_service import SunaDefaultAgentService
+from core.utils.talos_default_agent_service import TalosDefaultAgentService
 from core.utils.config import config, EnvMode
 from dotenv import load_dotenv, set_key, find_dotenv, dotenv_values
 import os
@@ -511,28 +511,28 @@ async def get_user_threads_by_email(
 # AGENT & SYSTEM MANAGEMENT
 # ============================================================================
 
-@router.post("/suna-agents/install-user/{account_id}")
-async def admin_install_suna_for_user(
+@router.post("/talos-agents/install-user/{account_id}")
+async def admin_install_talos_for_user(
     account_id: str,
     replace_existing: bool = False,
     _: bool = Depends(verify_admin_api_key)
 ):
-    """Install Suna agent for a specific user."""
-    logger.debug(f"Admin installing Suna agent for user: {account_id}")
+    """Install Talos agent for a specific user."""
+    logger.debug(f"Admin installing Talos agent for user: {account_id}")
     
-    service = SunaDefaultAgentService()
-    agent_id = await service.install_suna_agent_for_user(account_id, replace_existing)
+    service = TalosDefaultAgentService()
+    agent_id = await service.install_talos_agent_for_user(account_id, replace_existing)
     
     if agent_id:
         return {
             "success": True,
-            "message": f"Successfully installed Suna agent for user {account_id}",
+            "message": f"Successfully installed Talos agent for user {account_id}",
             "agent_id": agent_id
         }
     else:
         raise HTTPException(
             status_code=500, 
-            detail=f"Failed to install Suna agent for user {account_id}"
+            detail=f"Failed to install Talos agent for user {account_id}"
         )
 
 @router.get("/env-vars")

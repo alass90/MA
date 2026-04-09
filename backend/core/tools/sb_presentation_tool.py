@@ -36,7 +36,7 @@ class SandboxPresentationTool(SandboxToolsBase):
         """Ensure the presentations directory exists"""
         full_path = f"{self.workspace_path}/{self.presentations_dir}"
         try:
-            await self.sandbox.fs.create_folder(full_path, "755")
+            await self.sandbox.filesystem.make_dir(full_path)
         except:
             pass
 
@@ -45,7 +45,7 @@ class SandboxPresentationTool(SandboxToolsBase):
         safe_name = self._sanitize_filename(presentation_name)
         presentation_path = f"{self.workspace_path}/{self.presentations_dir}/{safe_name}"
         try:
-            await self.sandbox.fs.create_folder(presentation_path, "755")
+            await self.sandbox.filesystem.make_dir(presentation_path)
         except:
             pass
         return safe_name, presentation_path
@@ -86,8 +86,10 @@ class SandboxPresentationTool(SandboxToolsBase):
         """Load presentation metadata, create if doesn't exist"""
         metadata_path = f"{presentation_path}/metadata.json"
         try:
-            metadata_content = await self.sandbox.fs.download_file(metadata_path)
-            return json.loads(metadata_content.decode())
+            metadata_content = await self.sandbox.filesystem.read(metadata_path)
+            if isinstance(metadata_content, bytes):
+                metadata_content = metadata_content.decode("utf-8")
+            return json.loads(metadata_content)
         except:
             # Create default metadata
             return {
@@ -103,7 +105,7 @@ class SandboxPresentationTool(SandboxToolsBase):
         """Save presentation metadata"""
         metadata["updated_at"] = datetime.now().isoformat()
         metadata_path = f"{presentation_path}/metadata.json"
-        await self.sandbox.fs.upload_file(json.dumps(metadata, indent=2).encode(), metadata_path)
+        await self.sandbox.filesystem.write(metadata_path, json.dumps(metadata, indent=2))
 
     def _load_template_metadata(self, template_name: str) -> Dict:
         """Load metadata from a template on the backend filesystem"""
@@ -150,7 +152,7 @@ class SandboxPresentationTool(SandboxToolsBase):
                 target_dir = os.path.join(presentation_path, rel_path)
                 target_dir_path = target_dir.replace('\\', '/')  # Normalize path separators
                 try:
-                    await self.sandbox.fs.create_folder(target_dir_path, "755")
+                    await self.sandbox.filesystem.make_dir(target_dir_path)
                 except:
                     pass  # Directory might already exist
             else:
@@ -165,7 +167,7 @@ class SandboxPresentationTool(SandboxToolsBase):
                 try:
                     with open(source_file, 'rb') as f:
                         file_content = f.read()
-                    await self.sandbox.fs.upload_file(file_content, target_file)
+                    await self.sandbox.filesystem.write(target_file, file_content)
                     copied_files.append(rel_file_path)
                 except Exception as e:
                     # Log error but continue with other files
@@ -578,7 +580,7 @@ class SandboxPresentationTool(SandboxToolsBase):
             # Save slide file
             slide_filename = f"slide_{slide_number:02d}.html"
             slide_path = f"{presentation_path}/{slide_filename}"
-            await self.sandbox.fs.upload_file(slide_html.encode(), slide_path)
+            await self.sandbox.filesystem.write(slide_path, slide_html)
             
             # Update metadata
             if "slides" not in metadata:
@@ -751,7 +753,7 @@ class SandboxPresentationTool(SandboxToolsBase):
             # Delete slide file
             slide_path = f"{presentation_path}/{slide_filename}"
             try:
-                await self.sandbox.fs.delete_file(slide_path)
+                await self.sandbox.filesystem.remove(slide_path)
             except:
                 pass  # File might not exist
             
@@ -794,7 +796,7 @@ class SandboxPresentationTool(SandboxToolsBase):
             presentations_path = f"{self.workspace_path}/{self.presentations_dir}"
             
             try:
-                files = await self.sandbox.fs.list_files(presentations_path)
+                files = await self.sandbox.filesystem.list(presentations_path)
                 presentations = []
                 
                 for file_info in files:
@@ -855,7 +857,7 @@ class SandboxPresentationTool(SandboxToolsBase):
             presentation_path = f"{self.workspace_path}/{self.presentations_dir}/{safe_name}"
             
             try:
-                await self.sandbox.fs.delete_folder(presentation_path)
+                await self.sandbox.filesystem.remove(presentation_path)
                 return self.success_response({
                     "message": f"Presentation '{presentation_name}' deleted successfully",
                     "deleted_path": f"{self.presentations_dir}/{safe_name}"
@@ -968,11 +970,11 @@ print(json.dumps(result))
             
             # Write the script to a temporary file in the sandbox
             script_path = f"{self.workspace_path}/.validate_slide_temp.py"
-            await self.sandbox.fs.upload_file(measurement_script.encode(), script_path)
+            await self.sandbox.filesystem.write(script_path, measurement_script)
             
             # Execute the script
             try:
-                result = await self.sandbox.process.exec(
+                result = await self.sandbox.commands.run(
                     f"/bin/sh -c 'cd /workspace && python3 .validate_slide_temp.py'",
                     timeout=30
                 )
@@ -986,14 +988,14 @@ print(json.dumps(result))
                 
                 # Clean up the temporary script
                 try:
-                    await self.sandbox.fs.delete_file(script_path)
+                    await self.sandbox.filesystem.remove(script_path)
                 except:
                     pass
                 
             except Exception as e:
                 # Clean up on error
                 try:
-                    await self.sandbox.fs.delete_file(script_path)
+                    await self.sandbox.filesystem.remove(script_path)
                 except:
                     pass
                 return self.fail_response(f"Failed to measure slide dimensions: {str(e)}")
@@ -1087,8 +1089,8 @@ print(json.dumps(result))
                     
                     try:
                         # Copy to presentation directory as well for easy access
-                        pptx_content = await self.sandbox.fs.download_file(downloads_path)
-                        await self.sandbox.fs.upload_file(pptx_content, presentation_pptx_path)
+                        pptx_content = await self.sandbox.filesystem.read(downloads_path)
+                        await self.sandbox.filesystem.write(presentation_pptx_path, pptx_content)
                     except Exception as e:
                         # If copy fails, file is still available in downloads, so continue
                         pass
@@ -1188,8 +1190,8 @@ print(json.dumps(result))
                     
                     try:
                         # Copy to presentation directory as well for easy access
-                        pdf_content = await self.sandbox.fs.download_file(downloads_path)
-                        await self.sandbox.fs.upload_file(pdf_content, presentation_pdf_path)
+                        pdf_content = await self.sandbox.filesystem.read(downloads_path)
+                        await self.sandbox.filesystem.write(presentation_pdf_path, pdf_content)
                     except Exception as e:
                         # If copy fails, file is still available in downloads, so continue
                         pass

@@ -7,7 +7,7 @@ import concurrent.futures
 from core.utils.auth_utils import verify_and_get_user_id_from_jwt
 from core.utils.logger import logger
 from core.billing.subscriptions import free_tier_service
-from core.utils.suna_default_agent_service import SunaDefaultAgentService
+from core.utils.talos_default_agent_service import TalosDefaultAgentService
 from core.services.supabase import DBConnection
 from core.services.email import email_service
 
@@ -93,13 +93,13 @@ async def initialize_user_account(account_id: str, email: Optional[str] = None, 
                     'error': error_msg
                 }
         
-        logger.info(f"[SETUP] Installing Suna agent for {account_id}")
-        suna_service = SunaDefaultAgentService(db)
-        agent_id = await suna_service.install_suna_agent_for_user(account_id)
+        logger.info(f"[SETUP] Installing Talos agent for {account_id}")
+        talos_service = TalosDefaultAgentService(db)
+        agent_id = await talos_service.install_talos_agent_for_user(account_id)
         
 
         if not agent_id:
-            logger.warning(f"[SETUP] Failed to install Suna agent for {account_id}, but continuing")
+            logger.warning(f"[SETUP] Failed to install Talos agent for {account_id}, but continuing")
         
         if user_record:
             raw_user_metadata = user_record.get('raw_user_meta_data', {})
@@ -232,7 +232,7 @@ async def handle_user_created_webhook(
     request to this endpoint using pg_net.
     
     This webhook automatically:
-    1. Initializes account (free tier subscription + Suna agent)
+    1. Initializes account (free tier subscription + Talos agent)
     2. Sends welcome email
     
     All initialization happens automatically on the backend, eliminating

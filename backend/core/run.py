@@ -17,6 +17,7 @@ from core.agentpress.error_processor import ErrorProcessor
 from core.tools.data_providers_tool import DataProvidersTool
 from core.tools.expand_msg_tool import ExpandMessageTool
 from core.prompts.prompt import get_system_prompt
+from core.prompts.intent import classify_intent
 
 from core.utils.logger import logger
 
@@ -99,11 +100,11 @@ class ToolManager:
         self._register_browser_tool(disabled_tools)
         timings['browser_tool'] = (time.time() - t) * 1000
         
-        # Suna-specific tools (agent creation)
+        # Talos-specific tools (agent creation)
         if self.account_id:
             t = time.time()
-            self._register_suna_specific_tools(disabled_tools)
-            timings['suna_tools'] = (time.time() - t) * 1000
+            self._register_talos_specific_tools(disabled_tools)
+            timings['talos_tools'] = (time.time() - t) * 1000
         
         total = (time.time() - start) * 1000
         timing_str = " | ".join([f"{k}: {v:.1f}ms" for k, v in timings.items()])
@@ -187,7 +188,7 @@ class ToolManager:
         db = DBConnection()
 
         for tool_name, module_path, class_name in AGENT_BUILDER_TOOLS:
-            # Skip agent_creation_tool as it's registered separately in _register_suna_specific_tools
+            # Skip agent_creation_tool as it's registered separately in _register_talos_specific_tools
             if tool_name == 'agent_creation_tool':
                 continue
             
@@ -210,8 +211,8 @@ class ToolManager:
                 except Exception as e:
                     logger.warning(f"❌ Failed to register {tool_name}: {e}")
     
-    def _register_suna_specific_tools(self, disabled_tools: List[str]):
-        """Register Suna-specific tools like agent creation."""
+    def _register_talos_specific_tools(self, disabled_tools: List[str]):
+        """Register Talos-specific tools like agent creation."""
         if 'agent_creation_tool' not in disabled_tools and self.account_id:
             from core.tools.tool_registry import get_tool_info, get_tool_class
             from core.services.supabase import DBConnection
@@ -349,9 +350,10 @@ class PromptManager:
                                   tool_registry=None,
                                   xml_tool_calling: bool = False,
                                   user_id: Optional[str] = None,
-                                  project_id: Optional[str] = None) -> dict:
+                                  project_id: Optional[str] = None,
+                                  mode: str = "agent") -> dict:
         
-        default_system_content = get_system_prompt()
+        default_system_content = get_system_prompt(mode)
         
         # if "anthropic" not in model_name.lower():
         #     sample_response_path = os.path.join(os.path.dirname(__file__), 'prompts/samples/1.txt')
@@ -710,7 +712,7 @@ class AgentRunner:
         
         logger.debug(f"⏱️ [TIMING] setup() total: {(time.time() - setup_start) * 1000:.1f}ms")
     
-    def setup_tools(self):
+    def setup_tools(self, mode: str = "agent"):
         """Synchronous tool setup (for backwards compatibility)."""
         import time
         start = time.time()
@@ -723,6 +725,16 @@ class AgentRunner:
         
         disabled_tools = self._get_disabled_tools_from_config()
         
+        # 🛡️ KIMI-STYLE FILTERING: Strip heavy tools if just chatting
+        if mode == 'chat':
+            disabled_tools.extend([
+                'sb_shell_tool', 'sb_files_tool', 'agent_creation_tool', 
+                'agent_config_tool', 'deploy_website', 'sb_fullstack_tool', 
+                'sb_presentation_tool', 'trigger_tool', 'manage_project_tool'
+            ])
+            disabled_tools = list(set(disabled_tools))
+        
+        
         # Cache migrated tools config once for use in AgentRun methods
         migrate_start = time.time()
         self.migrated_tools = self._get_migrated_tools_config()
@@ -732,24 +744,24 @@ class AgentRunner:
         tool_manager.register_all_tools(agent_id=agent_id, disabled_tools=disabled_tools)
         logger.info(f"⏱️ [TIMING] register_all_tools(): {(time.time() - register_start) * 1000:.1f}ms")
         
-        is_suna_agent = (self.config.agent_config and self.config.agent_config.get('is_suna_default', False)) or (self.config.agent_config is None)
-        logger.debug(f"Agent config check: agent_config={self.config.agent_config is not None}, is_suna_default={is_suna_agent}")
+        is_talos_agent = (self.config.agent_config and self.config.agent_config.get('is_talos_default', False)) or (self.config.agent_config is None)
+        logger.debug(f"Agent config check: agent_config={self.config.agent_config is not None}, is_talos_default={is_talos_agent}")
         
-        if is_suna_agent:
-            suna_start = time.time()
-            logger.debug("Registering Suna-specific tools...")
-            self._register_suna_specific_tools(disabled_tools)
-            logger.debug(f"⏱️ [TIMING] Suna-specific tools: {(time.time() - suna_start) * 1000:.1f}ms")
+        if is_talos_agent:
+            talos_start = time.time()
+            logger.debug("Registering Talos-specific tools...")
+            self._register_talos_specific_tools(disabled_tools)
+            logger.debug(f"⏱️ [TIMING] Talos-specific tools: {(time.time() - talos_start) * 1000:.1f}ms")
         else:
-            logger.debug("Not a Suna agent, skipping Suna-specific tool registration")
+            logger.debug("Not a Talos agent, skipping Talos-specific tool registration")
         
         logger.info(f"⏱️ [TIMING] setup_tools() total: {(time.time() - start) * 1000:.1f}ms")
     
-    async def _setup_tools_async(self):
+    async def _setup_tools_async(self, mode: str = "agent"):
         """Async wrapper for tool setup to enable parallel execution."""
         # Run synchronous tool setup in executor to avoid blocking
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, self.setup_tools)
+        await loop.run_in_executor(None, self.setup_tools, mode)
     
     def _get_migrated_tools_config(self) -> dict:
         """Migrate tool config once and cache it. This is expensive so we only do it once."""
@@ -774,7 +786,7 @@ class AgentRunner:
         
         return get_enabled_methods_for_tool(tool_name, self.migrated_tools)
     
-    def _register_suna_specific_tools(self, disabled_tools: List[str]):
+    def _register_talos_specific_tools(self, disabled_tools: List[str]):
         if 'agent_creation_tool' not in disabled_tools:
             from core.tools.agent_creation_tool import AgentCreationTool
             from core.services.supabase import DBConnection
@@ -804,7 +816,7 @@ class AgentRunner:
         if not isinstance(raw_tools, dict):
             return disabled_tools
         
-        if self.config.agent_config.get('is_suna_default', False) and not raw_tools:
+        if self.config.agent_config.get('is_talos_default', False) and not raw_tools:
             return disabled_tools
         
         def is_tool_enabled(tool_name: str) -> bool:
@@ -851,10 +863,27 @@ class AgentRunner:
         setup_start = time.time()
         await self.setup()  # Must run first (sets up client, account_id)
         logger.info(f"⏱️ [TIMING] AgentRunner.setup() completed in {(time.time() - setup_start) * 1000:.1f}ms")
+
+        # 🧠 INTENT CLASSIFICATION FIRST
+        msg_start = time.time()
+        latest_user_message = await self.client.table('messages').select('*').eq('thread_id', self.config.thread_id).eq('type', 'user').order('created_at', desc=True).limit(1).execute()
+        logger.info(f"⏱️ [TIMING] Get latest user message in {(time.time() - msg_start) * 1000:.1f}ms")
+        
+        latest_user_message_content = None
+        if latest_user_message.data and len(latest_user_message.data) > 0:
+            data = latest_user_message.data[0]['content']
+            if isinstance(data, str):
+                data = json.loads(data)
+            if self.config.trace:
+                self.config.trace.update(input=data['content'])
+            latest_user_message_content = data.get('content') if isinstance(data, dict) else str(data)
+
+        detected_mode = classify_intent(latest_user_message_content or "")
+        logger.info(f"🧠 [INTENT] Detected mode from user message: {detected_mode}")
         
         # Run tool setup and MCP setup in parallel
         parallel_start = time.time()
-        setup_tools_task = asyncio.create_task(self._setup_tools_async())
+        setup_tools_task = asyncio.create_task(self._setup_tools_async(mode=detected_mode))
         mcp_task = asyncio.create_task(self.setup_mcp_tools())
         
         await setup_tools_task
@@ -871,31 +900,21 @@ class AgentRunner:
             mcp_wrapper_instance, self.client,
             tool_registry=self.thread_manager.tool_registry,
             xml_tool_calling=config.AGENT_XML_TOOL_CALLING,
-            user_id=self.account_id
+            user_id=self.account_id,
+            mode=detected_mode
         )
-        logger.info(f"⏱️ [TIMING] build_system_prompt() in {(time.time() - prompt_start) * 1000:.1f}ms ({len(str(system_message.get('content', '')))} chars)")
+        logger.info(f"⏱️ [TIMING] build_system_prompt(mode={detected_mode}) in {(time.time() - prompt_start) * 1000:.1f}ms ({len(str(system_message.get('content', '')))} chars)")
         logger.debug(f"model_name received: {self.config.model_name}")
         iteration_count = 0
         continue_execution = True
-
-        msg_start = time.time()
-        latest_user_message = await self.client.table('messages').select('*').eq('thread_id', self.config.thread_id).eq('type', 'user').order('created_at', desc=True).limit(1).execute()
-        logger.info(f"⏱️ [TIMING] Get latest user message in {(time.time() - msg_start) * 1000:.1f}ms")
-        
-        latest_user_message_content = None
-        if latest_user_message.data and len(latest_user_message.data) > 0:
-            data = latest_user_message.data[0]['content']
-            if isinstance(data, str):
-                data = json.loads(data)
-            if self.config.trace:
-                self.config.trace.update(input=data['content'])
-            # Extract content for fast path optimization
-            latest_user_message_content = data.get('content') if isinstance(data, dict) else str(data)
         
         total_setup = (time.time() - run_start) * 1000
         logger.info(f"⏱️ [TIMING] 🚀 TOTAL AgentRunner setup: {total_setup:.1f}ms (ready for first LLM call)")
 
-        while continue_execution and iteration_count < self.config.max_iterations:
+        # 🛡️ BUDGET CONTROL
+        actual_max_iterations = 10 if detected_mode == "chat" else self.config.max_iterations
+
+        while continue_execution and iteration_count < actual_max_iterations:
             iteration_count += 1
 
             # Check for cancellation signal first

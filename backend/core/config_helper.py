@@ -4,41 +4,41 @@ import os
 
 
 def extract_agent_config(agent_data: Dict[str, Any], version_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """Extract agent configuration with simplified logic for Suna vs custom agents."""
+    """Extract agent configuration with simplified logic for Talos vs custom agents."""
     agent_id = agent_data.get('agent_id', 'Unknown')
     metadata = agent_data.get('metadata', {})
-    is_suna_default = metadata.get('is_suna_default', False)
+    is_talos_default = metadata.get('is_talos_default', False)
     
     # Debug logging
     if os.getenv("ENV_MODE", "").upper() == "STAGING":
-        print(f"[DEBUG] extract_agent_config: Called for agent {agent_id}, is_suna_default={is_suna_default}")
+        print(f"[DEBUG] extract_agent_config: Called for agent {agent_id}, is_talos_default={is_talos_default}")
         print(f"[DEBUG] extract_agent_config: Input agent_data has icon_name={agent_data.get('icon_name')}, icon_color={agent_data.get('icon_color')}, icon_background={agent_data.get('icon_background')}")
     
-    # Handle Suna agents with special logic
-    if is_suna_default:
-        return _extract_suna_agent_config(agent_data, version_data)
+    # Handle Talos agents with special logic
+    if is_talos_default:
+        return _extract_talos_agent_config(agent_data, version_data)
     
     # Handle custom agents with versioning
     return _extract_custom_agent_config(agent_data, version_data)
 
 
-def _extract_suna_agent_config(agent_data: Dict[str, Any], version_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """Extract config for Suna agents - always use central config with user customizations."""
-    from core.suna_config import SUNA_CONFIG
+def _extract_talos_agent_config(agent_data: Dict[str, Any], version_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Extract config for Talos agents - always use central config with user customizations."""
+    from core.talos_config import TALOS_CONFIG
     
     agent_id = agent_data.get('agent_id', 'Unknown')
-    logger.debug(f"Using Suna central config for agent {agent_id}")
+    logger.debug(f"Using Talos central config for agent {agent_id}")
     
-    # Start with central Suna config
+    # Start with central Talos config
     config = {
         'agent_id': agent_data['agent_id'],
-        'name': SUNA_CONFIG['name'],
-        'description': SUNA_CONFIG['description'],
-        'system_prompt': SUNA_CONFIG['system_prompt'],
-        'model': SUNA_CONFIG['model'],
-        'agentpress_tools': _extract_agentpress_tools_for_run(SUNA_CONFIG['agentpress_tools']),
+        'name': TALOS_CONFIG['name'],
+        'description': TALOS_CONFIG['description'],
+        'system_prompt': TALOS_CONFIG['system_prompt'],
+        'model': TALOS_CONFIG['model'],
+        'agentpress_tools': _extract_agentpress_tools_for_run(TALOS_CONFIG['agentpress_tools']),
         'is_default': True,
-        'is_suna_default': True,
+        'is_talos_default': True,
         'centrally_managed': True,
         'account_id': agent_data.get('account_id'),
         'current_version_id': agent_data.get('current_version_id'),
@@ -121,7 +121,7 @@ def _extract_custom_agent_config(agent_data: Dict[str, Any], version_data: Optio
             'icon_color': agent_data.get('icon_color'),
             'icon_background': agent_data.get('icon_background'),
             'is_default': agent_data.get('is_default', False),
-            'is_suna_default': False,
+            'is_talos_default': False,
             'centrally_managed': False,
             'account_id': agent_data.get('account_id'),
             'current_version_id': agent_data.get('current_version_id'),
@@ -151,7 +151,7 @@ def _extract_custom_agent_config(agent_data: Dict[str, Any], version_data: Optio
         'icon_color': agent_data.get('icon_color'),
         'icon_background': agent_data.get('icon_background'),
         'is_default': agent_data.get('is_default', False),
-        'is_suna_default': False,
+        'is_talos_default': False,
         'centrally_managed': False,
         'account_id': agent_data.get('account_id'),
         'current_version_id': agent_data.get('current_version_id'),
@@ -171,7 +171,7 @@ def build_unified_config(
     agentpress_tools: Dict[str, Any],
     configured_mcps: List[Dict[str, Any]],
     custom_mcps: Optional[List[Dict[str, Any]]] = None,
-    suna_metadata: Optional[Dict[str, Any]] = None,
+    talos_metadata: Optional[Dict[str, Any]] = None,
     triggers: Optional[List[Dict[str, Any]]] = None
 ) -> Dict[str, Any]:
     simplified_tools = {}
@@ -192,8 +192,8 @@ def build_unified_config(
         'metadata': {}
     }
     
-    if suna_metadata:
-        config['suna_metadata'] = suna_metadata
+    if talos_metadata:
+        config['talos_metadata'] = talos_metadata
     
     return config
 

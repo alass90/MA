@@ -18,6 +18,7 @@ CORE_TOOLS = [
     ('expand_msg_tool', 'core.tools.expand_msg_tool', 'ExpandMessageTool'),
     ('message_tool', 'core.tools.message_tool', 'MessageTool'),
     ('task_list_tool', 'core.tools.task_list_tool', 'TaskListTool'),
+    ('cognitive_tools', 'core.tools.cognitive_tools', 'TalosCognitiveTools'),
 ]
 
 # Sandbox tools - File system, shell, and workspace operations
@@ -34,6 +35,7 @@ SANDBOX_TOOLS = [
     # ('sb_docs_tool', 'core.tools.sb_docs_tool', 'SandboxDocsTool'),
     ('sb_fullstack_tool', 'core.tools.sb_fullstack_tool', 'SandboxFullstackTool'),
     ('sb_mobile_tool', 'core.tools.sb_mobile_tool', 'SandboxMobileTool'),
+    ('sb_ipython_tool', 'core.tools.sb_ipython_tool', 'SandboxIPythonTool'),
 ]
 
 # Search and research tools
@@ -48,7 +50,7 @@ SEARCH_TOOLS = [
 # Utility tools
 UTILITY_TOOLS = [
     ('data_providers_tool', 'core.tools.data_providers_tool', 'DataProvidersTool'),
-    ('browser_tool', 'core.tools.browser_tool', 'BrowserTool'),
+    ('browser_tool', 'core.tools.browser_tool', 'TalosBrowserTool'),
     ('vapi_voice_tool', 'core.tools.vapi_voice_tool', 'VapiVoiceTool'),
 ]
 

@@ -6,7 +6,7 @@ from typing import Optional
 from fastapi import FastAPI, UploadFile, File, HTTPException, APIRouter, Form, Depends, Request
 from fastapi.responses import Response
 from pydantic import BaseModel
-from daytona_sdk import AsyncSandbox
+from e2b_code_interpreter import AsyncSandbox
 
 from core.sandbox.sandbox import get_or_start_sandbox, delete_sandbox, create_sandbox
 from core.utils.logger import logger
@@ -144,7 +144,7 @@ async def create_file(
         content = await file.read()
         
         # Create file using raw binary content
-        await sandbox.fs.upload_file(content, final_path)
+        await sandbox.filesystem.write(final_path, content)
         logger.info(f"File uploaded successfully: {final_path} in sandbox {sandbox_id}")
         
         return {
@@ -183,7 +183,7 @@ async def update_file(
         sandbox = await get_sandbox_by_id_safely(client, sandbox_id)
         
         content_bytes = content.encode('utf-8') if isinstance(content, str) else content
-        await sandbox.fs.upload_file(content_bytes, path)
+        await sandbox.filesystem.write(path, content_bytes)
         logger.debug(f"File updated at {path} in sandbox {sandbox_id}")
         
         return {"status": "success", "updated": True, "path": path}
@@ -206,7 +206,7 @@ async def list_files(
     
     try:
         sandbox = await get_sandbox_by_id_safely(client, sandbox_id)
-        files = await sandbox.fs.list_files(path)
+        files = await sandbox.filesystem.list(path)
         
         result = []
         for f in files:
@@ -249,7 +249,7 @@ async def get_all_workspace_files(
         # Helper for recursion
         async def traverse(current_path):
             try:
-                files = await sandbox.fs.list_files(current_path)
+                files = await sandbox.filesystem.list(current_path)
                 for f in files:
                     rel_path = f"{current_path.rstrip('/')}/{f.name}"
                     
@@ -266,7 +266,7 @@ async def get_all_workspace_files(
                             continue
                             
                         try:
-                            content = (await sandbox.fs.download_file(rel_path)).decode('utf-8')
+                            content = await sandbox.filesystem.read(rel_path)
                             # Sandpack expects relative paths from the root of its 'files' object
                             sandpack_path = rel_path.replace("/workspace/", "")
                             if sandpack_path.startswith("/"):
@@ -313,7 +313,11 @@ async def read_file(
         
         # Read file directly - don't check existence first with a separate call
         try:
-            content = await sandbox.fs.download_file(path)
+            content = await sandbox.filesystem.read_bytes(path)
+        except AttributeError:
+            content = await sandbox.filesystem.read(path)
+            if isinstance(content, str):
+                content = content.encode('utf-8')
         except Exception as download_err:
             logger.error(f"Error downloading file {path} from sandbox {sandbox_id}: {str(download_err)}")
             raise HTTPException(
@@ -365,7 +369,7 @@ async def delete_file(
         sandbox = await get_sandbox_by_id_safely(client, sandbox_id)
         
         # Delete file
-        await sandbox.fs.delete_file(path)
+        await sandbox.filesystem.remove(path)
         logger.debug(f"File deleted at {path} in sandbox {sandbox_id}")
         
         return {"status": "success", "deleted": True, "path": path}
@@ -523,7 +527,7 @@ async def create_file_in_project(
         content = await file.read()
         
         # Upload file to sandbox
-        await sandbox.fs.upload_file(content, final_path)
+        await sandbox.filesystem.write(final_path, content)
         logger.info(f"File uploaded successfully: {final_path} in sandbox {sandbox_id}")
         
         return {
@@ -563,20 +567,15 @@ async def execute_terminal_command(
         session_id = "terminal-main"
         
         try:
-            await sandbox.process.create_session(session_id)
+            pass # no sessions in E2B
         except Exception:
             # Session might already exist
             pass
             
-        from daytona_sdk import SessionExecuteRequest
-        result = await sandbox.process.execute_session_command(
-            session_id, 
-            SessionExecuteRequest(command=command)
-        )
-        
+        result = await sandbox.commands.run(command, cwd="/workspace")
         return {
             "status": "success",
-            "output": result.output,
+            "output": (result.stdout or "") + "\n" + (result.stderr or ""),
             "exit_code": result.exit_code
         }
     except Exception as e:
@@ -613,7 +612,7 @@ async def write_single_file(
         else:
             full_path = normalized_path
             
-        await sandbox.fs.upload_file(content.encode("utf-8"), full_path)
+        await sandbox.filesystem.write(full_path, content.encode("utf-8"))
         logger.info(f"File written successfully to {full_path} in sandbox {sandbox_id}")
         return {"ok": True, "path": full_path}
     except Exception as e:

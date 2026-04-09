@@ -187,15 +187,12 @@ async def push_to_github(
             
     github_url = f"https://github.com/{username}/{payload.repo_name}"
     
-    # 3. Use Daytona Sandbox to push the code
+    # 3. Use E2B Sandbox to push the code
     try:
-        from core.sandbox.sandbox import daytona
-        from daytona_sdk import SessionExecuteRequest
+        from e2b_code_interpreter import AsyncSandbox
         import uuid
         
-        sandbox = await daytona.get(payload.sandbox_id)
-        session_id = f"git-push-{uuid.uuid4().hex[:8]}"
-        await sandbox.process.create_session(session_id)
+        sandbox = await AsyncSandbox.connect(payload.sandbox_id)
         
         # Git commands sequence
         commands = [
@@ -211,18 +208,10 @@ async def push_to_github(
         ]
         
         for cmd in commands:
-            req = SessionExecuteRequest(
-                command=cmd,
-                var_async=False,
-                cwd="/workspace"
-            )
-            resp = await sandbox.process.execute_session_command(session_id, req)
+            resp = await sandbox.commands.run(cmd, cwd="/workspace")
             if resp.exit_code != 0 and cmd.startswith("git push"):
                 raise Exception(f"Failed to push code (exit {resp.exit_code})")
                 
-        # Clean up session
-        await sandbox.process.delete_session(session_id)
-        
     except Exception as e:
         logger.error(f"Failed to push to GitHub sandbox {payload.sandbox_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -321,12 +310,12 @@ async def get_sandbox_db_connection(sandbox_id: Optional[str]) -> Optional[Dict[
         return None
         
     try:
-        from core.sandbox.sandbox import daytona
-        sandbox = await daytona.get(sandbox_id)
+        from e2b_code_interpreter import AsyncSandbox
+        sandbox = await AsyncSandbox.connect(sandbox_id)
         env_paths = ["app/.env", "app/.env.local", ".env", ".env.local"]
         for path in env_paths:
             try:
-                content = await sandbox.filesystem.read_file(path)
+                content = await sandbox.filesystem.read(path)
                 if not content: continue
                 
                 # Parse .env (simple key=value)

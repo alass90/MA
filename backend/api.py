@@ -72,9 +72,9 @@ async def lifespan(app: FastAPI):
         from core.utils.tool_discovery import warm_up_tools_cache
         warm_up_tools_cache()
         
-        # Pre-load static Suna config for fast path in API requests
-        from core.runtime_cache import load_static_suna_config
-        load_static_suna_config()
+        # Pre-load static Talos config for fast path in API requests
+        from core.runtime_cache import load_static_talos_config
+        load_static_talos_config()
         
         core_api.initialize(
             db,
@@ -217,7 +217,7 @@ async def log_requests_middleware(request: Request, call_next):
         raise
 
 # Define allowed origins based on environment
-allowed_origins = ["https://www.kortix.com", "https://kortix.com", "https://www.suna.so", "https://suna.so"]
+allowed_origins = ["https://www.talos.com", "https://talos.com", "https://www.talos.so", "https://talos.so"]
 allow_origin_regex = None
 
 # Add staging-specific origins
@@ -227,10 +227,10 @@ if config.ENV_MODE == EnvMode.LOCAL:
 
 # Add staging-specific origins
 if config.ENV_MODE == EnvMode.STAGING:
-    allowed_origins.append("https://staging.suna.so")
+    allowed_origins.append("https://staging.talos.so")
     allowed_origins.append("http://localhost:3000")
     # Allow Vercel preview deployments for both legacy and new project names
-    allow_origin_regex = r"https://(suna|kortixcom)-.*-prjcts\.vercel\.app"
+    allow_origin_regex = r"https://(talos|taloscom)-.*-prjcts\.vercel\.app"
 
 app.add_middleware(
     CORSMiddleware,
